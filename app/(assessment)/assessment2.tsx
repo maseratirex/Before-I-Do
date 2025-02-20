@@ -1,7 +1,6 @@
 import { Text, View } from "react-native";
-import { Link } from "expo-router";
 
-export default function Index() {
+export default function Assessment2() {
   return (
     <View
       style={{
@@ -10,7 +9,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Link href="/assessment1">Begin assessment</Link>
+      <Text>Page 2 of assessment</Text>
     </View>
   );
 }
