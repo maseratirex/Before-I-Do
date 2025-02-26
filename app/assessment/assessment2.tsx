@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-export default function Assessment1() {
+export default function Assessment2Screen() {
   return (
     <View
       style={{
@@ -9,7 +9,7 @@ export default function Assessment1() {
         alignItems: "center",
       }}
     >
-      <Text>Page 1 of assessment</Text>
+      <Text>Page 2 of assessment</Text>
     </View>
   );
 }

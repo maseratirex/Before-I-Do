@@ -1,17 +1,8 @@
 import { View, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
-import { Link, useRouter } from "expo-router";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from '@/firebaseConfig'
 
-export default function Index() {
-  const router = useRouter();
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user || !user.emailVerified) {
-      router.replace('./login');
-    }
-  });
-
+export default function ProfileScreen() {
   return (
     <View
       style={{
@@ -20,7 +11,6 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Link href="/assessment1">Begin assessment</Link>
       <TouchableOpacity style={styles.button} onPress={() => { 
         signOut(auth).catch((error) => {
           Alert.alert('Sign Out Failed', error.message);
