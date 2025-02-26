@@ -10,34 +10,22 @@ export default function RootLayout() {
         name="(home)"
         options={{
           title: 'Home',
+          headerShown: false,
           headerStyle: {
             backgroundColor: '#77CDFF',
           },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Stack.Screen
         name="auth"
         options={{
             headerShown: false,
-        //   title: 'Home',
-        //   headerStyle: {
-        //     backgroundColor: '#77CDFF',
-        //   },
-        //   headerTintColor: '#fff',
-        //   headerTitleStyle: {
-        //     fontWeight: 'bold',
-        //   },
-        //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Stack.Screen
         name="(assessment)/directory"
         options={{
+          headerTintColor: '#697073',
           title: '',
         //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
@@ -46,6 +34,9 @@ export default function RootLayout() {
         name="(assessment)/assessment2"
         options={{
           title: 'Assessment',
+          headerStyle: {
+            backgroundColor: '#F4B9EE',
+          },
         //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />

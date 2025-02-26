@@ -32,29 +32,28 @@ export default function LoginScreen() {
 
     return (
         <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput
-            style={styles.input}
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            onChangeText={setEmail}
-            value={email}
-        />
-        <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            onChangeText={setPassword}
-            value={password}
-        />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Log In</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => { router.replace('./createAccount') }}>
-            <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-
+            <Text style={styles.title}>Login</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="Email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={setEmail}
+                value={email}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Password"
+                secureTextEntry
+                onChangeText={setPassword}
+                value={password}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                <Text style={styles.buttonText}>Log In</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => { router.push('./createAccount') }}>
+                <Text style={styles.buttonText}>Sign Up</Text>
+            </TouchableOpacity>
         </View>
     );
 };

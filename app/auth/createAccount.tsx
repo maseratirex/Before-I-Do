@@ -21,7 +21,7 @@ export default function CreateAccountScreen() {
         sendEmailVerification(userCredential.user)
           .then(() => {
             Alert.alert('Sent verification email')
-            router.replace('./login')
+            router.dismissTo('/auth/login')
           });
       })
       .catch((error) => {

@@ -5,11 +5,7 @@ import { auth } from '@/firebaseConfig'
 export default function ProfileScreen() {
   return (
     <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      style={styles.container}
     >
       <Text style={styles.title}>Pair with Partner</Text>
       <TouchableOpacity style={styles.button} onPress={() => { 
