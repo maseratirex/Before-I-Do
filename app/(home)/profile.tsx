@@ -11,6 +11,7 @@ export default function ProfileScreen() {
         alignItems: "center",
       }}
     >
+      <Text style={styles.title}>Pair with Partner</Text>
       <TouchableOpacity style={styles.button} onPress={() => { 
         signOut(auth).catch((error) => {
           Alert.alert('Sign Out Failed', error.message);

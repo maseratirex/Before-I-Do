@@ -9,7 +9,7 @@ export default function Assessment2Screen() {
         alignItems: "center",
       }}
     >
-      <Text>Page 2 of assessment</Text>
+      <Text>Section 1</Text>
     </View>
   );
 }

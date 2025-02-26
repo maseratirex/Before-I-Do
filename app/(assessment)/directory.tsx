@@ -1,17 +1,7 @@
-import { View, StyleSheet, Text } from "react-native";
-import { Link, useRouter } from "expo-router";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from '@/firebaseConfig'
+import { View, StyleSheet } from "react-native";
+import { Link } from "expo-router";
 
-export default function Index() {
-  const router = useRouter();
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user || !user.emailVerified) {
-      router.replace('/auth/login');
-    }
-  });
-
+export default function AssessmentDirectoryScreen() {
   return (
     <View
       style={{
@@ -20,9 +10,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Link href="/directory" style={styles.linkText}>Begin assessment</Link>
-
-      <Text style={styles.title}>Pair with Partner</Text>
+      <Link href="./assessment2" style={styles.linkText}>Go to section 1</Link>
     </View>
   );
 }

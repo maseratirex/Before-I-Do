@@ -36,7 +36,14 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
-        name="assessment"
+        name="(assessment)/directory"
+        options={{
+          title: '',
+        //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+        }}
+      />
+      <Stack.Screen
+        name="(assessment)/assessment2"
         options={{
           title: 'Assessment',
         //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
