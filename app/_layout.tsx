@@ -8,20 +8,20 @@ export default function RootLayout() {
         name="index"
         options={{
           title: 'Home',
+          headerStyle: {
+            backgroundColor: '#77CDFF',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
         //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Stack.Screen
-        name="login"
+        name="(auth)"
         options={{
-          title: 'Login',
-        //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Stack.Screen
-        name="createAccount"
-        options={{
-          title: 'Sign Up',
+          headerShown: false,
         //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />

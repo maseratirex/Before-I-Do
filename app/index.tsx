@@ -7,7 +7,7 @@ export default function Index() {
   const router = useRouter();
 
   onAuthStateChanged(auth, (user) => {
-    if (!user) {
+    if (!user || !user.emailVerified) {
       router.replace('./login');
     }
   });

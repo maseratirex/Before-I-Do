@@ -11,17 +11,22 @@ export default function LoginScreen() {
 
     const handleLogin = async () => {
         if (!email || !password) {
-            Alert.alert('Error', 'Please enter both email and password.');
+            Alert.alert('Error', 'Please enter both email and password');
             return;
         }
 
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                // Signed in 
-                router.replace('/');
+                if (userCredential.user.emailVerified) {
+                    // Signed in 
+                    router.replace('/');
+                } else {
+                    Alert.alert('Please verify your email or resend email verification');
+                }
             })
             .catch((error) => {
-                Alert.alert('Login Failed', error.message);
+                // TODO change alert based on error.code
+                Alert.alert('Incorrect email or password', error.message);
             });
     };
 

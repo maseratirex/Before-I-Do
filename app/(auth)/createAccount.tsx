@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { auth } from '@/firebaseConfig'
 
@@ -21,16 +21,8 @@ export default function CreateAccountScreen() {
         sendEmailVerification(userCredential.user)
           .then(() => {
             Alert.alert('Sent verification email')
+            router.replace('./login')
           });
-
-        // Wait until email verification
-        // TODO: does not work. How to observe emailVerified?
-        onAuthStateChanged(auth, (user) => {
-          if (user && user.emailVerified) {
-            console.log('Email verified')
-            router.replace('/');
-          }
-        });
       })
       .catch((error) => {
         if (error.code === 'auth/email-already-in-use') {
