@@ -31,7 +31,7 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
-        name="(assessment)/assessment2"
+        name="(assessment)/section/[name]"
         options={{
           title: 'Assessment',
           headerStyle: {

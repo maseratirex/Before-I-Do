@@ -14,14 +14,15 @@ export default function CreateAccountScreen() {
       Alert.alert('Error', 'Please enter both an email and password.');
       return;
     }
+    
     // Email verification sent!
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('Created user with email and password');
         sendEmailVerification(userCredential.user)
           .then(() => {
-            Alert.alert('Sent verification email')
-            router.dismissTo('/auth/login')
+            Alert.alert('Sent verification email');
+            router.dismissTo('/auth/login');
           });
       })
       .catch((error) => {

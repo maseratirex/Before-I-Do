@@ -2,6 +2,7 @@ import { View, StyleSheet } from "react-native";
 import { Link } from "expo-router";
 
 export default function AssessmentDirectoryScreen() {
+  const names = [ "Personality", "Family", "Couple", "Cultural" ];
   return (
     <View
       style={{
@@ -10,7 +11,11 @@ export default function AssessmentDirectoryScreen() {
         alignItems: "center",
       }}
     >
-      <Link href="./assessment2" style={styles.linkText}>Go to section 1</Link>
+      {
+        names.map((name) => (
+          <Link href={`./section/${name}`} key={name} style={styles.linkText}>Go to {name}</Link>
+        ))
+      }
     </View>
   );
 }
