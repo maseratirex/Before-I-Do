@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { useLocalSearchParams } from 'expo-router';
 import LikertScale from '@/components/LikertScale'
-import { questionnaire } from "./questionnaire";
+import { questionnaire } from "../../../components/questionnaire";
 
 type SectionName = 'personality' | 'family' | 'couple' | 'cultural';
 
