@@ -1,8 +1,8 @@
 import { initializeApp } from "firebase/app";
-// import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+import { getFunctions } from "firebase/functions";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,10 +18,12 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication and get a reference to the service
-// export const auth = getAuth(app);
 export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
+
+// Initialize Firebase Functions and get a reference to the service
+export const functions = getFunctions(app);

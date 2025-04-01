@@ -1,18 +1,45 @@
-import { View, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
-import { signOut } from "firebase/auth";
-import { auth } from '@/firebaseConfig'
+import { View, StyleSheet, TouchableOpacity, Text, Alert, TextInput } from "react-native";
+import { useState } from "react";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "@/firebaseConfig"; // Ensure this is correctly configured
 
 export default function ProfileScreen() {
+  const [email, setEmail] = useState("");
+
+  const sendEmail = async () => {
+    if (!email) {
+      Alert.alert("Error", "Please enter an email address.");
+      return;
+    }
+
+    try {
+      const sendEmailFunction = httpsCallable(functions, "sendEmail");
+      await sendEmailFunction({ email });
+      Alert.alert("Success", "Email sent successfully!");
+    } catch (error) {
+      Alert.alert("Profile found Errorss", error.message || "Failed to send email.");
+    }
+  };
+
   return (
-    <View
-      style={styles.container}
-    >
-      <Text style={styles.title}>Pair with Partner</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Enter Partner's Email</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter email address"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <TouchableOpacity style={styles.button} onPress={sendEmail}>
+        <Text style={styles.buttonText}>Send Email</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => { 
         signOut(auth).catch((error) => {
           Alert.alert('Sign Out Failed', error.message);
         });
-       }}>
+      }}>
         <Text style={styles.buttonText}>Sign Out</Text>
       </TouchableOpacity>
     </View>

@@ -19,8 +19,8 @@ export default function Index() {
         justifyContent: "center",
         alignItems: "center",
       }}
-    >
-      <Link href="/directory" style={styles.linkText}>Begin assessment</Link>
+    >      <Link href="/directory" style={styles.linkText}>Begin assessment</Link>
+
 
       <Text style={styles.title}>Pair with Partner</Text>
     </View>
