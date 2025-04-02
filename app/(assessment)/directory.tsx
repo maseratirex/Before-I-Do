@@ -1,9 +1,10 @@
 import { Text, View, StyleSheet } from "react-native";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import { useState, useEffect } from "react";
 import * as Progress from 'react-native-progress';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth } from "firebase/auth";
+import React from "react";
 
 export default function AssessmentDirectoryScreen() {
   const names = [ "Personality", "Family", "Couple", "Cultural" ];
@@ -11,6 +12,12 @@ export default function AssessmentDirectoryScreen() {
 
   const auth = getAuth();
   const userId = auth.currentUser ? auth.currentUser.uid : "guest";
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadProgress();
+    }, [])
+  );
 
   const loadProgress = async () => {
     const progress: any = {};
