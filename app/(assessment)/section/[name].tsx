@@ -13,8 +13,9 @@ type SectionName = 'personality' | 'family' | 'couple' | 'cultural';
 export default function Assessment2Screen() {
     const { name } = useLocalSearchParams<{ name: string }>();
     const section = name.toLowerCase() as SectionName;
-    const questions = questionnaire[section];
-    const [answers, setAnswers] = useState<string>("0".repeat(questions.length));
+    const subsections = questionnaire[section];
+    const questions = Object.values(subsections).flat();
+    const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(0));
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     const auth = getAuth();
@@ -24,13 +25,19 @@ export default function Assessment2Screen() {
     const loadAnswers = React.useCallback(async () => {
         try {
             const savedAnswers = await AsyncStorage.getItem(storageKey);
-            if (savedAnswers) setAnswers(JSON.parse(savedAnswers));
+            if (savedAnswers) {
+                const parsedAnswers = JSON.parse(savedAnswers);
+                const adjustedAnswers = Array(questions.length)
+                    .fill(0)
+                    .map((defaultValue, index) => parsedAnswers[index] ?? defaultValue); // Merge saved answers
+                setAnswers(adjustedAnswers);
+            }
         } catch (error) {
             console.error("Error loading saved answers:", error);
         } finally {
             setIsLoaded(true);
         }
-    }, [section]);
+    }, [section, questions.length]);
 
     const saveAnswers = React.useCallback(async () => {
         try {
@@ -62,7 +69,7 @@ export default function Assessment2Screen() {
     ? (() => {
           let completedCount = 0;
           for (let i = 0; i < answers.length; i++) {
-              if (answers[i] !== "0") {
+              if (answers[i] !== 0) {
                   completedCount++;
               }
           }
@@ -79,8 +86,6 @@ export default function Assessment2Screen() {
                 alignItems: "center",
             }}
         >
-            <Text>Section {name}</Text>
-            <Text>{answers}</Text>
             {isLoaded && (
                 <>
                     <Progress.Bar
@@ -93,10 +98,10 @@ export default function Assessment2Screen() {
                         borderRadius={5}
                         style={{ marginVertical: 20 }}
                     />
-                    <Text>{Math.round(progress * 100)}% Completed</Text>
+                    <Text>{Math.round(progress * 100)}%</Text>
                 </>
             )}
-            <LikertScale questions={questions} answers={answers} setAnswers={setAnswers}/>
+            <LikertScale subsections={subsections} answers={answers} setAnswers={setAnswers}/>
         </View>
     );
 }

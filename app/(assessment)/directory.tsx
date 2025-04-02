@@ -29,7 +29,7 @@ export default function AssessmentDirectoryScreen() {
           const answers = JSON.parse(savedAnswers);
           let completedCount = 0;
           for (let i = 0; i < answers.length; i++) {
-              if (answers[i] !== "0") {
+              if (answers[i] !== 0) {
                   completedCount++;
               }
           }
