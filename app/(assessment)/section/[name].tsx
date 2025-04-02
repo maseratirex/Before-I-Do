@@ -5,6 +5,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LikertScale from '@/components/LikertScale'
 import { questionnaire } from "../../../components/questionnaire";
+import { getAuth } from "firebase/auth";
 
 type SectionName = 'personality' | 'family' | 'couple' | 'cultural';
 
@@ -14,9 +15,13 @@ export default function Assessment2Screen() {
     const questions = questionnaire[section];
     const [answers, setAnswers] = useState<string>("0".repeat(questions.length));
 
+    const auth = getAuth();
+    const userId = auth.currentUser ? auth.currentUser.uid : 'guest';
+    const storageKey = `answers-${userId}-${section}`;
+
     const loadAnswers = React.useCallback(async () => {
         try {
-            const savedAnswers = await AsyncStorage.getItem(`answers-${section}`);
+            const savedAnswers = await AsyncStorage.getItem(storageKey);
             if (savedAnswers) setAnswers(JSON.parse(savedAnswers));
         } catch (error) {
             console.error("Error loading saved answers:", error);
@@ -25,7 +30,7 @@ export default function Assessment2Screen() {
 
     const saveAnswers = React.useCallback(async () => {
         try {
-            await AsyncStorage.setItem(`answers-${section}`, JSON.stringify(answers));
+            await AsyncStorage.setItem(storageKey, JSON.stringify(answers));
         } catch (error) {
             console.error("Failed to save answers:", error);
         }
