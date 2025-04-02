@@ -3,6 +3,7 @@ import { AppState, Text, View } from "react-native";
 import { useLocalSearchParams } from 'expo-router';
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Progress from 'react-native-progress';
 import LikertScale from '@/components/LikertScale'
 import { questionnaire } from "../../../components/questionnaire";
 import { getAuth } from "firebase/auth";
@@ -14,6 +15,7 @@ export default function Assessment2Screen() {
     const section = name.toLowerCase() as SectionName;
     const questions = questionnaire[section];
     const [answers, setAnswers] = useState<string>("0".repeat(questions.length));
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     const auth = getAuth();
     const userId = auth.currentUser ? auth.currentUser.uid : 'guest';
@@ -25,6 +27,8 @@ export default function Assessment2Screen() {
             if (savedAnswers) setAnswers(JSON.parse(savedAnswers));
         } catch (error) {
             console.error("Error loading saved answers:", error);
+        } finally {
+            setIsLoaded(true);
         }
     }, [section]);
 
@@ -54,6 +58,19 @@ export default function Assessment2Screen() {
         }, [saveAnswers])
     );
 
+    const progress = isLoaded
+    ? (() => {
+          let completedCount = 0;
+          for (let i = 0; i < answers.length; i++) {
+              if (answers[i] !== "0") {
+                  completedCount++;
+              }
+          }
+          return completedCount / questions.length;
+      })()
+    : 0;
+
+
     return (
         <View
             style={{
@@ -64,6 +81,21 @@ export default function Assessment2Screen() {
         >
             <Text>Section {name}</Text>
             <Text>{answers}</Text>
+            {isLoaded && (
+                <>
+                    <Progress.Bar
+                        progress={progress}
+                        width={300}
+                        height={10}
+                        color="purple"
+                        unfilledColor="lightgray"
+                        borderWidth={0}
+                        borderRadius={5}
+                        style={{ marginVertical: 20 }}
+                    />
+                    <Text>{Math.round(progress * 100)}% Completed</Text>
+                </>
+            )}
             <LikertScale questions={questions} answers={answers} setAnswers={setAnswers}/>
         </View>
     );
