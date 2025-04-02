@@ -10,13 +10,10 @@ const labels = [
   "Strongly agree",
 ];
 
-const LikertScale = ({ questions, answers: initialAnswers }) => {
-  const [answers, setAnswers] = useState(initialAnswers.split(""));
-
+const LikertScale = ({ questions, answers, setAnswers }) => {
   useEffect(() => {
-    // Ensure state updates properly if initialAnswers changes
-    setAnswers(initialAnswers.padEnd(questions.length, "0").split(""));
-  }, [initialAnswers, questions.length]);
+    setAnswers(answers);
+  }, [answers, setAnswers]);
 
   const handlePress = (questionIndex, value) => {
     const updatedAnswers = [...answers]; // Copy array
@@ -47,7 +44,7 @@ const LikertScale = ({ questions, answers: initialAnswers }) => {
           </View>
         </View>
       ))}
-      <Text style={styles.answerText}>Answers: {answers.join("")}</Text>
+      <Text style={styles.answerText}>Answers: {answers}</Text>
     </ScrollView>
   );
 };
