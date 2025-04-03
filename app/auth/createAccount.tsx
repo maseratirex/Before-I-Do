@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'expo-router';
-import { auth } from '@/firebaseConfig'
+import { auth, db } from '@/firebaseConfig';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function CreateAccountScreen() {
   const [email, setEmail] = useState('');
@@ -19,6 +20,26 @@ export default function CreateAccountScreen() {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('Created user with email and password');
+
+        //add user to firestore
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            const userRef = doc(db, "users", user.uid);
+            await setDoc(userRef, {
+              email: email,
+              isPaired: false,
+              partner: null,
+              personalityDynamics: null,
+              familyDynamics: null,
+              coupleDynamics: null,
+              cultureDynamics: null,
+          });
+        }
+        else {
+            throw new Error("User not authenticated");
+        }
+        });
+
         sendEmailVerification(userCredential.user)
           .then(() => {
             Alert.alert('Sent verification email');
