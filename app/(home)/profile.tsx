@@ -1,18 +1,88 @@
-import { View, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
-import { signOut } from "firebase/auth";
-import { auth } from '@/firebaseConfig'
+import { View, StyleSheet, TouchableOpacity, Text, Alert, TextInput } from "react-native";
+import { useState } from "react";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "@/firebaseConfig"; // Ensure this is correctly configured
+import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 
 export default function ProfileScreen() {
+  const [email, setEmail] = useState("");
+
+  const sendEmail = async () => {
+    if (!email) {
+      Alert.alert("Error", "Please enter an email address.");
+      return;
+    }
+
+    try {
+      const sendPairRequestFunction = httpsCallable(functions, "pairRequest");
+      const auth = getAuth();
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          console.log("user signed in", user.email);
+          const myParams = {
+            email: email,
+            user: user.uid,
+          }
+          const result = await sendPairRequestFunction(myParams);
+          console.log("Pair Requests:", result);
+          console.log("INFO:", JSON.stringify(result));
+        }
+      });
+      
+      Alert.alert("Success", "Email sent successfully!");
+    } catch (error) {
+      console.log("Error checking pair requests:", error);
+      Alert.alert("Profile found Errorss", error.message || "Failed to send email.");
+    }
+  };
+
+  const seePairRequests = async () => {
+    try {
+      const checkPairRequestFunction = httpsCallable(functions, "checkPairRequest");
+      const auth = getAuth();
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          console.log("user signed in", user.email);
+          const myParams = {
+            user: user.uid,
+          }
+          const result = await checkPairRequestFunction(myParams);
+          console.log("Pair Requests:", result);
+          console.log("INFO:", JSON.stringify(result));
+          Alert.alert("Success", "Email sent successfully!" + JSON.stringify(result));
+        }
+      });
+      //const result = await checkPairRequestFunction({ user: user.uid});
+      //console.log("Pair Requests:", result);
+    } catch (error) {
+      console.log("Error checking pair requests:", error);
+      Alert.alert("Profile found Errorss", error.message || "Failed to send email.");
+    }
+  }
+
   return (
-    <View
-      style={styles.container}
-    >
-      <Text style={styles.title}>Pair with Partner</Text>
-      <TouchableOpacity style={styles.button} onPress={() => { 
+    <View style={styles.container}>
+      <Text style={styles.title}>Enter Partner's Email</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter email address"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <TouchableOpacity style={styles.button} onPress={sendEmail}>
+        <Text style={styles.buttonText}>Send Email</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={seePairRequests}>
+        <Text style={styles.buttonText}>See Requests</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => {
+        const auth = getAuth(); 
         signOut(auth).catch((error) => {
           Alert.alert('Sign Out Failed', error.message);
         });
-       }}>
+      }}>
         <Text style={styles.buttonText}>Sign Out</Text>
       </TouchableOpacity>
     </View>
