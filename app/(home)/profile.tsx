@@ -32,7 +32,7 @@ export default function ProfileScreen() {
       Alert.alert("Success", "Email sent successfully!");
     } catch (error) {
       console.log("Error checking pair requests:", error);
-      Alert.alert("Profile found Errorss", error.message || "Failed to send email.");
+      Alert.alert("Profile found Errors", error.message || "Failed to send email.");
     }
   };
 
