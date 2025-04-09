@@ -1,67 +1,66 @@
 import { Tabs } from "expo-router";
-import { Platform } from 'react-native';
+import { Platform, StyleSheet, View  } from 'react-native';
+import Icon from "react-native-vector-icons/MaterialIcons"; 
+import { LinearGradient } from "expo-linear-gradient";
+
+const styles = StyleSheet.create({
+  tabBar: {
+    position: "absolute",
+    bottom: 50,
+    marginLeft: "10%",
+    width: "80%", 
+    height: 70, 
+    borderRadius: 16,
+    backgroundColor: "white",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  tabBarItemStyle: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%",
+    flexDirection: "column",
+    paddingBottom: 5,
+  },
+  tabBarIconStyle: {
+    marginBottom: 2,
+  },
+});
 
 export default function HomeLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        // tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        // tabBarButton: HapticTab,
-        // tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-        //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-        //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-    </Tabs>
-
-    // <Stack>
-    //   <Stack.Screen
-    //     name="index"
-    //     options={{
-    //       title: 'Home',
-    //       headerStyle: {
-    //         backgroundColor: '#77CDFF',
-    //       },
-    //       headerTintColor: '#fff',
-    //       headerTitleStyle: {
-    //         fontWeight: 'bold',
-    //       },
-    //     //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-    //     }}
-    //   />
-    //   <Stack.Screen
-    //     name="(auth)"
-    //     options={{
-    //       headerShown: false,
-    //     //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-    //     }}
-    //   />
-    //   <Stack.Screen
-    //     name="(assessment)"
-    //     options={{
-    //       title: 'Assessment',
-    //     //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-    //     }}
-    //   />
-    // </Stack>
+    <View style={{ flex: 1 }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: styles.tabBar,
+          tabBarItemStyle: styles.tabBarItemStyle,
+        }}>
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color }) => (
+              <Icon name="home" size={40} color={color} style={styles.tabBarIconStyle} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color }) => (
+              <Icon name="person" size={40} color={color} style={styles.tabBarIconStyle} />
+            ),
+          }}
+        />
+      </Tabs>
+    </View>
   );
 }
