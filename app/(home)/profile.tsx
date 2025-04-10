@@ -16,23 +16,17 @@ export default function ProfileScreen() {
     try {
       const sendPairRequestFunction = httpsCallable(functions, "pairRequest");
       const auth = getAuth();
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          console.log("user signed in", user.email);
-          const myParams = {
-            email: email,
-            user: user.uid,
-          }
-          const result = await sendPairRequestFunction(myParams);
-          console.log("Pair Requests:", result);
-          console.log("INFO:", JSON.stringify(result));
-        }
-      });
-      
-      Alert.alert("Success", "Email sent successfully!");
+      console.log("user signed in", auth.currentUser?.email);
+      const myParams = {
+        email: email,
+        user: auth.currentUser?.uid,
+      }
+      const result = await sendPairRequestFunction(myParams);
+      console.log("send request info:", JSON.stringify(result));
+      Alert.alert("Success", JSON.stringify(result));
     } catch (error) {
       console.log("Error checking pair requests:", error);
-      Alert.alert("Profile found Errorss", error.message || "Failed to send email.");
+      Alert.alert("Profile found Errors", error.message || "Failed to send email.");
     }
   };
 
@@ -40,23 +34,18 @@ export default function ProfileScreen() {
     try {
       const checkPairRequestFunction = httpsCallable(functions, "checkPairRequest");
       const auth = getAuth();
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          console.log("user signed in", user.email);
-          const myParams = {
-            user: user.uid,
-          }
-          const result = await checkPairRequestFunction(myParams);
-          console.log("Pair Requests:", result);
-          console.log("INFO:", JSON.stringify(result));
-          Alert.alert("Success", "Email sent successfully!" + JSON.stringify(result));
-        }
-      });
+      const myParams = {
+        user: auth.currentUser?.uid,
+      }
+      const result = await checkPairRequestFunction(myParams);
+      console.log("get request info:", JSON.stringify(result));
+      Alert.alert("Success", JSON.stringify(result));
+      
       //const result = await checkPairRequestFunction({ user: user.uid});
       //console.log("Pair Requests:", result);
     } catch (error) {
       console.log("Error checking pair requests:", error);
-      Alert.alert("Profile found Errorss", error.message || "Failed to send email.");
+      Alert.alert("Profile found Errors", error.message || "Failed to send email.");
     }
   }
 
