@@ -1,7 +1,7 @@
 import { View, StyleSheet, TouchableOpacity, Text, Alert, TextInput } from "react-native";
 import { useState } from "react";
 import { httpsCallable } from "firebase/functions";
-import { functions } from "@/firebaseConfig"; // Ensure this is correctly configured
+import { functions } from "@/firebaseConfig";
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 
 export default function ProfileScreen() {
