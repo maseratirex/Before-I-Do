@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text, Button, TouchableOpacity, Alert, FlatList, TextInput } from "react-native";
 import { Link, useRouter } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from '@/firebaseConfig'
 import { functions } from "@/firebaseConfig";
@@ -26,6 +26,7 @@ export default function Index() {
       ])
     )
   );
+  const [acceptPartner, setAcceptPartner] = useState(""); // Replace the var declaration with useState
   var sentRequest = "";
 
   onAuthStateChanged(auth, (user) => {
@@ -69,17 +70,18 @@ export default function Index() {
       const auth = getAuth();
       const myParams = {
         user: auth.currentUser?.uid,
-      }
+      };
+
       const result = await checkPairRequestFunction(myParams);
       const data = result.data as { success: boolean; message?: string; emails?: string[]; timestamps?: string[] };
       if (data.success) {
         pairRequestsArray = data.emails || [];
         pairRequestTimesArray = data.timestamps || [];
-      }
-      else {
+      } else {
         pairRequestsArray = [];
         pairRequestTimesArray = [];
       }
+
       for (let i = 0; i < pairRequestsArray.length; i++) {
         const pairRequest = {
           id: i,
@@ -89,24 +91,28 @@ export default function Index() {
         };
         setPairRequests((prev) => new Map(prev).set(i, pairRequest));
       }
+      return pairRequestsArray;
     } catch (error) {
-      console.log("Error checking pair requests:", error);
+      console.error("seePairRequests: Error occurred:", error);
     }
   }
 
-  const acceptPairRequest = async (email: string) => {
+  const acceptPairRequest = async () => {
     try {
+      if (acceptPartner == "") {
+        return Alert.alert("Error", "Please select a partner to accept.");
+      }
       const confirmPairRequestFunction = httpsCallable(functions, "confirmPairing");
       const auth = getAuth();
       const myParams = {
-        email: email,
+        email: acceptPartner,
         user: auth.currentUser?.uid,
       }
       const result = await confirmPairRequestFunction(myParams);
       const data = result.data as { success: boolean; message?: string };
       if (data.success) {
-        Alert.alert("Success", "Successfully confirmed pair request with " + email + ".");
-        console.log("Successfully paired with " + email + ".");
+        Alert.alert("Success", "Successfully confirmed pair request with " + acceptPartner + ".");
+        console.log("Successfully paired with " + acceptPartner + ".");
       }
       else {
         Alert.alert("Error", "Failed to confirm pair request: " + data.message);
@@ -116,13 +122,41 @@ export default function Index() {
       console.log("Error confirming pair requests:", error);
     }
   }
+  
+  // Check pair requests once when the page loads
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && user.emailVerified) {
+        seePairRequests();
+      } else {
+        console.log("User is not authenticated or email not verified.");
+        router.replace('/auth/login');
+      }
+    });
 
-  //seePairRequests();
+    return () => unsubscribe(); // Cleanup the listener on unmount
+  }, []);
 
   const renderPairRequest = ({ item }: { item: { id: number; email: string; timestamp: string; isDesired: boolean } }) => {
+    const toggleIsDesired = (id: number) => {
+      setPairRequests((prev) => {
+        const updatedMap = new Map(prev);
+        updatedMap.forEach((value, key) => {
+          updatedMap.set(key, { ...value, isDesired: key === id ? !value.isDesired : false });
+        });
+        return updatedMap;
+      });
+
+      // Update acceptPartner based on the toggled item's isDesired state
+      setAcceptPartner((prev) => (item.isDesired ? "" : item.email));
+    };
+
     return (
       <View style={styles.smallContainer}>
         <Text style={styles.emailText}>{item.email + " at " + item.timestamp}</Text>
+        <TouchableOpacity style={styles.button} onPress={() => toggleIsDesired(item.id)}>
+          <Text style={styles.buttonText}>{item.isDesired ? "Unselect" : "Select"}</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -139,6 +173,9 @@ export default function Index() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderPairRequest}
       />
+      <TouchableOpacity style={styles.button} onPress={acceptPairRequest}>
+        <Text style={styles.buttonText}>{"Accept Pair Request from " + acceptPartner}</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Enter Partner's Email</Text>
       <TextInput
         style={styles.input}
