@@ -1,5 +1,5 @@
-import { View, StyleSheet, Text } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { View, StyleSheet, Pressable, Text } from "react-native";
+import { useRouter } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from '@/firebaseConfig'
 
@@ -18,11 +18,10 @@ export default function Index() {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-      }}
-    >      <Link href="/directory" style={styles.linkText}>Begin assessment</Link>
-
-
-      <Text style={styles.title}>Pair with Partner</Text>
+      }}>
+      <Pressable style={styles.button} onPress={() => router.push("/directory")}>
+        <Text style={styles.buttonText}>Begin assessment</Text>
+      </Pressable>
     </View>
   );
 }

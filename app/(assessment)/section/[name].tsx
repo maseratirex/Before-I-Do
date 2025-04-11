@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { AppState, Text, View } from "react-native";
-import { useLocalSearchParams } from 'expo-router';
+import { Pressable, AppState, Text, View, ScrollView } from "react-native";
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Progress from 'react-native-progress';
@@ -12,9 +12,10 @@ type SectionName = 'personality' | 'family' | 'couple' | 'cultural';
 
 export default function Assessment2Screen() {
     const { name } = useLocalSearchParams<{ name: string }>();
+    const router = useRouter();
     const section = name.toLowerCase() as SectionName;
     const subsections = questionnaire[section];
-    const questions = Object.values(subsections).flat();
+    const questions = subsections ? Object.values(subsections).flat() : [];
     const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(0));
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
@@ -77,31 +78,43 @@ export default function Assessment2Screen() {
       })()
     : 0;
 
+    if (!subsections) {
+        return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Invalid section: "{section}"</Text>
+          </View>
+        );
+      }
 
     return (
-        <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-        >
-            {isLoaded && (
-                <>
-                    <Progress.Bar
-                        progress={progress}
-                        width={300}
-                        height={10}
-                        color="purple"
-                        unfilledColor="lightgray"
-                        borderWidth={0}
-                        borderRadius={5}
-                        style={{ marginVertical: 20 }}
-                    />
-                    <Text>{Math.round(progress * 100)}%</Text>
-                </>
-            )}
-            <LikertScale subsections={subsections} answers={answers} setAnswers={setAnswers}/>
-        </View>
+            isLoaded ? (
+                <View style={{flex: 1, alignItems: "center"}}>
+                    <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+                        <LikertScale subsections={subsections} answers={answers} setAnswers={setAnswers} />
+                        <Pressable onPress={() => router.back()}>
+                            <Text>Complete</Text>
+                        </Pressable>
+                    </ScrollView>
+                    <View>
+                        <Text>{Math.round(progress * 100)}%</Text>
+                        <Progress.Bar progress={progress}
+                            width={300}
+                            height={10}
+                            color="purple"
+                            unfilledColor="lightgray"
+                            borderWidth={0}
+                            borderRadius={5}
+                            style={{ marginVertical: 20 }} />
+                    </View>
+                </View>
+            ) : (
+                <View style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                    <Text>Loading...</Text>
+                </View>
+            )
     );
 }
