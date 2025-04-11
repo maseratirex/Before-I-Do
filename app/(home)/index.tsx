@@ -117,7 +117,7 @@ export default function Index() {
     }
   }
 
-  seePairRequests();
+  //seePairRequests();
 
   const renderPairRequest = ({ item }: { item: { id: number; email: string; timestamp: string; isDesired: boolean } }) => {
     return (
