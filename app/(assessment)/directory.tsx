@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 15,
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '500',
     alignSelf: 'flex-start'
     }, 
     submitButton: {
