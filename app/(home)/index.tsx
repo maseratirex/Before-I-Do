@@ -73,7 +73,7 @@ export default function Index() {
       };
 
       const result = await checkPairRequestFunction(myParams);
-      const data = result.data as { success: boolean; message?: string; emails?: string[]; timestamps?: string[] };
+      const data = result.data as { success: boolean; message?: string; emails?: string[]; timestamps?: any[] };
       if (data.success) {
         pairRequestsArray = data.emails || [];
         pairRequestTimesArray = data.timestamps || [];

@@ -50,18 +50,6 @@ export const pairRequest = onCall(async (request) => {
       return { success: false, message: "Sender does not exist." };
     }
 
-    // Check if the recipient is already paired
-    const recipientRef = admin.firestore().collection("users").doc(partnerRef.id);
-    const recipientDoc = await recipientRef.get();
-    if (recipientDoc.exists) {
-      const recipientData = recipientDoc.data();
-      if (recipientData && recipientData.isPaired) {
-        return { success: false, message: "Recipient is already paired with someone." };
-      }
-    } else {
-      return { success: false, message: "Recipient does not exist." };
-    }
-
     // Check if the sender and recipient are the same
     if (senderId === partnerRef.id) {
       return { success: false, message: "You cannot send a request to yourself." };
@@ -74,13 +62,12 @@ export const pairRequest = onCall(async (request) => {
       pairStatus: "pending",
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
-    return { success: true, message: val.id };
+    return { success: true, message: "Request has been sent with ID: " + val.id };
   }
   else {
     return { success: false, message: "User does not exist" };
   }
 });
-
 
 export const checkPairRequest = onCall(async (request) => {
   // Get parameters from request
@@ -115,18 +102,17 @@ export const checkPairRequest = onCall(async (request) => {
           }
         } 
       } else {
-        return {success: false, message: "Sender does not exist:" + senderId};
+        return {success: false, message: "Sender does not exist: " + senderId};
       }
     }
   }
   
   if (senderEmails.length > 0) {
-    return { success: true, emails: senderEmails, timestamps: requestTimeStamps };
+    return { success: true, emails: senderEmails, timestamps: requestTimeStamps, message: "Pending pair requests found." };
   } else {
-    return { success: false, message: "No pending pair requests." };
+    return { success: true, emails: senderEmails, timestamps: requestTimeStamps, message: "No pending pair requests." };
   }
 });
-
 
 export const confirmPairing = onCall(async (request) => {
   // Get parameters from request
@@ -148,26 +134,7 @@ export const confirmPairing = onCall(async (request) => {
     // Get just the one user document
     const partnerRef = partnerSnapshot.docs[0];
     const partnerId = partnerRef.id;
-
-    // REJECT ALL OTHER PAIRING REQUESTS
-    // Find all pending requests associated with the current user as specified by userId
-    const allRequestsSnapshot = await admin.firestore().collection('requests')
-    .where('recipientId', '==', userId).where('pairStatus', '==', 'pending')
-    .get();
-    if (!allRequestsSnapshot.empty) {
-      for (const doc of allRequestsSnapshot.docs) {
-        // Get the senderId from the document data from each request
-        const senderId = doc.data().senderId;
-
-        // Check if the senderId is not equal to the partnerId
-        if (senderId !== partnerId) {
-          // Update the pairStatus to "rejected"
-          await doc.ref.update({ pairStatus: "rejected" });
-        }
-      } 
-    }
     
-    // CONFIRM PAIRNING
     // Confirm the pair request exists
     const requestSnapshot = await admin.firestore().collection("requests").where("recipientId", "==", userId).where("senderId", "==", partnerId).where("pairStatus", "==", "pending").get();
     if (!requestSnapshot.empty) {
@@ -205,23 +172,143 @@ export const confirmPairing = onCall(async (request) => {
   }
 });
 
-
 export const cancelPairingRequest = onCall(async (request) => {
   // Get parameters from request
   const userId = request.data.user;
 
   // Get all sent pair requests
   const pendingSentRequestsSnapshot = await admin.firestore().collection('requests')
-  .where('senderId', '==', userId).where('pairStatus', '==', 'pending')
-  .get();
+  .where('senderId', '==', userId).where('pairStatus', '!=', 'confirmed').get();
   if (!pendingSentRequestsSnapshot.empty) {
     for (const doc of pendingSentRequestsSnapshot.docs) {
-      await doc.ref.update({ pairStatus: "canceled" });
+      await doc.ref.delete();
     }
     return { success: true, message: "All sent pair requests have been canceled" };
   }
   return { success: false, message: "No sent pair requests to cancel" };
 });
 
+export const seePairStatus = onCall(async (request) => {
+  // Get parameters from request
+  const userId = request.data.user;
 
-// TODO: add function to unpair currently paired users
+  // Check if the user is paired
+  const userDoc = await admin.firestore().collection("users").doc(userId).get();
+  if (userDoc.exists) {
+    const userData = userDoc.data();
+    if (userData && userData.isPaired) {
+      // User is paired, return the partnerId
+      const partnerId = userData.partner;
+      const partnerDoc = await admin.firestore().collection("users").doc(partnerId).get();
+      if (partnerDoc.exists) {
+        const partnerData = partnerDoc.data();
+        if (partnerData && partnerData.email) {
+          return { success: true, type: "paired", partner: partnerData.email, message: "You are paired with " + partnerData.email };
+        }
+      }
+      return { success: false, message: "Partner does not exist" };
+    }
+  }
+  // Find requests associated with the current user as specified by userId
+  const querySnapshot = await admin.firestore().collection('requests')
+      .where('senderId', '==', userId).where('pairStatus', '==', 'pending')
+      .get();
+
+  if (!querySnapshot.empty) {
+    const partnerDoc = await admin.firestore().collection("users").doc(querySnapshot.docs[0].recipientId).get();
+    if (partnerDoc.exists) {
+      return { success: true, type: "requested", partnerRequest: partnerDoc.data().email, message: "You have sent a pending pair request to " + partnerDoc.data().email};
+    }
+    else {
+      return { success: false, message: "Partner does not exist" };
+    }
+  }
+  else {
+    return { success: true, type: "not requested", message: "No pair requests exist" };
+  }
+});
+
+export const unpair = onCall(async (request) => {
+  // Get parameters from request
+  const userId = request.data.user;
+  
+  var partnerId = "";
+  
+  // Confirm that the user is paired
+  const userDoc = await admin.firestore().collection("users").doc(userId).get();
+  if (userDoc.exists) {
+    const userData = userDoc.data();
+    if (userData && userData.isPaired) {
+      // User is paired, return the partnerId
+      partnerId = userData.partner;
+    }
+    else {
+      return { success: false, message: "You are not paired with anyone" };
+    }
+  }
+  else {
+    return { success: false, message: "User does not exist" };
+  }
+  
+  // change pair request to pending
+  const requestSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).where('senderId', '==', partnerId).get();
+  if (!requestSnapshot.empty) {
+    const requestDoc = requestSnapshot.docs[0];
+    await requestDoc.ref.update({ pairStatus: "pending" });
+  }
+  else {
+    const requestSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', partnerId).where('senderId', '==', userId).get();
+    if (!requestSnapshot.empty) {
+      const requestDoc = requestSnapshot.docs[0];
+      await requestDoc.ref.update({ pairStatus: "pending" });
+    }
+    else {
+      return { success: false, message: "Pair request does not exist" };
+    }
+  }
+  
+  // update both users to unpaired state
+  const partnerRef = await admin.firestore().collection("users").doc(partnerId);
+  const userRef = await admin.firestore().collection("users").doc(userId);
+  await partnerRef.update({ isPaired: false, partner: null });
+  await userRef.update({ isPaired: false, partner: null });
+  return { success: true, message: "Users have been unpaired" };
+});
+
+export const seePartnerResponses = onCall(async (request) => {
+  // Get parameters from request
+  const userId = request.data.user;
+  
+  var partnerId = "";
+
+  // Confirm that the user is paired
+  const userDoc = await admin.firestore().collection("users").doc(userId).get();
+  if (userDoc.exists) {
+    const userData = userDoc.data();
+    if (userData && userData.isPaired) {
+      // User is paired, return the partnerId
+      partnerId = userData.partner;
+    }
+    else {
+      return { success: false, message: "You are not paired with anyone" };
+    }
+  }
+  else {
+    return { success: false, message: "User does not exist" };
+  }
+
+  // Get the partner's questionnaire responses
+  const partnerDoc = await admin.firestore().collection("users").doc(partnerId).get();
+  if (partnerDoc.exists) {
+    const partnerData = partnerDoc.data();
+    if (partnerData && partnerData.coupleDynamics && partnerData.cultureDynamics && partnerData.familyDynamics && partnerData.personalityDynamics) {
+      return { success: true, responses: {coupleResponses: partnerData.coupleDynamics, cultureResponses: partnerData.cultureDynamics, familyResponses: partnerData.familyDynamics, personalityResponses: partnerData.personalityDynamics}, message: "Partner's questionnaire responses retrieved" };
+    }
+    else {
+      return { success: false, message: "Partner's questionnaire responses not found" };
+    }
+  }
+  else {
+    return { success: false, message: "Partner does not exist" };
+  }
+});
