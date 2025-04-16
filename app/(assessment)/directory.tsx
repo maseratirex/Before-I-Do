@@ -1,10 +1,12 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
 import { useState, useEffect } from "react";
 import * as Progress from 'react-native-progress';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth } from "firebase/auth";
 import React from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from 'expo-router';
 
 export default function AssessmentDirectoryScreen() {
   const names = [ "Personality", "Family", "Couple", "Cultural" ];
@@ -12,6 +14,11 @@ export default function AssessmentDirectoryScreen() {
 
   const auth = getAuth();
   const userId = auth.currentUser ? auth.currentUser.uid : "guest";
+  const router = useRouter();
+  const allSectionsComplete = () => {
+    return names.every((name) => progressData[name] === 1);
+  };
+  
 
   useFocusEffect(
     React.useCallback(() => {
@@ -49,18 +56,19 @@ export default function AssessmentDirectoryScreen() {
   }, [userId]);
   
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.container}>
       {names.map((name) => (
-        <View key={name} style={styles.sectionContainer}>
-          <Link href={`./section/${name}`} style={styles.linkText}>{name}</Link>
-
+        <TouchableOpacity key={name} style={styles.sectionContainer} onPress={() => router.push(`./section/${name}`)}
+        activeOpacity={0.7}>
+          {/* <Link href={`./section/${name}`} style={styles.linkText}>{name}</Link> */}
+          <Text style={styles.title}>{name} Dynamics</Text>
           {progressData[name] !== undefined && (
             <View style={styles.progressContainer}>
               <Progress.Bar
                 progress={progressData[name]}
-                width={200}
-                height={10}
-                color="purple"
+                width={260}
+                height={6}
+                color="#5856ce"
                 unfilledColor="lightgray"
                 borderWidth={0}
                 borderRadius={5}
@@ -68,23 +76,43 @@ export default function AssessmentDirectoryScreen() {
               <Text style={styles.progressText}>{Math.round(progressData[name] * 100)}%</Text>
             </View>
           )}
-        </View>
+        </TouchableOpacity>
       ))}
-    </View>
+      
+      {allSectionsComplete() && (
+        <TouchableOpacity style={styles.submitButton} onPress={() => console.log("Submitted!")}>
+          <Text style={styles.submitText}>Submit</Text>
+        </TouchableOpacity>
+      )}
+
+    
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 20,
+    paddingTop: 50,
     backgroundColor: '#fff',
+    
   },
   sectionContainer: {
     marginBottom: 20,
     alignItems: 'center',
+    padding: 15,
+    borderColor: '#fff',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 6,
+    width: '90%',
   },
   linkText: {
     color: '#007bff',
@@ -94,8 +122,9 @@ const styles = StyleSheet.create({
   progressContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: 220,
+    justifyContent: 'flex-start',
+    width: '100%',
+    marginBottom: 10,
   },
   progressTextContainer: {
     flex: 1,
@@ -106,4 +135,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#555',
   },
+  title: {
+    marginTop: 15,
+    marginBottom: 15,
+    fontSize: 20,
+    fontWeight: '500',
+    alignSelf: 'flex-start'
+    }, 
+    submitButton: {
+      backgroundColor: '#fff',
+      paddingVertical: 12,
+      paddingHorizontal: 30,
+      borderRadius: 30,
+      marginTop: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+    
+    submitText: {
+      color: '#5856ce',
+      fontWeight: 'bold',
+      fontSize: 16,
+      textAlign: 'center',
+    },
+    
 });
