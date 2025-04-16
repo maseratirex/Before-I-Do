@@ -1,5 +1,6 @@
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import { Link, useFocusEffect } from "expo-router";
+import { useFocusEffect } from "expo-router";
+import { useHeaderHeight } from '@react-navigation/elements';
 import { useState, useEffect } from "react";
 import * as Progress from 'react-native-progress';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,6 +20,7 @@ export default function AssessmentDirectoryScreen() {
     return names.every((name) => progressData[name] === 1);
   };
   
+  const headerHeight = useHeaderHeight();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -56,7 +58,7 @@ export default function AssessmentDirectoryScreen() {
   }, [userId]);
   
   return (
-    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.container}>
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={[styles.container, { paddingTop: headerHeight }]}>
       {names.map((name) => (
         <TouchableOpacity key={name} style={styles.sectionContainer} onPress={() => router.push(`./section/${name}`)}
         activeOpacity={0.7}>
@@ -84,8 +86,6 @@ export default function AssessmentDirectoryScreen() {
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
       )}
-
-    
     </LinearGradient>
   );
 }
@@ -161,5 +161,4 @@ const styles = StyleSheet.create({
       fontSize: 16,
       textAlign: 'center',
     },
-    
 });
