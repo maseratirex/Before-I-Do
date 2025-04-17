@@ -4,29 +4,27 @@ import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const SeeRequestsComp = ({ isPaired, pairRequests }) => {
+const SeeRequestsComp = ({ isPaired, setIsPaired, pairRequests }) => {
     const numPairRequests = pairRequests.length;
     const [acceptPartner, setAcceptPartner] = useState("");
 
     const acceptPairRequest = async () => {
         try {
-            if (numPairRequests == 1) {
-                setAcceptPartner(pairRequests[0].email);
-            }
-            if (acceptPartner == "") {
+            if (acceptPartner == "" && numPairRequests > 1) {
                 return Alert.alert("Error", "Please select a partner to accept.");
             }
             const confirmPairRequestFunction = httpsCallable(functions, "confirmPairing");
             const auth = getAuth();
             const myParams = {
-                email: acceptPartner,
+                email: numPairRequests==1 ? pairRequests[0].email : acceptPartner,
                 user: auth.currentUser?.uid,
             }
             const result = await confirmPairRequestFunction(myParams);
             const data = result.data;
             if (data.success) {
-                Alert.alert("Success", "Successfully confirmed pair request with " + acceptPartner + ".");
-                console.log("Successfully paired with " + acceptPartner + ".");
+                setIsPaired(true);
+                Alert.alert("Success", "Successfully confirmed pair request with " + numPairRequests==1 ? pairRequests[0].email : acceptPartner + ".");
+                console.log("Successfully paired with " + numPairRequests==1 ? pairRequests[0].email : acceptPartner + ".");
             }
             else {
                 Alert.alert("Error", "Failed to confirm pair request: " + data.message);

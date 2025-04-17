@@ -107,8 +107,8 @@ const PairPartner = () => {
 
     return (
         <View style={styles.container}>
-            <PairingInfo isPaired={isPaired} hasSentRequest={hasSentRequest} numRecievedRequest={pairRequests.size}/>
-            <SeeRequestsComp isPaired={isPaired} pairRequests={Array.from(pairRequests.values())}/>
+            <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={pairRequests.size}/>
+            <SeeRequestsComp isPaired={isPaired} setIsPaired={setIsPaired} pairRequests={Array.from(pairRequests.values())}/>
             <SendRequestsComp isPaired={isPaired} hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest}/>
             <TouchableOpacity style={styles.button} onPress={seePairRequests}><Text style={styles.buttonText}>Refresh Requests</Text></TouchableOpacity>
         </View>

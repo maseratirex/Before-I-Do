@@ -5,7 +5,7 @@ import { httpsCallable } from "firebase/functions";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
-const PairingInfo = ({ isPaired, hasSentRequest, numRecievedRequest }) => {
+const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest }) => {
     const unpairUsers = async () => {
         try {
             const unpairFunction = httpsCallable(functions, "unpair");
@@ -16,6 +16,7 @@ const PairingInfo = ({ isPaired, hasSentRequest, numRecievedRequest }) => {
             const result = await unpairFunction(myParams);
             const data = result.data;
             if (data.success) {
+                setIsPaired(false);
                 Alert.alert("Success", "Successfully unpaired.");
                 console.log("Successfully unpaired.");
             }
