@@ -12,22 +12,7 @@ const PairPartner = () => {
     const [isPaired, setIsPaired] = useState("");
     const [hasSentRequest, setHasSentRequest] = useState("");
     const [sentRequest, setSentRequest] = useState("");
-    const length = 0;
-    var pairRequestsArray = [];
-    var pairRequestTimesArray = [];
-    const [pairRequests, setPairRequests] = useState(
-        new Map(
-          Array.from({ length }, (_, i) => [
-            i,
-            {
-              id: i,
-              email: "",
-              timestamp: "",
-              isDesired: false,
-            },
-          ])
-        )
-      );
+    const [requests, setRequests] = useState([]);
 
     const seePairRequests = async () => {
         try {
@@ -40,23 +25,20 @@ const PairPartner = () => {
           const result = await checkPairRequestFunction(myParams);
           const data = result.data;
           if (data.success) {
-            pairRequestsArray = data.emails || [];
-            pairRequestTimesArray = data.timestamps || [];
+            const temp = [];
+            for (let i = 0; i < data.emails.length; i++) {
+                temp.push({
+                    id: i,
+                    email: data.emails[i],
+                    isDesired: false,
+                })
+              }
+            setRequests(temp);
+            console.log("Pair requests:", temp);
           } else {
-            pairRequestsArray = [];
-            pairRequestTimesArray = [];
+            setRequests([]);
           }
-    
-          for (let i = 0; i < pairRequestsArray.length; i++) {
-            const pairRequest = {
-              id: i,
-              email: pairRequestsArray[i],
-              timestamp: pairRequestTimesArray[i],
-              isDesired: false,
-            };
-            setPairRequests((prev) => new Map(prev).set(i, pairRequest));
-          }
-          return pairRequestsArray;
+          return requests;
         } catch (error) {
           console.error("seePairRequests: Error occurred:", error);
         }
@@ -107,8 +89,8 @@ const PairPartner = () => {
 
     return (
         <View style={styles.container}>
-            <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={pairRequests.size}/>
-            <SeeRequestsComp isPaired={isPaired} setIsPaired={setIsPaired} pairRequests={Array.from(pairRequests.values())}/>
+            <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} />
+            <SeeRequestsComp isPaired={isPaired} setIsPaired={setIsPaired} pairRequests={requests} setRequests={setRequests} />
             <SendRequestsComp isPaired={isPaired} hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest}/>
             <TouchableOpacity style={styles.button} onPress={seePairRequests}><Text style={styles.buttonText}>Refresh Requests</Text></TouchableOpacity>
         </View>

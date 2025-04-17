@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const SeeRequestsComp = ({ isPaired, setIsPaired, pairRequests }) => {
+const SeeRequestsComp = ({ isPaired, setIsPaired, pairRequests,  setRequests}) => {
     const numPairRequests = pairRequests.length;
     const [acceptPartner, setAcceptPartner] = useState("");
 
@@ -50,31 +50,31 @@ const SeeRequestsComp = ({ isPaired, setIsPaired, pairRequests }) => {
         );
     }
 
-    const renderPairRequest = ({ item }) => {
-        const toggleIsDesired = (id) => {
-          setPairRequests((prev) => {
-            const updatedMap = new Map(prev);
-            updatedMap.forEach((value, key) => {
-              updatedMap.set(key, { ...value, isDesired: key === id ? !value.isDesired : false });
+    const handleListAccepting = useCallback((index) => {
+        setRequests((prevRequests) => {
+            return prevRequests.map((request, i) => {
+                if (i === index) {
+                    const isDesired = !request.isDesired;
+                    setAcceptPartner(isDesired ? request.email : "");
+                    return { ...request, isDesired };
+                }
+                return { ...request, isDesired: false };
             });
-            return updatedMap;
-          });
-    
-          // Update acceptPartner based on the toggled item's isDesired state
-          setAcceptPartner((prev) => (item.isDesired ? "" : item.email));
-        };
-    }
+        });
+    }, [setRequests, setAcceptPartner]);
 
     const multiRecievedRequestsReturn = () => {
         return (
             <View style={styles.container}> 
-                <Text style={styles.message}>{pairRequests[0].email} sent you a pair request</Text>
-                <FlatList
-                    style={styles.list}
-                    data={Array.from(pairRequests.values())}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={renderPairRequest}
-                />
+                <Text style={styles.message}>You have the following pair requests:</Text>
+                {pairRequests.map((request, index) => (
+                    <View key={index}>
+                        <Text style={styles.item}>{request.email} sent you a request</Text>
+                        <TouchableOpacity style={styles.button} onPress={() => handleListAccepting(index)}>
+                            <Text style={styles.buttonText}>{request.isDesired ? "unselect" : "select"}</Text>
+                        </TouchableOpacity>
+                    </View>
+                ))}
                 <TouchableOpacity style={styles.button} onPress={acceptPairRequest}>
                     <Text style={styles.buttonText}>{"Accept Pair Request from " + acceptPartner}</Text>
                 </TouchableOpacity>

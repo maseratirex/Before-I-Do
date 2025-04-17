@@ -5,7 +5,7 @@ import { httpsCallable } from "firebase/functions";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
-const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest }) => {
+const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests}) => {
     const unpairUsers = async () => {
         try {
             const unpairFunction = httpsCallable(functions, "unpair");
@@ -28,13 +28,81 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
             console.log("Error unpairing:", error);
         }
     }
+
+    const seePairRequests = async () => {
+        try {
+            const checkPairRequestFunction = httpsCallable(functions, "checkPairRequest");
+            const auth = getAuth();
+            const myParams = {
+            user: auth.currentUser?.uid,
+            };
+    
+            const result = await checkPairRequestFunction(myParams);
+            const data = result.data;
+            if (data.success) {
+            const temp = [];
+            for (let i = 0; i < data.emails.length; i++) {
+                temp.push({
+                    id: i,
+                    email: data.emails[i],
+                    timestamp: data.timestamps[i],
+                    isDesired: false,
+                })
+                }
+            setRequests(temp);
+            console.log("Pair requests:", temp);
+            } else {
+            setRequests([]);
+            }
+        } catch (error) {
+            console.error("seePairRequests: Error occurred:", error);
+        }
+    }
+
+    const refreshButton = () => {
+        return (
+            <TouchableOpacity style={styles.button} onPress={seePairRequests}>
+                <Text>Refresh</Text>
+            </TouchableOpacity>
+        );
+    }
+
+    const pairedInfo = () => {
+        return (
+            <View>
+                <Text>You are paired with someone.</Text>
+                <TouchableOpacity style={styles.button} onPress={unpairUsers}>
+                    <Text>Unpair</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    const sentRequestInfo = () => {
+        return (
+            <Text>You have sent a pairing request.</Text>
+        );
+    }
+
+    const receivedRequestInfo = () => {
+        return (
+            <Text>You have received {numRecievedRequest} pairing requests.</Text>
+        );
+    }
+
+    const initialInfo = () => {
+        return (
+            <Text>You are not paired with anyone.</Text>
+        );
+    }
     
     return (
         <View style={styles.container}>
-        {isPaired ? <View><Text>You are paired with someone.</Text><TouchableOpacity style={styles.button} onPress={unpairUsers}><Text>Unpair</Text></TouchableOpacity></View> : 
-         hasSentRequest ? <Text>You have sent a pairing request.</Text> :
-         numRecievedRequest > 0 ? <Text> You have received {numRecievedRequest} pairing requests.</Text> :
-         <Text>You are not paired with anyone.</Text>}
+        {isPaired ? pairedInfo() : 
+         hasSentRequest ? sentRequestInfo() :
+         numRecievedRequest > 0 ? receivedRequestInfo() :
+         initialInfo()}
+        {refreshButton()}
         </View>
     );
 }

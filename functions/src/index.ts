@@ -75,7 +75,6 @@ export const checkPairRequest = onCall(async (request) => {
   
   // create array to emails of senders of pair requests
   const senderEmails: string[] = [];
-  const requestTimeStamps: string[] = [];
 
   // Find all pending requests associated with the current user as specified by userId
   const querySnapshot = await admin.firestore().collection('requests')
@@ -95,11 +94,6 @@ export const checkPairRequest = onCall(async (request) => {
         if (senderDocData && senderDocData.email) {
           // Add the email to the array
           senderEmails.push(senderDocData.email);
-          if (senderDocData.timestamp) {
-            requestTimeStamps.push(senderDocData.timestamp);
-          }else {
-            requestTimeStamps.push("No timestamp available");
-          }
         } 
       } else {
         return {success: false, message: "Sender does not exist: " + senderId};
@@ -108,9 +102,9 @@ export const checkPairRequest = onCall(async (request) => {
   }
   
   if (senderEmails.length > 0) {
-    return { success: true, emails: senderEmails, timestamps: requestTimeStamps, message: "Pending pair requests found." };
+    return { success: true, emails: senderEmails, message: "Pending pair requests found." };
   } else {
-    return { success: true, emails: senderEmails, timestamps: requestTimeStamps, message: "No pending pair requests." };
+    return { success: true, emails: senderEmails, message: "No pending pair requests." };
   }
 });
 
