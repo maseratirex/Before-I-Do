@@ -4,7 +4,7 @@ import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest }) => {
+const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) => {
     const [email, setEmail] = useState("");
 
     const sendPairRequest = async () => {
@@ -24,6 +24,7 @@ const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest }) => {
             const data = result.data;
             if (data.success) {
                 setHasSentRequest(true) // Update the state to indicate that a request has been sent
+                setSentRequest(email) // Update the state to indicate that a request has been sent
                 Alert.alert("Success", "Pair request sent successfully.");
                 console.log("Pair request sent successfully.");
             }
@@ -40,7 +41,7 @@ const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest }) => {
         return (
             <View style={styles.container}> 
                 <Text style={styles.title}>Pairing Request Sent</Text>
-                <Text style={styles.message}>You have already sent a pairing request.</Text>
+                <Text style={styles.message}>You have already sent a pairing request to {sentRequestEmail}.</Text>
             </View>
         );
     }

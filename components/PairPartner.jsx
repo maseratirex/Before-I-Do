@@ -60,27 +60,39 @@ const PairPartner = () => {
         } catch (error) {
           console.error("seePairRequests: Error occurred:", error);
         }
-      }
+    }
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-          if (user && user.emailVerified) {
-            const checkPairStatusFunction = httpsCallable(functions, "seePairStatus");
+    const seePairStatus = async () => {
+        try {
+            const seePairStatusFunction = httpsCallable(functions, "seePairStatus");
             const auth = getAuth();
             const myParams = {
                 user: auth.currentUser?.uid,
             };
-        
-            const result = await checkPairStatusFunction(myParams);
+            console.log("Checking pairing status for user:", myParams);
+            const result = await seePairStatusFunction(myParams);
             const data = result.data;
+            console.log("Pairing status data:", data);
             if (data.success) {
                 console.log("Pairing status:", data);
-                setIsPaired(data.type === "paired");
-                setHasSentRequest(data.type === "requested");
-                setSentRequest(data.type === "requested" ? data.pairRequest : "");
+                setIsPaired(data.type == "paired");
+                setHasSentRequest(data.type == "requested");
+                setSentRequest(data.type == "requested" ? data.partnerRequest : "");
+                console.log("Pairing status:", data.type);
+                console.log("Pair request email:", data.partnerRequest);
+                console.log("isPaired:", isPaired);
             } else {
                 console.log("Failed to check pairing status:", data.message);
             }
+        }catch (error) {
+          console.error("seePairRequests: Error occurred:", error);
+        }
+    }
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+          if (user && user.emailVerified) {
+            seePairStatus();
             seePairRequests();
           } else {
             console.log("User is not authenticated or email not verified.");
@@ -97,7 +109,7 @@ const PairPartner = () => {
         <View style={styles.container}>
             <PairingInfo isPaired={isPaired} hasSentRequest={hasSentRequest} numRecievedRequest={pairRequests.size}/>
             <SeeRequestsComp isPaired={isPaired} pairRequests={Array.from(pairRequests.values())}/>
-            <SendRequestsComp isPaired={isPaired} hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest}/>
+            <SendRequestsComp isPaired={isPaired} hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest}/>
             <TouchableOpacity style={styles.button} onPress={seePairRequests}><Text style={styles.buttonText}>Refresh Requests</Text></TouchableOpacity>
         </View>
     )

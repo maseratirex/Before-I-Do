@@ -215,12 +215,16 @@ export const seePairStatus = onCall(async (request) => {
       .get();
 
   if (!querySnapshot.empty) {
-    const partnerDoc = await admin.firestore().collection("users").doc(querySnapshot.docs[0].recipientId).get();
-    if (partnerDoc.exists) {
-      return { success: true, type: "requested", partnerRequest: partnerDoc.data().email, message: "You have sent a pending pair request to " + partnerDoc.data().email};
-    }
-    else {
-      return { success: false, message: "Partner does not exist" };
+    const recipientId = querySnapshot.docs[0].data().recipientId;
+    if (recipientId && typeof recipientId === "string" && recipientId.trim() !== "") {
+      const partnerDoc = await admin.firestore().collection("users").doc(recipientId).get();
+      if (partnerDoc.exists) {
+        return { success: true, type: "requested", partnerRequest: partnerDoc.data().email, message: "You have sent a pending pair request to " + partnerDoc.data().email };
+      } else {
+        return { success: false, message: "Partner does not exist" };
+      }
+    } else {
+      return { success: false, message: "Invalid recipientId in pair request" };
     }
   }
   else {
