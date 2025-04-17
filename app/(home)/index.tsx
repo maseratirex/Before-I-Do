@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, Button, TouchableOpacity, Alert, FlatList, TextInput } from "react-native";
+import { View, StyleSheet, Text, Button, TouchableOpacity, Alert, FlatList, TextInput, ScrollView } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useState, useEffect, useRef } from "react";
 import { onAuthStateChanged } from "firebase/auth";
@@ -6,6 +6,7 @@ import { auth } from '@/firebaseConfig'
 import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
+import PairPartner from '@/components/PairPartner';
 
 export default function Index() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function Index() {
     }
   });
 
-  const sendPairRequest = async () => {
+  /*const sendPairRequest = async () => {
     if (!email) {
       Alert.alert("Error", "Please enter an email address.");
       return;
@@ -190,7 +191,19 @@ export default function Index() {
       </TouchableOpacity>
       <Text style={styles.title}>{"Current Pair Request: " + sentRequest}</Text>
     </View>
-  );
+  );*/
+  
+  return (
+    <View style={styles.container}>    
+      <TouchableOpacity style={styles.button} onPress={() => { router.push('/directory') }}>
+        <Text style={styles.buttonText}>Take Assessment</Text>
+      </TouchableOpacity>
+      <Text style={styles.title}>Pair with Partner</Text>
+      <ScrollView style={styles.list}>
+        <PairPartner/>
+      </ScrollView>
+    </View>
+    );
 }
 
 const styles = StyleSheet.create({

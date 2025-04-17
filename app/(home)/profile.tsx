@@ -5,7 +5,7 @@ import { functions } from "@/firebaseConfig";
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 
 export default function ProfileScreen() {
-  const [email, setEmail] = useState("");
+  /*const [email, setEmail] = useState("");
 
   const sendEmail = async () => {
     if (!email) {
@@ -66,6 +66,19 @@ export default function ProfileScreen() {
       <TouchableOpacity style={styles.button} onPress={seePairRequests}>
         <Text style={styles.buttonText}>See Requests</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => {
+        const auth = getAuth(); 
+        signOut(auth).catch((error) => {
+          Alert.alert('Sign Out Failed', error.message);
+        });
+      }}>
+        <Text style={styles.buttonText}>Sign Out</Text>
+      </TouchableOpacity>
+    </View>
+  );*/
+
+  return (
+    <View style={styles.container}>
       <TouchableOpacity style={styles.button} onPress={() => {
         const auth = getAuth(); 
         signOut(auth).catch((error) => {
