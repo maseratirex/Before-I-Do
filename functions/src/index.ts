@@ -178,7 +178,7 @@ export const cancelPairingRequest = onCall(async (request) => {
 
   // Get all sent pair requests
   const pendingSentRequestsSnapshot = await admin.firestore().collection('requests')
-  .where('senderId', '==', userId).where('pairStatus', '!=', 'confirmed').get();
+  .where('senderId', '==', userId).where('pairStatus', '==', 'pending').get();
   if (!pendingSentRequestsSnapshot.empty) {
     for (const doc of pendingSentRequestsSnapshot.docs) {
       await doc.ref.delete();

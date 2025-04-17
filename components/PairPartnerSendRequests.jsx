@@ -37,11 +37,38 @@ const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentReq
         }
     };
 
+    const cancelPairRequest = async () => {
+        try {
+            const cancelPairRequestFunction = httpsCallable(functions, "cancelPairingRequest");
+            const auth = getAuth();
+            const myParams = {
+                user: auth.currentUser?.uid,
+            }
+            const result = await cancelPairRequestFunction(myParams);
+            const data = result.data;
+            if (data.success) {
+                setHasSentRequest(false) // Update the state to indicate that a request has been sent
+                setSentRequest("") // Update the state to indicate that a request has been sent
+                Alert.alert("Success", "Pair request cancelled successfully.");
+                console.log("Pair request cancelled successfully.");
+            }
+            else {
+                Alert.alert("Error", "Failed to cancel pair request: " + data.message);
+                console.log("Failed to cancel pair request:", data.message);
+            }
+        } catch (error) {
+            console.log("Error cancelling pair requests:", error);
+        }
+    };
+
     const sentRequestReturn = () => {
         return (
             <View style={styles.container}> 
                 <Text style={styles.title}>Pairing Request Sent</Text>
                 <Text style={styles.message}>You have already sent a pairing request to {sentRequestEmail}.</Text>
+                <TouchableOpacity style={styles.button} onPress={cancelPairRequest}>
+                    <Text style={styles.buttonText}>Cancel Request</Text>
+                </TouchableOpacity>
             </View>
         );
     }
