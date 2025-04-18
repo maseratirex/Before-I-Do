@@ -5,7 +5,7 @@ import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 
 
-const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests}) => {
+const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests, partnerInitials, setPartnerInitials, partnerEmail, setPartnerEmail}) => {
     const unpairUsers = async () => {
         try {
             const unpairFunction = httpsCallable(functions, "unpair");
@@ -17,6 +17,8 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
             const data = result.data;
             if (data.success) {
                 setIsPaired(false);
+                setPartnerInitials("");
+                setPartnerEmail("");
                 Alert.alert("Success", "Successfully unpaired.");
                 console.log("Successfully unpaired.");
             }
@@ -69,7 +71,7 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
     const pairedInfo = () => {
         return (
             <View>
-                <Text>You are paired with someone.</Text>
+                <Text>{"You are paired with " + partnerInitials + " (" + partnerEmail + ")."}</Text>
                 <TouchableOpacity style={styles.button} onPress={unpairUsers}>
                     <Text>Unpair</Text>
                 </TouchableOpacity>

@@ -197,7 +197,7 @@ export const seePairStatus = onCall(async (request) => {
       if (partnerDoc.exists) {
         const partnerData = partnerDoc.data();
         if (partnerData && partnerData.email) {
-          return { success: true, type: "paired", partner: partnerData.email, message: "You are paired with " + partnerData.email };
+          return { success: true, type: "paired", partner: partnerData.email, partnerInitials: partnerData.initials, message: "You are paired with " + partnerData.email };
         }
       }
       return { success: false, message: "Partner does not exist" };

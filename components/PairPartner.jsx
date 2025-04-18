@@ -12,6 +12,8 @@ const PairPartner = () => {
     const [isPaired, setIsPaired] = useState("");
     const [hasSentRequest, setHasSentRequest] = useState("");
     const [sentRequest, setSentRequest] = useState("");
+    const [partnerInitials, setPartnerInitials] = useState("");
+    const [partnerEmail, setPartnerEmail] = useState("");
     const [requests, setRequests] = useState([]);
 
     const seePairRequests = async () => {
@@ -60,6 +62,8 @@ const PairPartner = () => {
                 setIsPaired(data.type == "paired");
                 setHasSentRequest(data.type == "requested");
                 setSentRequest(data.type == "requested" ? data.partnerRequest : "");
+                setPartnerInitials(data.type == "paired" ? data.partnerInitials : "");
+                setPartnerEmail(data.type == "paired" ? data.partner : "");
                 console.log("Pairing status:", data.type);
                 console.log("Pair request email:", data.partnerRequest);
                 console.log("isPaired:", isPaired);
@@ -89,8 +93,8 @@ const PairPartner = () => {
 
     return (
         <View style={styles.container}>
-            <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} />
-            <SeeRequestsComp isPaired={isPaired} setIsPaired={setIsPaired} pairRequests={requests} setRequests={setRequests} />
+            <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} partnerInitials={partnerInitials} setPartnerInitials={setPartnerInitials} partnerEmail={partnerEmail} setPartnerEmail={setPartnerEmail}/>
+            <SeeRequestsComp isPaired={isPaired} setIsPaired={setIsPaired} pairRequests={requests} setRequests={setRequests} setPartnerInitials={setPartnerInitials} setPartnerEmail={setPartnerEmail} />
             <SendRequestsComp isPaired={isPaired} hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest}/>
         </View>
     )

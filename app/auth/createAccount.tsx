@@ -7,6 +7,7 @@ import { doc, setDoc } from 'firebase/firestore';
 
 export default function CreateAccountScreen() {
   const [email, setEmail] = useState('');
+  const [initials, setInitials] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
 
@@ -26,6 +27,7 @@ export default function CreateAccountScreen() {
           if (user) {
             const userRef = doc(db, "users", user.uid);
             await setDoc(userRef, {
+              initials: initials,
               email: email,
               isPaired: false,
               partner: null,
@@ -60,6 +62,15 @@ export default function CreateAccountScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Initials"
+        keyboardType="default"
+        autoCapitalize="characters"
+        onChangeText={setInitials}
+        value={initials}
+        maxLength={3}
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"

@@ -4,7 +4,7 @@ import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 
-const SeeRequestsComp = ({ isPaired, setIsPaired, pairRequests,  setRequests}) => {
+const SeeRequestsComp = ({ isPaired, setIsPaired, pairRequests,  setRequests, setPartnerInitials, setPartnerEmail}) => {
     const numPairRequests = pairRequests.length;
     const [acceptPartner, setAcceptPartner] = useState("");
 
@@ -25,6 +25,14 @@ const SeeRequestsComp = ({ isPaired, setIsPaired, pairRequests,  setRequests}) =
                 setIsPaired(true);
                 Alert.alert("Success", "Successfully confirmed pair request with " + numPairRequests==1 ? pairRequests[0].email : acceptPartner + ".");
                 console.log("Successfully paired with " + numPairRequests==1 ? pairRequests[0].email : acceptPartner + ".");
+                const seePairStatusFunction = httpsCallable(functions, "seePairStatus");
+                const auth = getAuth();
+                const myParams = {
+                    user: auth.currentUser?.uid,
+                };
+                const result = await seePairStatusFunction(myParams);
+                setPartnerInitials(result.data.partnerInitials);
+                setPartnerEmail(result.data.partner);
             }
             else {
                 Alert.alert("Error", "Failed to confirm pair request: " + data.message);
