@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, StyleSheet } from "react-native";
 import PairingInfo from '@/components/PairPartnerInfo';
 import SeeRequestsComp from '@/components/PairPartnerRecievedRequests';
 import SendRequestsComp from '@/components/PairPartnerSendRequests';

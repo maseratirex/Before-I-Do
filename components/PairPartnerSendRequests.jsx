@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from "react-native";
 import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) => {
     const [email, setEmail] = useState("");

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 
 const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests}) => {
