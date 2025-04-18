@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 
 const options = ["1", "2", "3", "4", "5"];
@@ -21,6 +21,7 @@ const LikertScale = ({ subsections, answers, setAnswers }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Text>Your progress is saved automatically when you press ‘Complete’ or ‘Back’</Text>
       {Object.entries(subsections).map(([subsection, questions]) => (
         <View key={subsection} style={styles.subsectionContainer}>
           <Text style={styles.subsectionTitle}>{subsection}</Text>
@@ -51,7 +52,7 @@ const LikertScale = ({ subsections, answers, setAnswers }) => {
           })}
         </View>
       ))}
-      <Text style={styles.answerText}>Answers: {answers}</Text>
+      <Text style={styles.answerText}>Answers: {answers.join(', ')}</Text>
     </ScrollView>
   );
 };

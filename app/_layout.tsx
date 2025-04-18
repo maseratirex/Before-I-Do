@@ -1,6 +1,4 @@
-// import { Tabs } from "expo-router";
 import { Stack } from "expo-router";
-// import { Platform } from 'react-native';
 
 export default function RootLayout() {
   
@@ -25,7 +23,8 @@ export default function RootLayout() {
       <Stack.Screen
         name="(assessment)/directory"
         options={{
-          headerTintColor: '#697073',
+          headerTransparent: true,
+          // headerTintColor: '#697073',
           title: '',
         //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
@@ -33,10 +32,8 @@ export default function RootLayout() {
       <Stack.Screen
         name="(assessment)/section/[name]"
         options={{
+          headerTransparent: true,
           title: 'Assessment',
-          headerStyle: {
-            backgroundColor: '#F4B9EE',
-          },
         //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />

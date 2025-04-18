@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, Button, TouchableOpacity, Alert, FlatList, TextInput, ScrollView } from "react-native";
+import { View, StyleSheet, Text, Button, TouchableOpacity, Alert, FlatList, TextInput, ScrollView, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from '@/firebaseConfig'
@@ -14,10 +14,15 @@ export default function Index() {
   });
   
   return (
-    <View style={styles.container}>    
-      <TouchableOpacity style={styles.button} onPress={() => { router.push('/directory') }}>
-        <Text style={styles.buttonText}>Take Assessment</Text>
-      </TouchableOpacity>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}>
+      <Pressable style={styles.button} onPress={() => router.push("/directory")}>
+        <Text style={styles.buttonText}>Begin assessment</Text>
+      </Pressable>
       <Text style={styles.title}>Pair with Partner</Text>
       <ScrollView style={styles.list}>
         <PairPartner/>
