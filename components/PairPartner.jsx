@@ -92,7 +92,6 @@ const PairPartner = () => {
             <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} />
             <SeeRequestsComp isPaired={isPaired} setIsPaired={setIsPaired} pairRequests={requests} setRequests={setRequests} />
             <SendRequestsComp isPaired={isPaired} hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest}/>
-            <TouchableOpacity style={styles.button} onPress={seePairRequests}><Text style={styles.buttonText}>Refresh Requests</Text></TouchableOpacity>
         </View>
     )
 }

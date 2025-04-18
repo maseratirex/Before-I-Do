@@ -45,7 +45,6 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
                 temp.push({
                     id: i,
                     email: data.emails[i],
-                    timestamp: data.timestamps[i],
                     isDesired: false,
                 })
                 }
