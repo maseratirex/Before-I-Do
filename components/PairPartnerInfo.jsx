@@ -101,7 +101,7 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
          hasSentRequest ? sentRequestInfo() :
          numRecievedRequest > 0 ? receivedRequestInfo() :
          initialInfo()}
-        {refreshButton()}
+        {isPaired? "" : refreshButton()}
         </View>
     );
 }
