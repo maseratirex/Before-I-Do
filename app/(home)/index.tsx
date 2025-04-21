@@ -1,7 +1,8 @@
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, Button, TouchableOpacity, Alert, FlatList, TextInput, ScrollView, Pressable } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from '@/firebaseConfig'
+import PairPartner from '@/components/PairPartner';
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function Index() {
@@ -12,9 +13,9 @@ export default function Index() {
       router.replace('/auth/login');
     }
   });
-
+  
   return (
-    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.container}>
+<!--     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.container}>
         <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
           <Text style={styles.title}>Assessment</Text>
           <Text style={styles.description}>
@@ -25,7 +26,22 @@ export default function Index() {
         </TouchableOpacity>
       <Text style={styles.title}>Pair with Partner</Text>
     </LinearGradient>
-  );
+  ); -->
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}>
+      <Pressable style={styles.button} onPress={() => router.push("/directory")}>
+        <Text style={styles.buttonText}>Begin assessment</Text>
+      </Pressable>
+      <Text style={styles.title}>Pair with Partner</Text>
+      <ScrollView style={styles.list}>
+        <PairPartner/>
+      </ScrollView>
+    </View>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -67,6 +83,16 @@ const styles = StyleSheet.create({
       color: "#4a4a4a",
     
     },
+    list: {
+      width: '100%',
+      flexGrow: 0,
+    },
+    smallContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+      backgroundColor: '#fff',
+  },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -98,4 +124,9 @@ const styles = StyleSheet.create({
         color: '#007bff',
         fontSize: 14,
     },
+    emailText: {
+      marginTop: 15,
+      color: '#000000',
+      fontSize: 14,
+  },
 });
