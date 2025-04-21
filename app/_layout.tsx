@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
-  
+
   return (
     <Stack>
       <Stack.Screen
@@ -17,16 +17,14 @@ export default function RootLayout() {
       <Stack.Screen
         name="auth"
         options={{
-            headerShown: false,
+          headerShown: false,
         }}
       />
       <Stack.Screen
         name="(assessment)/directory"
         options={{
           headerTransparent: true,
-          // headerTintColor: '#697073',
           title: '',
-        //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Stack.Screen
@@ -34,7 +32,13 @@ export default function RootLayout() {
         options={{
           headerTransparent: true,
           title: 'Assessment',
-        //   tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+        }}
+      />
+      <Stack.Screen
+        name="report"
+        options={{
+          headerTransparent: true,
+          title: '',
         }}
       />
     </Stack>
