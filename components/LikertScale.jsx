@@ -9,11 +9,13 @@ const labels = [
   "Agree",
   "Strongly agree",
 ];
+const reverseScoreIndexes = {"personality": [], "family": [17, 27], "couple": [26], "cultural": [7, 14]}
 
-const LikertScale = ({ subsections, answers, setAnswers }) => {
+
+const LikertScale = ({ section, subsections, answers, setAnswers }) => {
   const handlePress = (questionIndex, value) => {
     const updatedAnswers = [...answers]; // Copy array
-    updatedAnswers[questionIndex] = value; // Update specific index
+    updatedAnswers[questionIndex] = (reverseScoreIndexes[section].includes(questionIndex)) ? 6 - value : value; // Update specific index
     setAnswers(updatedAnswers); // Update state
   };
 
@@ -37,11 +39,11 @@ const LikertScale = ({ subsections, answers, setAnswers }) => {
                       <TouchableOpacity
                         style={[
                           styles.radioButton,
-                          answers[index] === value && styles.selectedRadioButton,
+                          answers[index] === ((reverseScoreIndexes[section].includes(index)) ? 6 - value : value) && styles.selectedRadioButton,
                         ]}
                         onPress={() => handlePress(index, value)}
                       >
-                        {answers[index] === value && <View style={styles.radioInner} />}
+                        {answers[index] === ((reverseScoreIndexes[section].includes(index)) ? 6 - value : value) && <View style={styles.radioInner} />}
                       </TouchableOpacity>
                       <Text style={styles.radioLabel}>{labels[idx]}</Text>
                     </View>

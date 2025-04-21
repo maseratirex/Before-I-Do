@@ -99,11 +99,11 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
     
     return (
         <View style={styles.container}>
-        {isPaired ? pairedInfo() : 
-         hasSentRequest ? sentRequestInfo() :
-         numRecievedRequest > 0 ? receivedRequestInfo() :
-         initialInfo()}
-        {isPaired? "" : refreshButton()}
+            {isPaired ? pairedInfo() : 
+            hasSentRequest ? sentRequestInfo() :
+            numRecievedRequest > 0 ? receivedRequestInfo() :
+            initialInfo()}
+            {isPaired? "" : refreshButton()}
         </View>
     );
 }

@@ -68,7 +68,7 @@ export const questionnaire = {
             "My parents make decisions regarding our family together.",
             "My parents value each other's opinions.",
             "My parents manage our family budget well.",
-            "I don't think my parents set a good example for marriage.",
+            "----I don't think my parents set a good example for marriage.",
             "My parents feel happy when they are with each other.",
             "My parents are in harmony regarding housework.",
             "My parents can solve their problems through communication.",
@@ -80,7 +80,7 @@ export const questionnaire = {
             "I am open and clear with my partner when we discuss matters related to our families.",
             /* "I express my expectations regarding our families to my partner clearly.",
             "I believe that my partner has a good relationship with my family.",
-            "I cannot cooperate with my partner to resolve issues related to our families.",
+            "----I cannot cooperate with my partner to resolve issues related to our families.",
             "My partner and I determine our boundaries regarding our families together.",
             "I express my feelings regarding our families clearly to my partner.",
             "I respect cultural differences between our families.",
@@ -114,13 +114,13 @@ export const questionnaire = {
             "I put effort into our relationship.",
             "I value my partner's happiness.",
             "I value my partner's feelings.",
-            "I want to have a sexually fulfilling relationship with my partner." */
+            "I want to have a sexually fulfilling relationship with my partner."*/
         ],
         "Relationship Challenges": [
             "I find it difficult to believe what my partner says.",
             "I cannot openly discuss problems with my partner.",
-            /* "I am patient with my partner during our arguments.",
-            "The lack of trust in our relationship bothers me.",
+            "----I am patient with my partner during our arguments.",
+            /*"The lack of trust in our relationship bothers me.",
             "I always want things to go my way in the relationship.",
             "I wish my partner were less critical.",
             "I am sometimes embarrassed by my partner's behavior.",
@@ -144,23 +144,23 @@ export const questionnaire = {
         "Spiritual Beliefs": [
             "I openly discuss my religious beliefs with my partner.",
             "I respect my partner's religious beliefs.",
-            /* "I discuss the role of our beliefs in our lives with my partner.",
+            /*"I discuss the role of our beliefs in our lives with my partner.",
             "I respect my partner's special religious days.",
             "I discuss how our beliefs will influence our children's lives with my partner.",
             "I am happy to have mutual understanding about religious matters with my partner.",
             "I make an effort to ensure that my family is respectful towards my partner and their family in religious matters.",
-            "I am worried that my family does not approve of my partner's beliefs." */
+            "----I am worried that my family does not approve of my partner's beliefs."*/
         ],
         "Lifestyle": [
             "Our lifestyles are compatible with each other.",
             "I want to have a similar world view with my partner.",
-            /* "My partner and I have similar political views.",
+            /*"My partner and I have similar political views.",
             "My partner and I have similar personal goals.",
             "Our education levels match.",
             "Our hobbies are similar.",
-            "I worry about our differences in opinions.",
+            "----I worry about our differences in opinions.",
             "I respect my partner's clothing style.",
-            "I am satisfied with my partner's working conditions." */
+            "I am satisfied with my partner's working conditions."*/
         ],
         "Traditions": [
             "I am satisfied with the culture my partner's family comes from.",

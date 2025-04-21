@@ -96,7 +96,7 @@ export default function QuestionnaireScreen() {
                 <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
                     <View style={{ flex: 1, alignItems: "center", paddingTop: headerHeight }}>
                         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
-                            <LikertScale subsections={subsections} answers={answers} setAnswers={setAnswers} />
+                            <LikertScale section={section} subsections={subsections} answers={answers} setAnswers={setAnswers} />
                             <Pressable onPress={() => router.back()}>
                                 <Text>Complete</Text>
                             </Pressable>
