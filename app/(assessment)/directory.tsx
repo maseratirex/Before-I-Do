@@ -8,6 +8,8 @@ import { getAuth } from "firebase/auth";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from 'expo-router';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/firebaseConfig'
 
 export default function AssessmentDirectoryScreen() {
   const names = [ "Personality", "Family", "Couple", "Cultural" ];
@@ -56,6 +58,35 @@ export default function AssessmentDirectoryScreen() {
   useEffect(() => {
     loadProgress();
   }, [userId]);
+
+  const submitResults = async () => {
+    console.log("Submitting results...");
+    const user = auth.currentUser;
+    if (user) {
+      var answers = [];
+      for (let name of names) {
+        const storageKey = `answers-${userId}-${name.toLowerCase()}`;
+        try {
+          const savedAnswers = await AsyncStorage.getItem(storageKey);
+          if (savedAnswers) {
+            const sectionAnswers = JSON.parse(savedAnswers);
+            answers.push(sectionAnswers);
+          }
+        } catch (error) {
+          console.error(`Error loading progress for ${name}:`, error);
+        }
+      }
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(userRef, {
+        personalityDynamics: answers[0],
+        familyDynamics: answers[1],
+        coupleDynamics: answers[2],
+        cultureDynamics: answers[3],
+      }, { merge: true });
+      console.log("Results submitted successfully");
+      Alert.alert("Results Submitted", "Your results have been submitted successfully.");
+    }
+  }
   
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={[styles.container, { paddingTop: headerHeight }]}>
@@ -82,7 +113,7 @@ export default function AssessmentDirectoryScreen() {
       ))}
       
       {allSectionsComplete() ? (
-        <TouchableOpacity style={styles.submitButton} onPress={() => console.log("Submitted!")}>
+        <TouchableOpacity style={styles.submitButton} onPress={submitResults}>
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
       ) : 
