@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useState, useEffect } from "react";
@@ -81,11 +81,14 @@ export default function AssessmentDirectoryScreen() {
         </TouchableOpacity>
       ))}
       
-      {allSectionsComplete() && (
+      {allSectionsComplete() ? (
         <TouchableOpacity style={styles.submitButton} onPress={() => console.log("Submitted!")}>
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
-      )}
+      ) : 
+        (<TouchableOpacity style={styles.unsubmittableButton} onPress={() => {Alert.alert("Can't Submit Yet", "Please complete the questionaire before submitting"); console.log("User tried to submit before completing the questionnaire")}}>
+          <Text style={styles.submitText}>Submit</Text>
+        </TouchableOpacity>)}
     </LinearGradient>
   );
 }
@@ -154,7 +157,18 @@ const styles = StyleSheet.create({
       shadowRadius: 4,
       elevation: 4,
     },
-    
+    unsubmittableButton: {
+      backgroundColor: '#bbb',
+      paddingVertical: 12,
+      paddingHorizontal: 30,
+      borderRadius: 30,
+      marginTop: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      elevation: 4,
+    },
     submitText: {
       color: '#5856ce',
       fontWeight: 'bold',
