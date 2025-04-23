@@ -76,18 +76,21 @@ const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentReq
     const noSentRequestReturn = () => {
         return (
             <View style={styles.container}> 
-                <Text style={styles.title}>Enter Partner's Email</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter email address"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
-                <TouchableOpacity style={styles.button} onPress={sendPairRequest}>
-                    <Text style={styles.buttonText}>Send Pair Request</Text>
-                </TouchableOpacity>
+                <Text style={styles.title}>Partner Email</Text>
+                <View style={styles.emailRequest}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter email address"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        placeholderTextColor="#888"
+                    />
+                    <TouchableOpacity style={styles.button} onPress={sendPairRequest}>
+                        <Text style={styles.buttonText}>Send Pair Request</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     }
@@ -97,11 +100,19 @@ const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentReq
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#ff0',
+      flex: 1,
+      width: "90%",
+      paddingVertical: 20,
+      paddingHorizontal: 15,
+      backgroundColor: "white",
+      borderRadius: 16,
+      justifyContent: "center",
+      marginBottom: 20,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      elevation: 6,
     },
     list: {
       width: '100%',
@@ -114,9 +125,10 @@ const styles = StyleSheet.create({
       backgroundColor: '#fff',
   },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
+        fontSize: 15,
+        fontWeight: "bold",
+        color: "#4a4a4a",
+        paddingBottom: 20,
     },
     input: {
         width: '100%',
@@ -124,20 +136,22 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 5,
+        borderRadius: 9,
+        marginRight: 15,
     },
     button: {
         width: '100%',
-        padding: 15,
-        backgroundColor: '#007bff',
+        padding: 8,
+        backgroundColor: '#FF9FB8',
         alignItems: 'center',
-        borderRadius: 5,
-        marginTop: 10,
+        borderRadius: 15,
+        marginBottom: 10,
     },
     buttonText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+        lineHeight: 22,
     },
     linkText: {
         marginTop: 15,
@@ -149,6 +163,13 @@ const styles = StyleSheet.create({
       color: '#000000',
       fontSize: 14,
   },
+    emailRequest: {
+        // flexDirection: 'row',
+  },
+    message: {
+        marginBottom: 20,
+
+    },
 });
 
 export default SendRequestsComp;

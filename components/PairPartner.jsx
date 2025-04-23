@@ -105,8 +105,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#0f0',
+        // padding: 20,
+        // backgroundColor: '#0f0',
+        backgroundColor: 'transparent',
     },
     list: {
       width: '100%',

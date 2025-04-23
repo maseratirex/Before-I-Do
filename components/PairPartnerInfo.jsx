@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
+import { MaterialIcons } from "@expo/vector-icons";
 
 
 const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests, partnerInitials, setPartnerInitials, partnerEmail, setPartnerEmail}) => {
@@ -62,8 +63,11 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
 
     const refreshButton = () => {
         return (
-            <TouchableOpacity style={styles.button} onPress={seePairRequests}>
-                <Text>Refresh</Text>
+            <TouchableOpacity style={styles.refreshButton} onPress={seePairRequests}>
+                <MaterialIcons
+                    name="refresh"
+                    size={36}
+                />
             </TouchableOpacity>
         );
     }
@@ -93,7 +97,7 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
 
     const initialInfo = () => {
         return (
-            <Text>You are not paired with anyone.</Text>
+            <Text style={styles.xpairTitle} >You are not paired with anyone.</Text>
         );
     }
     
@@ -110,14 +114,22 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#f0f',
+      flex: 1,
+      width: "90%",
+      paddingVertical: 20,
+      paddingHorizontal: 15,
+      backgroundColor: "white",
+      borderRadius: 16,
+      justifyContent: "center",
+      marginBottom: 20,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      elevation: 6,
     },
     list: {
-      width: '100%',
+    width: '100%',
       flexGrow: 0,
     },
     smallContainer: {
@@ -162,6 +174,9 @@ const styles = StyleSheet.create({
       color: '#000000',
       fontSize: 14,
   },
+    refeshButton: {
+
+    }
 });
 
 export default PairingInfo;
