@@ -21,8 +21,54 @@ export default function Index() {
     }
   });
 
-  return (
-    < LinearGradient colors = { ['#FFE4EB', '#FFC6D5']} style = { styles.container } >
+  const checkStatus = async () => {
+    console.log("Checking status...");
+    const user = auth.currentUser;
+    if (user) {
+      const userRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setIsSubmitted(data.coupleDynamics !== null && data.cultureDynamics !== null && data.familyDynamics !== null && data.personalityDynamics !== null);
+        console.log("isSubmitted: ", isSubmitted);
+        const confirmPairRequestFunction = httpsCallable(functions, "confirmPairing");
+        const myParams = {
+          user: auth.currentUser?.uid,
+        }
+        const result = await confirmPairRequestFunction(myParams);
+        const results = result.data as { success: boolean };
+        if (results.success) {
+          setIsPartnerFinished(true);
+        }
+        else {
+          setIsPartnerFinished(false);
+        }
+        console.log("partnerComplete: ", isPartnerFinished);
+      } else {
+        console.log("No such document!");
+      }
+    } else {
+      console.log("No user is signed in");
+    }
+  }
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.emailVerified) {
+        checkStatus();
+      } else {
+        console.log("User is not authenticated or email not verified.");
+        router.replace('/auth/login');
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup the listener on unmount
+  }, []
+  );
+
+  const hasNotSubmitted = () => {
+    return (
+      <>
         <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
           <Text style={styles.title}>Assessment</Text>
           <Text style={styles.description}>
@@ -31,10 +77,68 @@ export default function Index() {
           <View style={styles.divider} />
           <Text style={styles.actionText}>Begin Assessment</Text>
         </TouchableOpacity>
-      <Text style={styles.title}>Pair with Partner</Text>
-      <ScrollView>
+        <Text style={styles.title}>Pair with Partner</Text>
         <PairPartner />
-      </ScrollView>
+        </>
+    );
+  }
+
+  const submittedAndWaiting = () => {
+    return (
+      <>
+        <TouchableOpacity style={styles.box} onPress={() => router.push("/report/personality")}>
+          <Text style={styles.title}>Relationship Report</Text>
+          <Text style={styles.description}>
+            Waiting for your partner to complete their assessment NOT WORKING YET
+          </Text>
+          <View style={styles.divider} />
+          <Text style={styles.actionText}>View Results</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
+          <Text style={styles.title}>Resources</Text>
+          <Text style={styles.description}>
+            Explore general self-help resources. NOT READY YET
+          </Text>
+          <View style={styles.divider} />
+          <Text style={styles.actionText}>View Resources</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Pair with Partner</Text>
+        <PairPartner />
+        </>
+    );
+  }
+
+  const submittedAndReady = () => {
+    return (
+      <>
+        <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
+          <Text style={styles.title}>Relationship Report</Text>
+          <Text style={styles.description}>
+            See your relationship's strengths NOT WORKING YET
+          </Text>
+          <View style={styles.divider} />
+          <Text style={styles.actionText}>View Results</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
+          <Text style={styles.title}>Resources</Text>
+          <Text style={styles.description}>
+            Explore general self-help resources NOT READY YET
+          </Text>
+          <View style={styles.divider} />
+          <Text style={styles.actionText}>View Resources</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Pair with Partner</Text>
+        <PairPartner />
+      </>
+    );
+  }
+  return (
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.container} >
+      <SafeAreaView>
+        <ScrollView>
+          {isSubmitted ? (isPartnerFinished ? submittedAndReady() : submittedAndWaiting()) : hasNotSubmitted()}
+        </ScrollView>
+      </SafeAreaView>
     </LinearGradient >
   );
 }

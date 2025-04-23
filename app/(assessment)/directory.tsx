@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Alert, SafeAreaView } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useState, useEffect } from "react";
@@ -12,7 +12,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebaseConfig'
 
 export default function AssessmentDirectoryScreen() {
-  const names = [ "Personality", "Family", "Couple", "Cultural" ];
+  const names = ["Personality", "Family", "Couple", "Cultural"];
   const [progressData, setProgressData] = useState<any>({});
 
   const auth = getAuth();
@@ -21,7 +21,7 @@ export default function AssessmentDirectoryScreen() {
   const allSectionsComplete = () => {
     return names.every((name) => progressData[name] === 1);
   };
-  
+
   const headerHeight = useHeaderHeight();
 
   useFocusEffect(
@@ -40,9 +40,9 @@ export default function AssessmentDirectoryScreen() {
           const answers = JSON.parse(savedAnswers);
           let completedCount = 0;
           for (let i = 0; i < answers.length; i++) {
-              if (answers[i] !== 0) {
-                  completedCount++;
-              }
+            if (answers[i] !== 0) {
+              completedCount++;
+            }
           }
           progress[name] = completedCount / answers.length;
         } else {
@@ -87,39 +87,41 @@ export default function AssessmentDirectoryScreen() {
       Alert.alert("Results Submitted", "Your results have been submitted successfully.");
     }
   }
-  
+
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={[styles.container, { paddingTop: headerHeight }]}>
-      {names.map((name) => (
-        <TouchableOpacity key={name} style={styles.sectionContainer} onPress={() => router.push(`./section/${name}`)}
-        activeOpacity={0.7}>
-          {/* <Link href={`./section/${name}`} style={styles.linkText}>{name}</Link> */}
-          <Text style={styles.title}>{name} Dynamics</Text>
-          {progressData[name] !== undefined && (
-            <View style={styles.progressContainer}>
-              <Progress.Bar
-                progress={progressData[name]}
-                width={260}
-                height={6}
-                color="#5856ce"
-                unfilledColor="lightgray"
-                borderWidth={0}
-                borderRadius={5}
-              />
-              <Text style={styles.progressText}>{Math.round(progressData[name] * 100)}%</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      ))}
-      
-      {allSectionsComplete() ? (
-        <TouchableOpacity style={styles.submitButton} onPress={submitResults}>
-          <Text style={styles.submitText}>Submit</Text>
-        </TouchableOpacity>
-      ) : 
-        (<TouchableOpacity style={styles.unsubmittableButton} onPress={() => {Alert.alert("Can't Submit Yet", "Please complete the questionaire before submitting"); console.log("User tried to submit before completing the questionnaire")}}>
-          <Text style={styles.submitText}>Submit</Text>
-        </TouchableOpacity>)}
+      <SafeAreaView>
+        {names.map((name) => (
+          <TouchableOpacity key={name} style={styles.sectionContainer} onPress={() => router.push(`./section/${name}`)}
+            activeOpacity={0.7}>
+            {/* <Link href={`./section/${name}`} style={styles.linkText}>{name}</Link> */}
+            <Text style={styles.title}>{name} Dynamics</Text>
+            {progressData[name] !== undefined && (
+              <View style={styles.progressContainer}>
+                <Progress.Bar
+                  progress={progressData[name]}
+                  width={260}
+                  height={6}
+                  color="#5856ce"
+                  unfilledColor="lightgray"
+                  borderWidth={0}
+                  borderRadius={5}
+                />
+                <Text style={styles.progressText}>{Math.round(progressData[name] * 100)}%</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        ))}
+
+        {allSectionsComplete() ? (
+          <TouchableOpacity style={styles.submitButton} onPress={submitResults}>
+            <Text style={styles.submitText}>Submit</Text>
+          </TouchableOpacity>
+        ) :
+          (<TouchableOpacity style={styles.unsubmittableButton} onPress={() => { Alert.alert("Can't Submit Yet", "Please complete the questionaire before submitting"); console.log("User tried to submit before completing the questionnaire") }}>
+            <Text style={styles.submitText}>Submit</Text>
+          </TouchableOpacity>)}
+      </SafeAreaView>
     </LinearGradient>
   );
 }
@@ -132,7 +134,7 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 50,
     backgroundColor: '#fff',
-    
+
   },
   sectionContainer: {
     marginBottom: 20,
@@ -175,35 +177,35 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '500',
     alignSelf: 'flex-start'
-    }, 
-    submitButton: {
-      backgroundColor: '#fff',
-      paddingVertical: 12,
-      paddingHorizontal: 30,
-      borderRadius: 30,
-      marginTop: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 4,
-      elevation: 4,
-    },
-    unsubmittableButton: {
-      backgroundColor: '#bbb',
-      paddingVertical: 12,
-      paddingHorizontal: 30,
-      borderRadius: 30,
-      marginTop: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 4,
-      elevation: 4,
-    },
-    submitText: {
-      color: '#5856ce',
-      fontWeight: 'bold',
-      fontSize: 16,
-      textAlign: 'center',
-    },
+  },
+  submitButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  unsubmittableButton: {
+    backgroundColor: '#bbb',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  submitText: {
+    color: '#5856ce',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });
