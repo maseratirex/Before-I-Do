@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useState, useEffect } from "react";
@@ -8,6 +8,8 @@ import { getAuth } from "firebase/auth";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from 'expo-router';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/firebaseConfig'
 
 export default function AssessmentDirectoryScreen() {
   const names = [ "Personality", "Family", "Couple", "Cultural" ];
@@ -56,6 +58,35 @@ export default function AssessmentDirectoryScreen() {
   useEffect(() => {
     loadProgress();
   }, [userId]);
+
+  const submitResults = async () => {
+    console.log("Submitting results...");
+    const user = auth.currentUser;
+    if (user) {
+      var answers = [];
+      for (let name of names) {
+        const storageKey = `answers-${userId}-${name.toLowerCase()}`;
+        try {
+          const savedAnswers = await AsyncStorage.getItem(storageKey);
+          if (savedAnswers) {
+            const sectionAnswers = JSON.parse(savedAnswers);
+            answers.push(sectionAnswers);
+          }
+        } catch (error) {
+          console.error(`Error loading progress for ${name}:`, error);
+        }
+      }
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(userRef, {
+        personalityDynamics: answers[0],
+        familyDynamics: answers[1],
+        coupleDynamics: answers[2],
+        cultureDynamics: answers[3],
+      }, { merge: true });
+      console.log("Results submitted successfully");
+      Alert.alert("Results Submitted", "Your results have been submitted successfully.");
+    }
+  }
   
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={[styles.container, { paddingTop: headerHeight }]}>
@@ -81,11 +112,14 @@ export default function AssessmentDirectoryScreen() {
         </TouchableOpacity>
       ))}
       
-      {allSectionsComplete() && (
-        <TouchableOpacity style={styles.submitButton} onPress={() => console.log("Submitted!")}>
+      {allSectionsComplete() ? (
+        <TouchableOpacity style={styles.submitButton} onPress={submitResults}>
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
-      )}
+      ) : 
+        (<TouchableOpacity style={styles.unsubmittableButton} onPress={() => {Alert.alert("Can't Submit Yet", "Please complete the questionaire before submitting"); console.log("User tried to submit before completing the questionnaire")}}>
+          <Text style={styles.submitText}>Submit</Text>
+        </TouchableOpacity>)}
     </LinearGradient>
   );
 }
@@ -154,7 +188,18 @@ const styles = StyleSheet.create({
       shadowRadius: 4,
       elevation: 4,
     },
-    
+    unsubmittableButton: {
+      backgroundColor: '#bbb',
+      paddingVertical: 12,
+      paddingHorizontal: 30,
+      borderRadius: 30,
+      marginTop: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      elevation: 4,
+    },
     submitText: {
       color: '#5856ce',
       fontWeight: 'bold',
