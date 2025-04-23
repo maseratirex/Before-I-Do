@@ -22,21 +22,53 @@ export default function Index() {
   });
 
   return (
-    < LinearGradient colors = { ['#FFE4EB', '#FFC6D5']} style = { styles.container } >
-        <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
-          <Text style={styles.title}>Assessment</Text>
-          <Text style={styles.description}>
-            Discover insights about yourself and your relationship
-          </Text>
-          <View style={styles.divider} />
-          <Text style={styles.actionText}>Begin Assessment</Text>
-        </TouchableOpacity>
-      <Text style={styles.title}>Pair with Partner</Text>
-      <ScrollView>
-        <PairPartner />
-      </ScrollView>
-    </LinearGradient >
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.centeredSection}>
+            <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
+              <Text style={styles.title}>Assessment</Text>
+              <Text style={styles.description}>
+                Discover insights about yourself and your relationship
+              </Text>
+              <View style={styles.divider} />
+              <Text style={styles.actionText}>Begin Assessment</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.title}>Pair with Partner</Text>
+          </View>
+
+          <PairPartner />
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
+    // < LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.container} >
+    //   <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
+    //     <Text style={styles.title}>Assessment</Text>
+    //     <Text style={styles.description}>
+    //       Discover insights about yourself and your relationship
+    //     </Text>
+    //     <View style={styles.divider} />
+    //     <Text style={styles.actionText}>Begin Assessment</Text>
+    //   </TouchableOpacity>
+    //   <Text style={styles.title}>Pair with Partner</Text>
+    // </LinearGradient >
   );
+  // <View
+  //   style={{
+  //     flex: 1,
+  //     justifyContent: "center",
+  //     alignItems: "center",
+  //   }}>
+  //   <Pressable style={styles.button} onPress={() => router.push("/directory")}>
+  //     <Text style={styles.buttonText}>Begin assessment</Text>
+  //   </Pressable>
+  //   <Text style={styles.title}>Pair with Partner</Text>
+  //   <ScrollView style={styles.list}>
+  //     <PairPartner />
+  //   </ScrollView>
+  // </View>
+  // );
 }
 
 const styles = StyleSheet.create({
