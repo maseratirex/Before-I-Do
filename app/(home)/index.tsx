@@ -22,7 +22,7 @@ export default function Index() {
   });
 
   return (
-< !--     < LinearGradient colors = { ['#FFE4EB', '#FFC6D5']} style = { styles.container } >
+    < LinearGradient colors = { ['#FFE4EB', '#FFC6D5']} style = { styles.container } >
         <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
           <Text style={styles.title}>Assessment</Text>
           <Text style={styles.description}>
@@ -32,23 +32,11 @@ export default function Index() {
           <Text style={styles.actionText}>Begin Assessment</Text>
         </TouchableOpacity>
       <Text style={styles.title}>Pair with Partner</Text>
-    </LinearGradient >
-  ); -->
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
-      <Pressable style={styles.button} onPress={() => router.push("/directory")}>
-        <Text style={styles.buttonText}>Begin assessment</Text>
-      </Pressable>
-      <Text style={styles.title}>Pair with Partner</Text>
-      <ScrollView style={styles.list}>
+      <ScrollView>
         <PairPartner />
       </ScrollView>
-    </View>
-    );
+    </LinearGradient >
+  );
 }
 
 const styles = StyleSheet.create({
