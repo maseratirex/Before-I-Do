@@ -70,6 +70,7 @@ export default function CreateAccountScreen() {
         onChangeText={setInitials}
         value={initials}
         maxLength={3}
+        placeholderTextColor="#888"
       />
       <TextInput
         style={styles.input}
@@ -78,6 +79,7 @@ export default function CreateAccountScreen() {
         autoCapitalize="none"
         onChangeText={setEmail}
         value={email}
+        placeholderTextColor="#888"
       />
       <TextInput
         style={styles.input}
@@ -85,6 +87,7 @@ export default function CreateAccountScreen() {
         secureTextEntry
         onChangeText={setPassword}
         value={password}
+        placeholderTextColor="#888"
       />
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>

@@ -53,7 +53,11 @@ const SeeRequestsComp = ({ isPaired, setIsPaired, pairRequests,  setRequests, se
         return (
             <View style={styles.container}> 
                 <Text style={styles.message}>{pairRequests[0].email} sent you a pair request</Text>
-                <TouchableOpacity style={styles.button} onPress={acceptPairRequest}><Text>Accept</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={acceptPairRequest}>
+                    <Text style={styles.buttonText}>
+                        Accept
+                    </Text>
+                </TouchableOpacity>
             </View>
         );
     }
@@ -95,11 +99,19 @@ const SeeRequestsComp = ({ isPaired, setIsPaired, pairRequests,  setRequests, se
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#0ff',
+      flex: 1,
+      width: "90%",
+      paddingVertical: 20,
+      paddingHorizontal: 15,
+      backgroundColor: "white",
+      borderRadius: 16,
+      justifyContent: "center",
+      marginBottom: 20,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      elevation: 6,
     },
     list: {
       width: '100%',
@@ -111,11 +123,6 @@ const styles = StyleSheet.create({
       padding: 20,
       backgroundColor: '#fff',
   },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
     input: {
         width: '100%',
         padding: 10,
@@ -126,26 +133,25 @@ const styles = StyleSheet.create({
     },
     button: {
         width: '100%',
-        padding: 15,
-        backgroundColor: '#007bff',
+        padding: 8,
+        backgroundColor: '#FF9FB8',
         alignItems: 'center',
-        borderRadius: 5,
-        marginTop: 10,
+        borderRadius: 15,
+        marginBottom: 10,
     },
     buttonText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+        lineHeight: 22,
     },
     linkText: {
         marginTop: 15,
         color: '#007bff',
         fontSize: 14,
     },
-    emailText: {
-      marginTop: 15,
-      color: '#000000',
-      fontSize: 14,
+    message: {
+      marginBottom: 20,
   },
 });
 

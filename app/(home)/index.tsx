@@ -4,6 +4,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from '@/firebaseConfig'
 import PairPartner from '@/components/PairPartner';
 import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Index() {
   const router = useRouter();
@@ -15,33 +16,56 @@ export default function Index() {
   });
   
   return (
-<!--     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.container}>
-        <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
-          <Text style={styles.title}>Assessment</Text>
-          <Text style={styles.description}>
-            Discover insights about yourself and your relationship
-          </Text>
-          <View style={styles.divider} />
-          <Text style={styles.actionText}>Begin Assessment</Text>
-        </TouchableOpacity>
-      <Text style={styles.title}>Pair with Partner</Text>
+    // <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.container}>
+    //     <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
+    //       <Text style={styles.title}>Assessment</Text>
+    //       <Text style={styles.description}>
+    //         Discover insights about yourself and your relationship
+    //       </Text>
+    //       <View style={styles.divider} />
+    //       <Text style={styles.actionText}>Begin Assessment</Text>
+    //     </TouchableOpacity>
+    //   <Text style={styles.title}>Pair with Partner</Text>
+    //   <ScrollView style={styles.list}>
+    //      <PairPartner/>
+    //   </ScrollView>
+    // </LinearGradient>
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.centeredSection}>
+            <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
+              <Text style={styles.title}>Assessment</Text>
+              <Text style={styles.description}>
+                Discover insights about yourself and your relationship
+              </Text>
+              <View style={styles.divider} />
+              <Text style={styles.actionText}>Begin Assessment</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.title}>Pair with Partner</Text>
+          </View>
+
+          <PairPartner />
+        </ScrollView>
+      </SafeAreaView>
     </LinearGradient>
-  ); -->
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
-      <Pressable style={styles.button} onPress={() => router.push("/directory")}>
-        <Text style={styles.buttonText}>Begin assessment</Text>
-      </Pressable>
-      <Text style={styles.title}>Pair with Partner</Text>
-      <ScrollView style={styles.list}>
-        <PairPartner/>
-      </ScrollView>
-    </View>
-    );
+  ); 
+    // <View
+    //   style={{
+    //     flex: 1,
+    //     justifyContent: "center",
+    //     alignItems: "center",
+    //   }}>
+    //   <Pressable style={styles.button} onPress={() => router.push("/directory")}>
+    //     <Text style={styles.buttonText}>Begin assessment</Text>
+    //   </Pressable>
+    //   <Text style={styles.title}>Pair with Partner</Text>
+    //   <ScrollView style={styles.list}>
+    //     <PairPartner/>
+    //   </ScrollView>
+    // </View>
+    // );
 }
 
 const styles = StyleSheet.create({
@@ -50,7 +74,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#fff',
     },
     box: {
       width: "90%",
@@ -65,6 +88,7 @@ const styles = StyleSheet.create({
       shadowOpacity: 0.2,
       shadowRadius: 2,
       elevation: 6,
+      alignItems: "center",
     },
     description: {
       fontSize: 14,
@@ -83,9 +107,17 @@ const styles = StyleSheet.create({
       color: "#4a4a4a",
     
     },
-    list: {
+    scroll: {
       width: '100%',
-      flexGrow: 0,
+    },
+    
+    scrollContent: {
+      paddingBottom: 20,
+    },
+    
+    centeredSection: {
+      alignItems: 'center',
+      width: '100%',
     },
     smallContainer: {
       justifyContent: 'center',
