@@ -1,51 +1,43 @@
 import { Tabs } from "expo-router";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import TabBarCard from "@/components/TabBarCard";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
-const TAB_WIDTH = 320;
+const TAB_BAR_HEIGHT = 60
+const TAB_ITEM_SIZE = 30
 
 export default function HomeLayout() {
   return (
-    <View style={styles.screen}>
+    <View style={{flex: 1}}>
       <Tabs
-        // tabBar={(props) => <TabBarCard {...props} />}
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: "black", // Use this to set the color of the icons
-          // tabBarLabelStyle: { // Use this to style the labels
-          //   fontSize: 20,
-          // },
-          // tabBarBackground: () => (
-          //   <View style={styles.tabBarWrapper}>
-          //     <View style={styles.tabBar} />
-          //   </View>
-          // ),
-          // tabBarButton: () => (
-          // ),
-          // tabBarItemStyle: {
-            // gap: 20,
-            // left: 20,
-            // backgroundColor: "red",
-            // left: 34.5,
-            // justifyContent: "center",
-            // borderRadius: 16,
-            // borderTopRightRadius: 0,
-            // borderBottomRightRadius: 0,
-            // // alignItems: "center",
-            // shadowColor: "#000",
-            // shadowOffset: { width: 0, height: 6 },
-            // shadowOpacity: 0.2,
-            // shadowRadius: 10,
-          // },
+          tabBarLabelStyle: { // Use this to style the labels
+            // fontSize: 20,
+            fontWeight: 'bold',
+          },
+          tabBarItemStyle: {
+            // This next line centers the icon vertically
+            marginTop: -10 + (TAB_BAR_HEIGHT-TAB_ITEM_SIZE)/2, // The -10 aligns the top of the icon/label pair to the top of the tab bar
+            padding: 0,
+            borderRadius: 16,
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.2,
+            shadowRadius: 10,
+          },
           // tabBarShowLabel: false,
           tabBarStyle: {
+            // paddingTop: 0,
             backgroundColor: "white",
             bottom: 40, // Shifts the tab bar up and down
             position: "absolute", // Shows your screen under the tab bar
-            height: 60,
-            marginLeft: 34.5, // Hard code centering
-            width: "83%",
+            height: TAB_BAR_HEIGHT,
+            width: "83%", // The tab bar is 83% of the screen's width
+            // This next line centers the tab bar horizontally
+            marginLeft: "8.5%", // 17% divided by 2
             borderRadius: 16,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 6 },
@@ -60,8 +52,8 @@ export default function HomeLayout() {
           options={{
             title: "Home",
             tabBarIcon: ({ color, size }) => (
-              <MaterialIcons
-                name="home"
+              <Ionicons
+                name="home-outline"
                 size={size}
                 color={color} />
             ),
@@ -72,8 +64,8 @@ export default function HomeLayout() {
           options={{
             title: "Profile",
             tabBarIcon: ({ color, size }) => (
-              <MaterialIcons
-                name="person"
+              <Ionicons
+                name="person-outline"
                 size={size}
                 color={color}
               />
@@ -84,29 +76,3 @@ export default function HomeLayout() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  tabBarWrapper: {
-    position: "absolute",
-    bottom: 0,
-    // width: "100%",
-    alignItems: "center",
-  },
-  tabBar: {
-    width: TAB_WIDTH,
-    height: 500,
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-});
