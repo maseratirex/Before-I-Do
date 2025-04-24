@@ -1,29 +1,57 @@
 import { Tabs } from "expo-router";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-
+import TabBarCard from "@/components/TabBarCard";
 
 const TAB_WIDTH = 320;
 
 export default function HomeLayout() {
   return (
-    <View style={styles.container}>
+    <View style={styles.screen}>
       <Tabs
+        // tabBar={(props) => <TabBarCard {...props} />}
         screenOptions={{
           headerShown: false,
-          tabBarBackground: () => (
-            <View style={styles.tabBarWrapper}>
-              <View style={styles.tabBar} />
-            </View>
-          ),
-          tabBarShowLabel: false,
+          tabBarActiveTintColor: "black", // Use this to set the color of the icons
+          // tabBarLabelStyle: { // Use this to style the labels
+          //   fontSize: 20,
+          // },
+          // tabBarBackground: () => (
+          //   <View style={styles.tabBarWrapper}>
+          //     <View style={styles.tabBar} />
+          //   </View>
+          // ),
+          // tabBarButton: () => (
+          // ),
+          // tabBarItemStyle: {
+            // gap: 20,
+            // left: 20,
+            // backgroundColor: "red",
+            // left: 34.5,
+            // justifyContent: "center",
+            // borderRadius: 16,
+            // borderTopRightRadius: 0,
+            // borderBottomRightRadius: 0,
+            // // alignItems: "center",
+            // shadowColor: "#000",
+            // shadowOffset: { width: 0, height: 6 },
+            // shadowOpacity: 0.2,
+            // shadowRadius: 10,
+          // },
+          // tabBarShowLabel: false,
           tabBarStyle: {
-            backgroundColor: "transparent",
-            position: "absolute",
-            // alignItems: "center",
-            height: 90,
-            borderTopWidth: 0,
-            elevation: 0,
+            backgroundColor: "white",
+            bottom: 40, // Shifts the tab bar up and down
+            position: "absolute", // Shows your screen under the tab bar
+            height: 60,
+            marginLeft: 34.5, // Hard code centering
+            width: "83%",
+            borderRadius: 16,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.5,
+            shadowRadius: 10,
+            // left: 20,
           },
         }}
       >
@@ -31,20 +59,11 @@ export default function HomeLayout() {
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-                <MaterialIcons
-                  name="home"
-                  size={36} // Icon size
-                  color={focused ? "#007AFF" : "gray"}
-                />
-                <Text
-                  style={[styles.label, { color: focused ? "#007AFF" : "gray" }]}
-                  numberOfLines={1}
-                >
-                  Home
-                </Text>
-              </View>
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons
+                name="home"
+                size={size}
+                color={color} />
             ),
           }}
         />
@@ -52,20 +71,12 @@ export default function HomeLayout() {
           name="profile"
           options={{
             title: "Profile",
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-                <MaterialIcons
-                  name="person"
-                  size={36} // Icon size
-                  color={focused ? "#007AFF" : "gray"}
-                />
-                <Text
-                  style={[styles.label, { color: focused ? "#007AFF" : "gray" }]}
-                  numberOfLines={1}
-                >
-                  Profile
-                </Text>
-              </View>
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons
+                name="person"
+                size={size}
+                color={color}
+              />
             ),
           }}
         />
@@ -75,18 +86,18 @@ export default function HomeLayout() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
   },
   tabBarWrapper: {
     position: "absolute",
-    bottom: 30,
-    width: "100%",
+    bottom: 0,
+    // width: "100%",
     alignItems: "center",
   },
   tabBar: {
     width: TAB_WIDTH,
-    height: 80,
+    height: 500,
     borderRadius: 20,
     backgroundColor: "#fff",
     flexDirection: "row",
@@ -97,21 +108,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 8,
-  },
-  tabItem: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: TAB_WIDTH / 2,
-  },
-  square: {
-    width: 36,
-    height: 36,
-    borderRadius: 6,
-    marginBottom: 4,
-  },
-  label: {
-    fontSize: 12,
-    color: "#333",
-    textAlign: "center",
   },
 });

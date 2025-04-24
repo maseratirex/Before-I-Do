@@ -8,7 +8,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 
-const PairPartner = () => {
+export default function PairPartnerCard() {
     const [isPaired, setIsPaired] = useState("");
     const [hasSentRequest, setHasSentRequest] = useState("");
     const [sentRequest, setSentRequest] = useState("");
@@ -92,69 +92,10 @@ const PairPartner = () => {
     );
 
     return (
-        <View style={styles.container}>
-            <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} partnerInitials={partnerInitials} setPartnerInitials={setPartnerInitials} partnerEmail={partnerEmail} setPartnerEmail={setPartnerEmail}/>
-            <SeeRequestsComp isPaired={isPaired} setIsPaired={setIsPaired} pairRequests={requests} setRequests={setRequests} setPartnerInitials={setPartnerInitials} setPartnerEmail={setPartnerEmail} />
-            <SendRequestsComp isPaired={isPaired} hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest}/>
-        </View>
+      <>
+        <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} partnerInitials={partnerInitials} setPartnerInitials={setPartnerInitials} partnerEmail={partnerEmail} setPartnerEmail={setPartnerEmail} />
+        {isPaired ? <></> : <SeeRequestsComp setIsPaired={setIsPaired} pairRequests={requests} setRequests={setRequests} setPartnerInitials={setPartnerInitials} setPartnerEmail={setPartnerEmail} />}
+        {isPaired ? <></> : <SendRequestsComp hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest} />}
+      </>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        // padding: 20,
-        // backgroundColor: '#0f0',
-        backgroundColor: 'transparent',
-    },
-    list: {
-      width: '100%',
-      flexGrow: 0,
-    },
-    smallContainer: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 20,
-      backgroundColor: '#fff',
-  },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    input: {
-        width: '100%',
-        padding: 10,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-    },
-    button: {
-        width: '100%',
-        padding: 15,
-        backgroundColor: '#007bff',
-        alignItems: 'center',
-        borderRadius: 5,
-        marginTop: 10,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    linkText: {
-        marginTop: 15,
-        color: '#007bff',
-        fontSize: 14,
-    },
-    emailText: {
-      marginTop: 15,
-      color: '#000000',
-      fontSize: 14,
-  },
-});
-
-export default PairPartner;
