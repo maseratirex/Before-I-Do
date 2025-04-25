@@ -85,6 +85,7 @@ export default function AssessmentDirectoryScreen() {
       }, { merge: true });
       console.log("Results submitted successfully");
       Alert.alert("Results Submitted", "Your results have been submitted successfully.");
+      router.back();
     }
   }
 

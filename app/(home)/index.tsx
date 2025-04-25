@@ -50,7 +50,7 @@ export default function Index() {
         console.log("No such document!");
       }
 
-      let localHasStarted = false;
+      let localHasStarted = localIsSubmitted;
       if (!localIsSubmitted) {
         for (let name of names) {
           const storageKey = `answers-${user.uid}-${name.toLowerCase()}`;
