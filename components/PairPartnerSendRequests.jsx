@@ -63,7 +63,7 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
 
     const sentRequestReturn = () => {
         return (
-            <View style={styles.container}> 
+            <View> 
                 <Text style={styles.title}>Pairing Request Sent</Text>
                 <Text style={styles.message}>You have already sent a pairing request to {sentRequestEmail}.</Text>
                 <TouchableOpacity style={styles.button} onPress={cancelPairRequest}>
@@ -75,8 +75,7 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
 
     const noSentRequestReturn = () => {
         return (
-            <View style={styles.container}> 
-                <Text style={styles.title}>Partner Email</Text>
+            <View> 
                 <View style={styles.emailRequest}>
                     <TextInput
                         style={styles.input}
@@ -87,6 +86,7 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
                         autoCapitalize="none"
                         placeholderTextColor="#888"
                     />
+                    <View style={styles.spacing}></View>
                     <TouchableOpacity style={styles.button} onPress={sendPairRequest}>
                         <Text style={styles.buttonText}>Send Pair Request</Text>
                     </TouchableOpacity>
@@ -99,6 +99,9 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
 }
 
 const styles = StyleSheet.create({
+    spacing: {
+        paddingVertical: 8,
+    },
     container: {
       width: "83%",
       paddingVertical: 20,

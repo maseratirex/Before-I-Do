@@ -61,25 +61,47 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
         }
     }
 
-    return (
-        <View style={styles.container}>
-            {isPaired ?
-                <View>
-                    <Text>{"You are paired with " + partnerInitials + " (" + partnerEmail + ")."}</Text>
-                    <TouchableOpacity style={styles.button} onPress={unpairUsers}>
-                        <Text>Unpair</Text>
+    const isPairedReturn = () => {
+        return (
+            <View>
+                <Text style={styles.title}>Pair Partner</Text>
+                <Text>{"You are paired with " + partnerInitials + " (" + partnerEmail + ")."}</Text>
+                <TouchableOpacity style={styles.button} onPress={unpairUsers}>
+                    <Text>Unpair</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    const isNotPairedReturn = () => {
+        return (
+            <>
+                <View style={styles.notPairedContainer}>
+                    <Text style={styles.title}>Pair Partner</Text>
+                    <TouchableOpacity style={styles.refreshButton} onPress={seePairRequests}>
+                        <MaterialIcons name="refresh" size={36} />
                     </TouchableOpacity>
-                </View> : hasSentRequest ?
-                    <Text>You have sent a pairing request.</Text> : numRecievedRequest > 0 ?
-                        <Text>You have received {numRecievedRequest} pairing requests.</Text> :
-                        <Text style={styles.description} >You are not paired with anyone.</Text>}
-            {isPaired ? "" :
-                <TouchableOpacity style={styles.refreshButton} onPress={seePairRequests}>
-                    <MaterialIcons
-                        name="refresh"
-                        size={36}
-                    />
-                </TouchableOpacity>}
+                </View>
+                {hasSentRequest ? (
+                    <>
+                        <Text>You have sent a pairing request.</Text>
+                    </>
+                ) : numRecievedRequest > 0 ? (
+                    <>
+                        <Text>You have received {numRecievedRequest} pairing requests.</Text>
+                    </>
+                ) : (
+                    <>
+                        <Text style={styles.description}>Enter your partner's email to send them a pair request:</Text>
+                    </>
+                )}
+            </>
+        );
+    }
+
+    return (
+        <View>
+            {isPaired ? isPairedReturn() : isNotPairedReturn()}
         </View>
     );
 }
@@ -105,6 +127,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#007bff',
         alignItems: 'center',
         borderRadius: 5,
+    },
+    notPairedContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
     },
 });
 

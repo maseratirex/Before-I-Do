@@ -51,7 +51,7 @@ const SeeRequestsComp = ({ setIsPaired, pairRequests,  setRequests, setPartnerIn
 
     const oneRecievedRequestReturn = () => {
         return (
-            <View style={styles.container}> 
+            <View> 
                 <Text style={styles.message}>{pairRequests[0].email} sent you a pair request</Text>
                 <TouchableOpacity style={styles.button} onPress={acceptPairRequest}>
                     <Text style={styles.buttonText}>
@@ -77,7 +77,7 @@ const SeeRequestsComp = ({ setIsPaired, pairRequests,  setRequests, setPartnerIn
 
     const multiRecievedRequestsReturn = () => {
         return (
-            <View style={styles.container}> 
+            <View> 
                 <Text style={styles.message}>You have the following pair requests:</Text>
                 {pairRequests.map((request, index) => (
                     <View key={index}>

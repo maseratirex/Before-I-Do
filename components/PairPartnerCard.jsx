@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import PairingInfo from '@/components/PairPartnerInfo';
 import SeeRequestsComp from '@/components/PairPartnerRecievedRequests';
 import SendRequestsComp from '@/components/PairPartnerSendRequests';
@@ -92,10 +92,45 @@ export default function PairPartnerCard() {
     );
 
     return (
-      <>
+      <View style={styles.card}>
         <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} partnerInitials={partnerInitials} setPartnerInitials={setPartnerInitials} partnerEmail={partnerEmail} setPartnerEmail={setPartnerEmail} />
         {isPaired ? <></> : <SeeRequestsComp setIsPaired={setIsPaired} pairRequests={requests} setRequests={setRequests} setPartnerInitials={setPartnerInitials} setPartnerEmail={setPartnerEmail} />}
         {isPaired ? <></> : <SendRequestsComp hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest} />}
-      </>
+      </View>
     )
 }
+
+const styles = StyleSheet.create({
+  card: {
+      width: "83%",
+      paddingVertical: 20,
+      paddingHorizontal: 15,
+      backgroundColor: "white",
+      borderRadius: 16,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+  },
+  description: {
+      fontSize: 14,
+      color: "#333",
+      marginBottom: 10,
+  },
+  divider: {
+      width: "100%",
+      height: 1,
+      backgroundColor: "#ccc",
+      marginVertical: 10,
+  },
+  actionText: {
+      fontSize: 15,
+      fontWeight: "bold",
+      color: "#4a4a4a",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+},
+});
