@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { onAuthStateChanged } from "firebase/auth";
@@ -76,8 +76,9 @@ export default function Index() {
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
       <ScrollView>
         <SafeAreaView style={styles.containerForCards}>
+          <Text>started questionaire: {} submitted questionaire: {String(isSubmitted)} partner finished: {String(isPartnerFinished)}</Text>
           {/* This shows Assessment or Report and Resources */}
-          {isSubmitted ? <><ReportCard isPartnerAssessmentSubmitted={true} /><ReportCard isPartnerAssessmentSubmitted={false} /><ResourcesCard /></> : <AssessmentCard />}
+          {isSubmitted ? (isPartnerFinished ? <><ReportCard isPartnerAssessmentSubmitted={true} /><ResourcesCard /></> : <><ReportCard isPartnerAssessmentSubmitted={false} /><ResourcesCard /></>) : <AssessmentCard />}
           <PairPartnerCard />
         </SafeAreaView>
       </ScrollView>

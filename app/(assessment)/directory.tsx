@@ -107,7 +107,9 @@ export default function AssessmentDirectoryScreen() {
                   borderWidth={0}
                   borderRadius={5}
                 />
-                <Text style={styles.progressText}>{Math.round(progressData[name] * 100)}%</Text>
+                <View style={styles.progressTextContainer}>
+                  <Text style={styles.progressText}>{Math.round(progressData[name] * 100)}%</Text>
+                </View>
               </View>
             )}
           </TouchableOpacity>
@@ -163,7 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   progressTextContainer: {
-    flex: 1,
+    width: 40, // Set a fixed width to ensure consistent card width
     alignItems: 'flex-end',
   },
   progressText: {
