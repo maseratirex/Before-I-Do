@@ -1,6 +1,7 @@
 import { View, StyleSheet, ScrollView, Text } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useHeaderHeight } from '@react-navigation/elements';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from '@/firebaseConfig'
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,6 +19,7 @@ import ResourcesCard from '@/components/ResourcesCard'
 export default function Index() {
   const headerHeight = useHeaderHeight();
   const router = useRouter();
+  const [hasStarted, setHasStarted] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isPartnerFinished, setIsPartnerFinished] = useState(false);
 
@@ -28,37 +30,55 @@ export default function Index() {
   });
 
   const checkStatus = async () => {
-    console.log("Checking status...");
+    const names = ["Personality", "Family", "Couple", "Cultural"];
     const user = auth.currentUser;
     if (user) {
       const userRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(userRef);
+      let localIsSubmitted = false;
+      let localIsPartnerFinished = false;
+
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setIsSubmitted(data.coupleDynamics !== null && data.cultureDynamics !== null && data.familyDynamics !== null && data.personalityDynamics !== null);
-        console.log("isSubmitted: ", isSubmitted);
-        const confirmPairRequestFunction = httpsCallable(functions, "confirmPairing");
-        const myParams = {
-          user: auth.currentUser?.uid,
-        }
-        const result = await confirmPairRequestFunction(myParams);
+        localIsSubmitted = data.coupleDynamics !== null && data.cultureDynamics !== null && data.familyDynamics !== null && data.personalityDynamics !== null;
+        const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
+        const myParams = { user: auth.currentUser?.uid };
+        const result = await checkPartnerResponsesFunction(myParams);
         const results = result.data as { success: boolean };
-        if (results.success) {
-          setIsPartnerFinished(true);
-        }
-        else {
-          setIsPartnerFinished(false);
-        }
-        console.log("partnerComplete: ", isPartnerFinished);
+        localIsPartnerFinished = results.success;
       } else {
         console.log("No such document!");
       }
+
+      let localHasStarted = false;
+      if (!localIsSubmitted) {
+        for (let name of names) {
+          const storageKey = `answers-${user.uid}-${name.toLowerCase()}`;
+          try {
+            const savedAnswers = await AsyncStorage.getItem(storageKey);
+            if (savedAnswers) {
+              const answers = JSON.parse(savedAnswers);
+              if (answers.some((answer: number) => answer !== 0)) {
+                localHasStarted = true;
+                break;
+              }
+            }
+          } catch (error) {
+            console.error(`Error loading progress for ${name}:`, error);
+          }
+        }
+      }
+
+      // Update state after all calculations
+      setIsSubmitted(localIsSubmitted);
+      setIsPartnerFinished(localIsPartnerFinished);
+      setHasStarted(localHasStarted);
     } else {
       console.log("No user is signed in");
     }
   }
 
-  useEffect(() => {
+  useFocusEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user && user.emailVerified) {
         checkStatus();
@@ -69,16 +89,15 @@ export default function Index() {
     });
 
     return () => unsubscribe(); // Cleanup the listener on unmount
-  }, []
-  );
+  });
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
       <ScrollView>
         <SafeAreaView style={styles.containerForCards}>
-          <Text>started questionaire: {} submitted questionaire: {String(isSubmitted)} partner finished: {String(isPartnerFinished)}</Text>
+          <Text>started questionaire: {String(hasStarted)} submitted questionaire: {String(isSubmitted)} partner finished: {String(isPartnerFinished)}</Text>
           {/* This shows Assessment or Report and Resources */}
-          {isSubmitted ? (isPartnerFinished ? <><ReportCard isPartnerAssessmentSubmitted={true} /><ResourcesCard /></> : <><ReportCard isPartnerAssessmentSubmitted={false} /><ResourcesCard /></>) : <AssessmentCard />}
+          {isSubmitted ? (isPartnerFinished ? <><ReportCard isPartnerAssessmentSubmitted={true} /><ResourcesCard /></> : <><ReportCard isPartnerAssessmentSubmitted={false} /><ResourcesCard /></>) : <AssessmentCard hasUserStarted={hasStarted}/>}
           <PairPartnerCard />
         </SafeAreaView>
       </ScrollView>

@@ -1,7 +1,7 @@
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 
-export default function AssessmentCard() {
+export default function AssessmentCard(hasUserStarted) {
     const router = useRouter();
     return (
         <TouchableOpacity style={styles.card} onPress={() => router.push("/directory")}>
@@ -10,7 +10,7 @@ export default function AssessmentCard() {
                 Discover insights about yourself and your relationship
             </Text>
             <View style={styles.divider} />
-            <Text style={styles.actionText}>Begin Assessment</Text>
+            <Text style={styles.actionText}>{hasUserStarted ? "Continue" : "Begin"} Assessment</Text>
         </TouchableOpacity>
     );
 }
