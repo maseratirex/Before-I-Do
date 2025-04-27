@@ -15,7 +15,7 @@ const reverseScoreIndexes = {"personality": [], "family": [17, 27], "couple": [2
 const LikertScale = ({ section, subsections, answers, setAnswers }) => {
   const handlePress = (questionIndex, value) => {
     const updatedAnswers = [...answers]; // Copy array
-    updatedAnswers[questionIndex] = (reverseScoreIndexes[section].includes(questionIndex)) ? 6 - value : value; // Update specific index
+    updatedAnswers[questionIndex] = (reverseScoreIndexes[section].includes(questionIndex)) ? String(6 - value) : value; // Update specific index
     setAnswers(updatedAnswers); // Update state
   };
 
@@ -39,11 +39,11 @@ const LikertScale = ({ section, subsections, answers, setAnswers }) => {
                       <TouchableOpacity
                         style={[
                           styles.radioButton,
-                          answers[index] === ((reverseScoreIndexes[section].includes(index)) ? 6 - value : value) && styles.selectedRadioButton,
+                          answers[index] === ((reverseScoreIndexes[section].includes(index)) ? String(6 - value) : value) && styles.selectedRadioButton,
                         ]}
                         onPress={() => handlePress(index, value)}
                       >
-                        {answers[index] === ((reverseScoreIndexes[section].includes(index)) ? 6 - value : value) && <View style={styles.radioInner} />}
+                        {answers[index] === ((reverseScoreIndexes[section].includes(index)) ? String(6 - value) : value) && <View style={styles.radioInner} />}
                       </TouchableOpacity>
                       <Text style={styles.radioLabel}>{labels[idx]}</Text>
                     </View>

@@ -1,8 +1,9 @@
-import { View, StyleSheet, Text, Button, TouchableOpacity, Alert, FlatList, TextInput, ScrollView, Pressable } from "react-native";
-import { Link, useRouter } from "expo-router";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { View, StyleSheet, ScrollView, Text } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useHeaderHeight } from '@react-navigation/elements';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from '@/firebaseConfig'
-import PairPartner from '@/components/PairPartner';
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { doc, getDoc } from 'firebase/firestore';
@@ -10,8 +11,15 @@ import { httpsCallable } from "firebase/functions";
 import { functions } from "@/firebaseConfig";
 import React, { useState, useEffect } from "react";
 
+import PairPartnerCard from '@/components/PairPartnerCard';
+import ReportCard from '@/components/ReportCard'
+import AssessmentCard from '@/components/AssessmentCard'
+import ResourcesCard from '@/components/ResourcesCard'
+
 export default function Index() {
+  const headerHeight = useHeaderHeight();
   const router = useRouter();
+  const [hasStarted, setHasStarted] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isPartnerFinished, setIsPartnerFinished] = useState(false);
 
@@ -21,147 +29,89 @@ export default function Index() {
     }
   });
 
+  const checkStatus = async () => {
+    const names = ["Personality", "Family", "Couple", "Cultural"];
+    const user = auth.currentUser;
+    if (user) {
+      const userRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userRef);
+      let localIsSubmitted = false;
+      let localIsPartnerFinished = false;
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        localIsSubmitted = data.coupleDynamics !== null && data.cultureDynamics !== null && data.familyDynamics !== null && data.personalityDynamics !== null;
+        const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
+        const myParams = { user: auth.currentUser?.uid };
+        const result = await checkPartnerResponsesFunction(myParams);
+        const results = result.data as { success: boolean };
+        localIsPartnerFinished = results.success;
+      } else {
+        console.log("No such document!");
+      }
+
+      let localHasStarted = localIsSubmitted;
+      if (!localIsSubmitted) {
+        for (let name of names) {
+          const storageKey = `answers-${user.uid}-${name.toLowerCase()}`;
+          try {
+            const savedAnswers = await AsyncStorage.getItem(storageKey);
+            if (savedAnswers) {
+              const answers = JSON.parse(savedAnswers);
+              if (answers.some((answer: number) => answer !== 0)) {
+                localHasStarted = true;
+                break;
+              }
+            }
+          } catch (error) {
+            console.error(`Error loading progress for ${name}:`, error);
+          }
+        }
+      }
+
+      // Update state after all calculations
+      setIsSubmitted(localIsSubmitted);
+      setIsPartnerFinished(localIsPartnerFinished);
+      setHasStarted(localHasStarted);
+    } else {
+      console.log("No user is signed in");
+    }
+  }
+
+  useFocusEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.emailVerified) {
+        checkStatus();
+      } else {
+        console.log("User is not authenticated or email not verified.");
+        router.replace('/auth/login');
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup the listener on unmount
+  });
+
   return (
-    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
-      <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-          <View style={styles.centeredSection}>
-            <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
-              <Text style={styles.title}>Assessment</Text>
-              <Text style={styles.description}>
-                Discover insights about yourself and your relationship
-              </Text>
-              <View style={styles.divider} />
-              <Text style={styles.actionText}>Begin Assessment</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.title}>Pair with Partner</Text>
-          </View>
-
-          <PairPartner />
-        </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
-    // < LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.container} >
-    //   <TouchableOpacity style={styles.box} onPress={() => router.push("/directory")}>
-    //     <Text style={styles.title}>Assessment</Text>
-    //     <Text style={styles.description}>
-    //       Discover insights about yourself and your relationship
-    //     </Text>
-    //     <View style={styles.divider} />
-    //     <Text style={styles.actionText}>Begin Assessment</Text>
-    //   </TouchableOpacity>
-    //   <Text style={styles.title}>Pair with Partner</Text>
-    // </LinearGradient >
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+      <ScrollView>
+        <SafeAreaView style={styles.containerForCards}>
+          <Text>started questionaire: {String(hasStarted)} submitted questionaire: {String(isSubmitted)} partner finished: {String(isPartnerFinished)}</Text>
+          {/* This shows Assessment or Report and Resources */}
+          {isSubmitted ? (isPartnerFinished ? <><ReportCard isPartnerAssessmentSubmitted={true} /><ResourcesCard /></> : <><ReportCard isPartnerAssessmentSubmitted={false} /><ResourcesCard /></>) : <AssessmentCard hasUserStarted={hasStarted} />}
+          <PairPartnerCard />
+        </SafeAreaView>
+      </ScrollView>
+    </LinearGradient >
   );
-  // <View
-  //   style={{
-  //     flex: 1,
-  //     justifyContent: "center",
-  //     alignItems: "center",
-  //   }}>
-  //   <Pressable style={styles.button} onPress={() => router.push("/directory")}>
-  //     <Text style={styles.buttonText}>Begin assessment</Text>
-  //   </Pressable>
-  //   <Text style={styles.title}>Pair with Partner</Text>
-  //   <ScrollView style={styles.list}>
-  //     <PairPartner />
-  //   </ScrollView>
-  // </View>
-  // );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
+  root: {
+    flex: 1, // Occupy the entire screen vertically and horizontally.
+    // ScrollView requires a bounded height; flex: 1 informs the LinearGradient's child
+    // that the height is the entire screen
+  },
+  containerForCards: {
+    gap: 20, // Adds spacing between the cards
     alignItems: 'center',
-    padding: 20,
-  },
-  box: {
-    width: "90%",
-    paddingVertical: 20,
-    paddingHorizontal: 15,
-    backgroundColor: "white",
-    borderRadius: 16,
-    justifyContent: "center",
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 6,
-    alignItems: "center",
-  },
-  description: {
-    fontSize: 14,
-    color: "#333",
-    marginBottom: 10,
-  },
-  divider: {
-    width: "100%",
-    height: 1,
-    backgroundColor: "#ccc",
-    marginVertical: 10,
-  },
-  actionText: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "#4a4a4a",
-
-  },
-  scroll: {
-    width: '100%',
-  },
-
-  scrollContent: {
-    paddingBottom: 20,
-  },
-
-  centeredSection: {
-    alignItems: 'center',
-    width: '100%',
-  },
-  smallContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    padding: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-  },
-  button: {
-    width: '100%',
-    padding: 15,
-    backgroundColor: '#007bff',
-    alignItems: 'center',
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  linkText: {
-    marginTop: 15,
-    color: '#007bff',
-    fontSize: 14,
-  },
-  emailText: {
-    marginTop: 15,
-    color: '#000000',
-    fontSize: 14,
   },
 });

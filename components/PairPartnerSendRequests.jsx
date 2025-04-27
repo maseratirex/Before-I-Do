@@ -4,7 +4,7 @@ import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 
-const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) => {
+const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) => {
     const [email, setEmail] = useState("");
 
     const sendPairRequest = async () => {
@@ -63,7 +63,7 @@ const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentReq
 
     const sentRequestReturn = () => {
         return (
-            <View style={styles.container}> 
+            <View> 
                 <Text style={styles.title}>Pairing Request Sent</Text>
                 <Text style={styles.message}>You have already sent a pairing request to {sentRequestEmail}.</Text>
                 <TouchableOpacity style={styles.button} onPress={cancelPairRequest}>
@@ -75,8 +75,7 @@ const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentReq
 
     const noSentRequestReturn = () => {
         return (
-            <View style={styles.container}> 
-                <Text style={styles.title}>Partner Email</Text>
+            <View> 
                 <View style={styles.emailRequest}>
                     <TextInput
                         style={styles.input}
@@ -87,6 +86,7 @@ const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentReq
                         autoCapitalize="none"
                         placeholderTextColor="#888"
                     />
+                    <View style={styles.spacing}></View>
                     <TouchableOpacity style={styles.button} onPress={sendPairRequest}>
                         <Text style={styles.buttonText}>Send Pair Request</Text>
                     </TouchableOpacity>
@@ -95,35 +95,24 @@ const SendRequestsComp = ({ isPaired, hasSentRequest, setHasSentRequest, sentReq
         );
     }
 
-    return (isPaired ? <View></View> : (hasSentRequest ? sentRequestReturn() : noSentRequestReturn()));
+    return hasSentRequest ? sentRequestReturn() : noSentRequestReturn();
 }
 
 const styles = StyleSheet.create({
+    spacing: {
+        paddingVertical: 8,
+    },
     container: {
-      flex: 1,
-      width: "90%",
+      width: "83%",
       paddingVertical: 20,
       paddingHorizontal: 15,
       backgroundColor: "white",
       borderRadius: 16,
-      justifyContent: "center",
-      marginBottom: 20,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.2,
       shadowRadius: 2,
-      elevation: 6,
     },
-    list: {
-      width: '100%',
-      flexGrow: 0,
-    },
-    smallContainer: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 20,
-      backgroundColor: '#fff',
-  },
     title: {
         fontSize: 15,
         fontWeight: "bold",
@@ -133,11 +122,9 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         padding: 10,
-        marginBottom: 10,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 9,
-        marginRight: 15,
     },
     button: {
         width: '100%',
@@ -145,7 +132,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#FF9FB8',
         alignItems: 'center',
         borderRadius: 15,
-        marginBottom: 10,
     },
     buttonText: {
         color: '#fff',
@@ -153,22 +139,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         lineHeight: 22,
     },
-    linkText: {
-        marginTop: 15,
-        color: '#007bff',
-        fontSize: 14,
-    },
-    emailText: {
-      marginTop: 15,
-      color: '#000000',
-      fontSize: 14,
-  },
     emailRequest: {
         // flexDirection: 'row',
-  },
+    },
     message: {
-        marginBottom: 20,
-
+        // marginBottom: 20,
     },
 });
 

@@ -1,29 +1,38 @@
 import { Tabs } from "expo-router";
-import { View, StyleSheet, Text } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-
-const TAB_WIDTH = 320;
+const TAB_BAR_HEIGHT = 65
+const TAB_ITEM_SIZE = 30
 
 export default function HomeLayout() {
   return (
-    <View style={styles.container}>
+    <View style={{flex: 1}}>
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarBackground: () => (
-            <View style={styles.tabBarWrapper}>
-              <View style={styles.tabBar} />
-            </View>
-          ),
-          tabBarShowLabel: false,
+          tabBarActiveTintColor: "black", // Use this to set the color of the icons
+          tabBarLabelStyle: { // Use this to style the labels
+            // fontSize: 20,
+            fontWeight: 'bold',
+          },
+          tabBarItemStyle: {
+            // This next line centers the icon vertically
+            marginTop: -10 + (TAB_BAR_HEIGHT-TAB_ITEM_SIZE)/2, // The -10 aligns the top of the icon/label pair to the top of the tab bar
+          },
           tabBarStyle: {
-            backgroundColor: "transparent",
-            position: "absolute",
-            // alignItems: "center",
-            height: 90,
-            borderTopWidth: 0,
-            elevation: 0,
+            backgroundColor: "white",
+            bottom: 40, // Shifts the tab bar up and down
+            position: "absolute", // Shows your screen under the tab bar
+            height: TAB_BAR_HEIGHT,
+            width: "83%", // The tab bar is 83% of the screen's width
+            // This next line centers the tab bar horizontally
+            marginLeft: "8.5%", // (100-83)% divided by 2
+            borderRadius: 16,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.5,
+            shadowRadius: 10,
           },
         }}
       >
@@ -31,20 +40,11 @@ export default function HomeLayout() {
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-                <MaterialIcons
-                  name="home"
-                  size={36} // Icon size
-                  color={focused ? "#007AFF" : "gray"}
-                />
-                <Text
-                  style={[styles.label, { color: focused ? "#007AFF" : "gray" }]}
-                  numberOfLines={1}
-                >
-                  Home
-                </Text>
-              </View>
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name="home-outline"
+                size={size}
+                color={color} />
             ),
           }}
         />
@@ -52,20 +52,12 @@ export default function HomeLayout() {
           name="profile"
           options={{
             title: "Profile",
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-                <MaterialIcons
-                  name="person"
-                  size={36} // Icon size
-                  color={focused ? "#007AFF" : "gray"}
-                />
-                <Text
-                  style={[styles.label, { color: focused ? "#007AFF" : "gray" }]}
-                  numberOfLines={1}
-                >
-                  Profile
-                </Text>
-              </View>
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name="person-outline"
+                size={size}
+                color={color}
+              />
             ),
           }}
         />
@@ -73,45 +65,3 @@ export default function HomeLayout() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  tabBarWrapper: {
-    position: "absolute",
-    bottom: 30,
-    width: "100%",
-    alignItems: "center",
-  },
-  tabBar: {
-    width: TAB_WIDTH,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  tabItem: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: TAB_WIDTH / 2,
-  },
-  square: {
-    width: 36,
-    height: 36,
-    borderRadius: 6,
-    marginBottom: 4,
-  },
-  label: {
-    fontSize: 12,
-    color: "#333",
-    textAlign: "center",
-  },
-});
