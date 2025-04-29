@@ -1,33 +1,27 @@
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView, Text } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useHeaderHeight } from '@react-navigation/elements';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from '@/firebaseConfig'
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TouchableOpacity, Alert } from "react-native";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db, functions } from '@/firebaseConfig'
 import { doc, getDoc } from 'firebase/firestore';
 import { httpsCallable } from "firebase/functions";
-import { functions } from "@/firebaseConfig";
-import React, { useState, useEffect } from "react";
 
 import PairPartnerCard from '@/components/PairPartnerCard';
 import ReportCard from '@/components/ReportCard'
 import AssessmentCard from '@/components/AssessmentCard'
 import ResourcesCard from '@/components/ResourcesCard'
 
-export default function Index() {
-  const headerHeight = useHeaderHeight();
+export default function HomeScreen() {
   const router = useRouter();
   const [hasStarted, setHasStarted] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isPartnerFinished, setIsPartnerFinished] = useState(false);
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user || !user.emailVerified) {
-      router.replace('/auth/login');
-    }
-  });
 
   const checkStatus = async () => {
     const names = ["Personality", "Family", "Couple", "Cultural"];
@@ -113,5 +107,6 @@ const styles = StyleSheet.create({
   containerForCards: {
     gap: 20, // Adds spacing between the cards
     alignItems: 'center',
+    paddingBottom: 100, // Update this magic number so it depends on the tab bar height and margin/padding
   },
 });

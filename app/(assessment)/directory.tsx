@@ -1,13 +1,11 @@
+import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, TouchableOpacity, Alert, SafeAreaView } from "react-native";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useHeaderHeight } from '@react-navigation/elements';
-import { useState, useEffect } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Progress from 'react-native-progress';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth } from "firebase/auth";
-import React from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from 'expo-router';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebaseConfig'
 
