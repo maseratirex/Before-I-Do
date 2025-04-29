@@ -32,29 +32,47 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
         }
     }
 
-    const seePairRequests = async () => {
+    const updatePairStatus = async () => {
         try {
-            const checkPairRequestFunction = httpsCallable(functions, "checkPairRequest");
+            const checkPairStatusFunction = httpsCallable(functions, "seePairStatus");
             const auth = getAuth();
             const myParams = {
                 user: auth.currentUser?.uid,
             };
 
-            const result = await checkPairRequestFunction(myParams);
-            const data = result.data;
-            if (data.success) {
-                const temp = [];
-                for (let i = 0; i < data.emails.length; i++) {
-                    temp.push({
-                        id: i,
-                        email: data.emails[i],
-                        isDesired: false,
-                    })
+            const statusResult = await checkPairStatusFunction(myParams);
+            const statusData = statusResult.data;
+            if (statusData.success) {
+                if (statusData.type == "paired") {
+                    setIsPaired(true);
+                    setPartnerInitials(statusData.partnerInitials);
+                    setPartnerEmail(statusData.partnerData);
                 }
-                setRequests(temp);
-                console.log("Pair requests:", temp);
-            } else {
-                setRequests([]);
+                else {
+                    setIsPaired(false);
+                    setPartnerInitials("");
+                    setPartnerEmail("");
+                    const checkPairRequestFunction = httpsCallable(functions, "checkPairRequest");
+                    const requestsResult = await checkPairRequestFunction(myParams);
+                    const requestsData = requestsResult.data;
+                    if (requestsData.success) {
+                        const temp = [];
+                        for (let i = 0; i < requestsData.emails.length; i++) {
+                            temp.push({
+                                id: i,
+                                email: requestsData.emails[i],
+                                isDesired: false,
+                            })
+                        }
+                        setRequests(temp);
+                        console.log("Pair requests:", temp);
+                    } else {
+                        setRequests([]);
+                    }
+                }
+            }
+            else {
+                console.log("Failed to check pair status:", statusData.message);
             }
         } catch (error) {
             console.error("seePairRequests: Error occurred:", error);
@@ -78,7 +96,7 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
             <>
                 <View style={styles.notPairedContainer}>
                     <Text style={styles.title}>Pair Partner</Text>
-                    <TouchableOpacity style={styles.refreshButton} onPress={seePairRequests}>
+                    <TouchableOpacity style={styles.refreshButton} onPress={updatePairStatus}>
                         <MaterialIcons name="refresh" size={36} />
                     </TouchableOpacity>
                 </View>
