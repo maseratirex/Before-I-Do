@@ -11,11 +11,17 @@ export default function PersonalityScreen() {
   const [sectionTitles, setSectionTitles] = useState<string[]>([]);
   const [selectedSectionIndex, setSelectedSectionIndex] = useState<number>(0);
   const scrollViewRef = useRef<ScrollView>(null);
-  const sectionDescriptions = ["The ability to stay calm and balanced under pressure helps partners navigate stress without becoming overwhelmed. It supports emotional steadiness and healthier conflict resolution.",
+  const sectionDescriptions = [
+    "The ability to stay calm and balanced under pressure helps partners navigate stress without becoming overwhelmed. It supports emotional steadiness and healthier conflict resolution.",
     "The capacity to understand and share another’s feelings deepens emotional connection and trust. It fosters compassion and more supportive, empathetic interactions.",
     "The tendency to embrace new ideas and experiences encourages growth, flexibility, and mutual exploration. It creates space for open-minded communication and adaptability in the relationship.",
     "A sense of self-assurance and inner security allows individuals to express themselves clearly and confidently. It reduces the need for constant reassurance and promotes mutual respect.",
     "The tendency to feel safe and supported in close relationships builds trust and emotional intimacy. It helps partners remain connected and resilient through challenges."]
+
+    const screenWidth = Dimensions.get('window').width * 0.9; // chart container width
+    const barCount = combinedData.length;
+    const barWidth = 20;
+    const spacing = barCount > 1 ? (screenWidth - barCount * barWidth) / (barCount - 1) : 0;
 
   const loadData = async () => {
     const user = auth.currentUser;
@@ -81,16 +87,8 @@ export default function PersonalityScreen() {
         const userAverage = userSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
         const partnerAverage = partnerSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
 
-        // Add bars for user and partner for the current subsection
-        newCombinedData.push({
-          value: userAverage,
-          frontColor: '#FFCDD9',
-          spacing: 0.5,
-        });
-        newCombinedData.push({
-          value: partnerAverage,
-          frontColor: '#DD90A8',
-        });
+        newCombinedData.push({ value: userAverage, spacing: 0.5, barBorderRadius: 3 });
+        newCombinedData.push({ value: partnerAverage, barBorderRadius: 3 });
 
         startIndex += length;
       });
@@ -142,8 +140,9 @@ export default function PersonalityScreen() {
                 },
               };
             })}
-            barWidth={20}
-            spacing={15}
+            barWidth={barWidth}
+            spacing={spacing}
+            initialSpacing={spacing / 2}
             hideRules
             noOfSections={5}
             yAxisLabelTexts={['—', '—', '—', '—', '—', '—']}
