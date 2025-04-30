@@ -104,20 +104,19 @@ export default function FamilyScreen() {
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
       <View style={styles.container}>
         <View style={styles.centeredContent}>
-          {/* Legend */}
-          <View style={styles.legendContainer}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendColor, { backgroundColor: '#DD90A8' }]} />
-              <Text style={styles.legendText}>You</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendColor, { backgroundColor: '#6178AE' }]} />
-              <Text style={styles.legendText}>Your Partner</Text>
-            </View>
-          </View>
-
-          {/* Bar Chart */}
           <View style={styles.chartContainer}>
+            {/* Legend */}
+            <View style={styles.legendContainer}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendColor, { backgroundColor: '#DD90A8' }]} />
+                <Text style={styles.legendText}>You</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendColor, { backgroundColor: '#6178AE' }]} />
+                <Text style={styles.legendText}>Your Partner</Text>
+              </View>
+            </View>
+
             <BarChart
               data={combinedData.map((bar, index) => {
                 const isUser = index % 2 === 0;
@@ -144,7 +143,7 @@ export default function FamilyScreen() {
               spacing={spacing}
               initialSpacing={(screenWidth - (barCount * barWidth + (barCount - 1) * spacing)) / 2 + spacing / 2}
               hideRules
-              noOfSections={sectionTitles.length}
+              noOfSections={5}
               yAxisLabelTexts={['—', '—', '—', '—', '—', '—']}
               yAxisThickness={0}
               xAxisThickness={0}
@@ -228,6 +227,10 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   scrollSection: {
     maxHeight: 120,

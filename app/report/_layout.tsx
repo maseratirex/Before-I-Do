@@ -50,12 +50,12 @@ export default function ReportLayout() {
           }}
         />
         <Tabs.Screen
-          name="couple"
+          name="family"
           options={{
-            title: "Couple",
+            title: "Family",
             tabBarIcon: ({ color, size }) => (
               <Ionicons
-                name="heart-outline"
+                name="people-outline"
                 size={size}
                 color={color}
               />
@@ -63,12 +63,12 @@ export default function ReportLayout() {
           }}
         />
         <Tabs.Screen
-          name="family"
+          name="couple"
           options={{
-            title: "Family",
+            title: "Couple",
             tabBarIcon: ({ color, size }) => (
               <Ionicons
-                name="people-outline"
+                name="heart-outline"
                 size={size}
                 color={color}
               />
