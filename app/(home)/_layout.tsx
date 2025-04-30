@@ -2,8 +2,9 @@ import { Tabs } from "expo-router";
 import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const TAB_BAR_HEIGHT = 65
+const TAB_BAR_HEIGHT = 75
 const TAB_ITEM_SIZE = 30
+const TAB_ICON_SIZE = 30
 
 export default function HomeLayout() {
   return (
@@ -12,8 +13,11 @@ export default function HomeLayout() {
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: "black", // Use this to set the color of the icons
+          tabBarIconStyle: {
+            
+          },
           tabBarLabelStyle: { // Use this to style the labels
-            // fontSize: 20,
+            fontSize: 12,
             fontWeight: 'bold',
           },
           tabBarItemStyle: {
@@ -30,9 +34,9 @@ export default function HomeLayout() {
             marginLeft: "8.5%", // (100-83)% divided by 2
             borderRadius: 16,
             shadowColor: "#000",
-            shadowOffset: { width: 0, height: 6 },
-            shadowOpacity: 0.5,
-            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 2, // Density of shadow
           },
         }}
       >
@@ -40,10 +44,10 @@ export default function HomeLayout() {
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: ({ color, size }) => (
+            tabBarIcon: ({ color }) => (
               <Ionicons
                 name="home-outline"
-                size={size}
+                size={TAB_ICON_SIZE}
                 color={color} />
             ),
           }}
@@ -52,10 +56,10 @@ export default function HomeLayout() {
           name="profile"
           options={{
             title: "Profile",
-            tabBarIcon: ({ color, size }) => (
+            tabBarIcon: ({ color }) => (
               <Ionicons
                 name="person-outline"
-                size={size}
+                size={TAB_ICON_SIZE}
                 color={color}
               />
             ),

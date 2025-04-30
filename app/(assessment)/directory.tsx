@@ -57,18 +57,32 @@ export default function AssessmentDirectoryScreen() {
     loadProgress();
   }, [userId]);
 
+  const storeAssessmentSubmissionStatusLocally = async (user, status: boolean) => {
+    console.log("Storing assessment submission status in local storage as", status);
+    // Store user assessment submitted false in local storage
+    try {
+      const submittedStorageKey = user.uid + 'assessment-submitted'
+      await AsyncStorage.setItem(submittedStorageKey, JSON.stringify(status));
+    } catch (e) {
+      console.error('Failed to save assessment submission in local storage', e);
+    }
+  };
+
+
   const submitResults = async () => {
     console.log("Submitting results...");
     const user = auth.currentUser;
     if (user) {
-      var answers = [];
+      let answers = [];
       for (let name of names) {
-        const storageKey = `answers-${userId}-${name.toLowerCase()}`;
+        const sectionStorageKey = `answers-${userId}-${name.toLowerCase()}`;
         try {
-          const savedAnswers = await AsyncStorage.getItem(storageKey);
+          const savedAnswers = await AsyncStorage.getItem(sectionStorageKey);
           if (savedAnswers) {
             const sectionAnswers = JSON.parse(savedAnswers);
             answers.push(sectionAnswers);
+          } else {
+            console.error("Failed to locate saved answers in local storage");
           }
         } catch (error) {
           console.error(`Error loading progress for ${name}:`, error);
@@ -83,7 +97,10 @@ export default function AssessmentDirectoryScreen() {
       }, { merge: true });
       console.log("Results submitted successfully");
       Alert.alert("Results Submitted", "Your results have been submitted successfully.");
+      await storeAssessmentSubmissionStatusLocally(user, true);
       router.back();
+    } else {
+      console.error("No user found — should be logged in");
     }
   }
 

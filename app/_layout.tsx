@@ -26,23 +26,25 @@ export default function RootLayout() {
     }
   };
 
-  const storeAssessmentSubmissionStatusLocally = async (status: boolean) => {
+  const storeAssessmentSubmissionStatusLocally = async (user, status: boolean) => {
     console.log("Storing assessment submission status in local storage as", status);
     // Store user assessment submitted false in local storage
     try {
-      await AsyncStorage.setItem('assessmentSubmitted', JSON.stringify(status));
+      const submittedStorageKey = user.uid + 'assessment-submitted'
+      await AsyncStorage.setItem(submittedStorageKey, JSON.stringify(status));
     } catch (e) {
       console.error('Failed to save assessment status', e);
     }
   };
 
-  const setupAssessmentSubmittedLocally = async () => {
+  const setupAssessmentSubmittedLocally = async (user) => {
     // Setup assessmentSubmitted boolean in AsyncStorage
     // If it's not in local storage, check if it's stored remotely (the user may have submitted before)
     // If it's stored remotely, store it locally as true
     // If it's not stored remotely, store it locally as false
     try {
-      const assessmentSubmittedResponse = await AsyncStorage.getItem('assessmentSubmitted');
+      const submittedStorageKey = user.uid + 'assessment-submitted'
+      const assessmentSubmittedResponse = await AsyncStorage.getItem(submittedStorageKey);
       // If it's in local storage, return
       if (assessmentSubmittedResponse === 'true') {
         console.log("Found assessment submission status in local storage");
@@ -51,10 +53,10 @@ export default function RootLayout() {
         const remotelySubmitted = await isAssessmentSubmittedRemotely();
         if(remotelySubmitted) {
           console.log("Assessment was remotely submitted");
-          await storeAssessmentSubmissionStatusLocally(true); 
+          await storeAssessmentSubmissionStatusLocally(user, true); 
         } else {
           console.log("Assessment was not remotely submitted");
-          await storeAssessmentSubmissionStatusLocally(false);
+          await storeAssessmentSubmissionStatusLocally(user, false);
         }
       }
     } catch (e) {
@@ -69,7 +71,7 @@ export default function RootLayout() {
         console.log('Auth listener: redirecting to login');
         router.replace('/auth/login');
       } else {
-        setupAssessmentSubmittedLocally();
+        setupAssessmentSubmittedLocally(user);
       }
     });
 

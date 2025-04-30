@@ -25,16 +25,17 @@ export default function HomeScreen() {
     console.log("Setting up isAssessmentSubmitted and hasStartedAssessment")
     // Determine assessment progress
     try {
-      const assessmentSubmittedResponse = await AsyncStorage.getItem('assessmentSubmitted');
+      const submittedStorageKey = user.uid + 'assessment-submitted'
+      const assessmentSubmittedResponse = await AsyncStorage.getItem(submittedStorageKey);
       const submitted = assessmentSubmittedResponse === 'true'; // Convert string | null to boolean
       let started = false;
       if (!submitted) {
         // Determine whether assessment has been started
         const names = ["personality", "family", "couple", "cultural"];
         for (let name of names) {
-          const storageKey = `answers-${user.uid}-${name}`;
+          const sectionStorageKey = `answers-${user.uid}-${name}`;
           try {
-            const savedAnswers = await AsyncStorage.getItem(storageKey);
+            const savedAnswers = await AsyncStorage.getItem(sectionStorageKey);
             if (savedAnswers) {
               const answers = JSON.parse(savedAnswers);
               if (answers.some((answer: number) => answer !== 0)) {

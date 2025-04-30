@@ -3,22 +3,11 @@ import { useRouter } from "expo-router";
 import { httpsCallable } from "firebase/functions";
 import { functions, auth } from '@/firebaseConfig'
 
-// export default function ReportCard({ isPartnerAssessmentSubmitted: isPartnerAssessmentSubmitted }) {
 export default function ReportCard() {
   const router = useRouter();
-  // const [isPartnerAssessmentSubmitted, setIsPartnerAssessmentSubmitted] = useState(false);
 
   // Check partner status
   const hasPartnerSubmittedAssessment = async () => {
-    // console.log("Checking partner assessment status")
-    // const checkPartnerAssessmentStatusFunction = httpsCallable(functions, "seePartnerResponses");
-    // const functionParams = { user: auth.currentUser?.uid }; // Vulnerability
-    // const response = await checkPartnerAssessmentStatusFunction(functionParams);
-    // console.log("This is the response: " + response)
-    // setIsPartnerFinished(response.data.success);
-    // console.log("how am I here")
-    // setBlahBlah(response.data.success);
-    // console.log("ok that's just crazy")
     try {
       console.log("Checking partner assessment status");
       
@@ -35,22 +24,20 @@ export default function ReportCard() {
 
   const tryAccessReportScreen = async () => {
     // TODO: Inform the user that we're checking whether their partner has submitted
+    // TODO: Set isLoading to true while we load
     const partnerSubmittedAssessment = await hasPartnerSubmittedAssessment()
     if (partnerSubmittedAssessment) {
       router.push("/report/personality")
     } else {
-      // TODO: Inform the user that their partner has not submitted
-      console.log("Waiting for your partner to complete their assessment")
+      Alert.alert("Waiting for partner", "Your partner must complete the assessment");
     }
   }
 
   return (
-    // <TouchableOpacity style={styles.card} onPress={() => isPartnerAssessmentSubmitted && router.push("/report/personality")}>
     <TouchableOpacity style={styles.card} onPress={tryAccessReportScreen}>
       <Text style={styles.title}>Relationship Report</Text>
       <Text style={styles.description}>
         See your assessment results with your partner
-        {/* {isPartnerAssessmentSubmitted ? "See your assessment results with your partner" : "Waiting for your partner to complete their assessment"} */}
       </Text>
       <View style={styles.divider} />
       <Text style={styles.actionText}>View Results</Text>
