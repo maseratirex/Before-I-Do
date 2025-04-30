@@ -1,52 +1,101 @@
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, ScrollView, Dimensions } from "react-native";
 import { BarChart, barDataItem } from "react-native-gifted-charts";
-import { auth, db } from '@/firebaseConfig'
-import React, { useState, useEffect } from "react";
+import { auth, db, functions } from '@/firebaseConfig';
+import React, { useState, useEffect, useRef } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { questionnaire } from "../../components/questionnaire";
-
+import { httpsCallable } from "firebase/functions";
 
 export default function PersonalityScreen() {
-  const [data, setData] = useState<barDataItem[]>([]);
+  const [combinedData, setCombinedData] = useState<barDataItem[]>([]);
+  const [sectionTitles, setSectionTitles] = useState<string[]>([]);
+  const [selectedSectionIndex, setSelectedSectionIndex] = useState<number>(0);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const sectionDescriptions = ["The ability to stay calm and balanced under pressure helps partners navigate stress without becoming overwhelmed. It supports emotional steadiness and healthier conflict resolution.",
+    "The capacity to understand and share another’s feelings deepens emotional connection and trust. It fosters compassion and more supportive, empathetic interactions.",
+    "The tendency to embrace new ideas and experiences encourages growth, flexibility, and mutual exploration. It creates space for open-minded communication and adaptability in the relationship.",
+    "A sense of self-assurance and inner security allows individuals to express themselves clearly and confidently. It reduces the need for constant reassurance and promotes mutual respect.",
+    "The tendency to feel safe and supported in close relationships builds trust and emotional intimacy. It helps partners remain connected and resilient through challenges."]
 
   const loadData = async () => {
-    setData([]);
     const user = auth.currentUser;
     if (user) {
+      let userAnswers: string[] = [];
+      let partnerAnswers: string[] = [];
+
+      // Fetch current user's data
       try {
         const userRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(userRef);
         if (docSnap.exists()) {
           const userData = docSnap.data();
-          const answers = userData.personalityDynamics as string[];
-
-          // get lengths of subsections
-          const section = questionnaire.personality;
-          const subsections = Object.values(section);
-          const subsectionLengths = subsections.map((subsection) => Object.keys(subsection).length);
-          console.log(subsectionLengths);
-
-          let startIndex = 0;
-          const newData: barDataItem[] = []; // Temporary array to store all data
-          subsectionLengths.forEach((length) => {
-            const subsectionAnswers = answers
-              .slice(startIndex, startIndex + length)
-              .map((value) => parseFloat(value)); // Convert string values to numbers
-            const average = subsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
-            newData.push({
-              value: average,
-              label: String(average),
-              frontColor: '#000',
-            });
-            startIndex += length;
-          });
-
-          setData(newData); // Update state once with the complete data array
-          console.log("Personality data:", newData);
+          userAnswers = userData.personalityDynamics as string[];
+        } else {
+          console.error("User document does not exist.");
+          return;
         }
       } catch (error) {
-        console.error(`Error loading progress for Personality:`, error);
+        console.error("Error fetching user's data:", error);
+        return;
       }
+
+      // Fetch partner's data
+      try {
+        const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
+        const myParams = { user: auth.currentUser?.uid };
+        const result = await checkPartnerResponsesFunction(myParams);
+        const results = result.data as { success: boolean, responses: { personalityResponses: string[] }, message: string };
+        if (results.success) {
+          partnerAnswers = results.responses.personalityResponses;
+        } else {
+          console.error("Error fetching partner's data:", results.message);
+          return;
+        }
+      } catch (error: any) {
+        console.error("Error calling seePartnerResponses:", error.message || error);
+        if (error.code) {
+          console.error("Error code:", error.code);
+        }
+        if (error.details) {
+          console.error("Error details:", error.details);
+        }
+        return;
+      }
+
+      // Combine user and partner data for the bar chart
+      const section = questionnaire.personality;
+      setSectionTitles(Object.keys(section));
+      const subsections = Object.values(section);
+      const subsectionLengths = subsections.map((subsection) => Object.keys(subsection).length);
+
+      let startIndex = 0;
+      const newCombinedData: barDataItem[] = [];
+      subsectionLengths.forEach((length, index) => {
+        const userSubsectionAnswers = userAnswers
+          .slice(startIndex, startIndex + length)
+          .map((value) => parseFloat(value));
+        const partnerSubsectionAnswers = partnerAnswers
+          .slice(startIndex, startIndex + length)
+          .map((value) => parseFloat(value));
+
+        const userAverage = userSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
+        const partnerAverage = partnerSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
+
+        // Add bars for user and partner for the current subsection
+        newCombinedData.push({
+          value: userAverage,
+          frontColor: '#FFCDD9',
+          spacing: 0.5,
+        });
+        newCombinedData.push({
+          value: partnerAverage,
+          frontColor: '#DD90A8',
+        });
+
+        startIndex += length;
+      });
+
+      setCombinedData(newCombinedData);
     }
   };
 
@@ -55,55 +104,169 @@ export default function PersonalityScreen() {
   }, []);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
-      <Text style={{color: '#000'}}>Personality</Text>
-      <BarChart data={data} />
+    <View style={styles.container}>
+      <View style={styles.centeredContent}>
+        {/* Legend */}
+        <View style={styles.legendContainer}>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: '#DD90A8' }]} />
+            <Text style={styles.legendText}>You</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: '#6178AE' }]} />
+            <Text style={styles.legendText}>Your Partner</Text>
+          </View>
+        </View>
+  
+        {/* Bar Chart */}
+        <View style={styles.chartContainer}>
+          <BarChart
+            data={combinedData.map((bar, index) => {
+              const isUser = index % 2 === 0;
+              const pair = Math.floor(index / 2);
+              const selected = pair === selectedSectionIndex;
+              const base = isUser ? '#FFCDD9' : '#AAC1F7';
+              const border = isUser ? '#DD90A8' : '#6178AE';
+
+              return {
+                ...bar,
+                frontColor: selected ? border : base,
+                barBorderColor: border,
+                barBorderWidth: 1.5,
+                onPress: () => {
+                  setSelectedSectionIndex(pair);
+                  scrollViewRef.current?.scrollTo({
+                    x: pair * (Dimensions.get("window").width - 40),
+                    animated: true,
+                  });
+                },
+              };
+            })}
+            barWidth={20}
+            spacing={15}
+            hideRules
+            noOfSections={5}
+            yAxisLabelTexts={['—', '—', '—', '—', '—', '—']}
+            yAxisThickness={0}
+            xAxisThickness={0}
+            maxValue={5}
+            height={250}
+          />
+        </View>
+  
+        {/* Section Info */}
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          ref={scrollViewRef}
+          onMomentumScrollEnd={(e) => {
+            const newIndex = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - 40));
+            setSelectedSectionIndex(newIndex);
+          }}
+          style={styles.scrollSection}
+          contentContainerStyle={[styles.scrollContent]}
+        >
+          {sectionTitles.map((title, index) => (
+            <View key={index} style={styles.sectionPage}>
+              <Text style={styles.sectionTitle}>{title}</Text>
+              <Text style={styles.sectionDescription}>{sectionDescriptions[index]}</Text>
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* Page Control */}
+        <View style={styles.pageControlContainer}>
+          {sectionTitles.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.pageControlDot,
+                selectedSectionIndex === index && styles.pageControlDotSelected,
+              ]}
+            />
+          ))}
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#fff',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    input: {
-        width: '100%',
-        padding: 10,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-    },
-    button: {
-        width: '100%',
-        padding: 15,
-        backgroundColor: '#007bff',
-        alignItems: 'center',
-        borderRadius: 5,
-        marginTop: 10,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    linkText: {
-        marginTop: 15,
-        color: '#007bff',
-        fontSize: 14,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F8F8',
+  },
+  centeredContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  legendColor: {
+    width: 15,
+    height: 15,
+    marginRight: 6,
+    borderRadius: 3,
+  },
+  legendText: {
+    color: '#000',
+    fontSize: 14,
+  },
+  chartContainer: {
+    width: '100%',
+    backgroundColor: '#EDEDED',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  scrollSection: {
+    maxHeight: 120,
+    width: '100%',
+  },
+  scrollContent: {
+    alignItems: 'center',
+  },
+  sectionPage: {
+    width: Dimensions.get("window").width - 40,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  sectionDescription: {
+    fontSize: 14,
+    color: '#000',
+    textAlign: 'center',
+  },
+  pageControlContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  pageControlDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#ccc',
+    marginHorizontal: 5,
+  },
+  pageControlDotSelected: {
+    backgroundColor: '#DD90A8',
+  },
 });
