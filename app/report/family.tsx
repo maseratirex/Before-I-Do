@@ -1,109 +1,271 @@
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, ScrollView, Dimensions } from "react-native";
 import { BarChart, barDataItem } from "react-native-gifted-charts";
-import { auth, db } from '@/firebaseConfig'
-import React, { useState, useEffect } from "react";
+import { auth, db, functions } from '@/firebaseConfig';
+import React, { useState, useEffect, useRef } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { questionnaire } from "../../components/questionnaire";
-
+import { httpsCallable } from "firebase/functions";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function FamilyScreen() {
-  const [data, setData] = useState<barDataItem[]>([]);
+  const [combinedData, setCombinedData] = useState<barDataItem[]>([]);
+  const [sectionTitles, setSectionTitles] = useState<string[]>([]);
+  const [selectedSectionIndex, setSelectedSectionIndex] = useState<number>(0);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const sectionDescriptions = [
+    "The sense of connection and emotional bonding with one’s family provides a strong foundation for relationship security. It reflects the value placed on closeness, communication, and mutual support within the family unit.",
+    "The perception of one's parents’ marital relationship can influence expectations and patterns in one’s own relationships. It shapes beliefs around conflict, commitment, and emotional dynamics in partnerships.",
+    "The quality of interaction between one’s family and partner can impact relationship harmony and integration. It reflects openness, mutual respect, and the ability to bridge important social worlds."]
 
+  const screenWidth = Dimensions.get('window').width * 0.9;
+  const barCount = combinedData.length;
+  const barWidth = 30;
+  const spacing = barCount > 1 ? (screenWidth - barCount * barWidth) / (barCount - 1) : 0;
+  
   const loadData = async () => {
-    setData([]);
     const user = auth.currentUser;
     if (user) {
+      let userAnswers: string[] = [];
+      let partnerAnswers: string[] = [];
+
+      // Fetch current user's data
       try {
         const userRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(userRef);
         if (docSnap.exists()) {
           const userData = docSnap.data();
-          const answers = userData.familyDynamics as string[];
-
-          // get lengths of subsections
-          const section = questionnaire.family;
-          const subsections = Object.values(section);
-          const subsectionLengths = subsections.map((subsection) => Object.keys(subsection).length);
-          console.log(subsectionLengths);
-
-          let startIndex = 0;
-          const newData: barDataItem[] = []; // Temporary array to store all data
-          subsectionLengths.forEach((length) => {
-            const subsectionAnswers = answers
-              .slice(startIndex, startIndex + length)
-              .map((value) => parseFloat(value)); // Convert string values to numbers
-            const average = subsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
-            newData.push({
-              value: average,
-              label: String(average),
-              frontColor: '#000',
-            });
-            startIndex += length;
-          });
-
-          setData(newData); // Update state once with the complete data array
-          console.log("Personality data:", newData);
+          userAnswers = userData.familyDynamics as string[];
+        } else {
+          console.error("User document does not exist.");
+          return;
         }
       } catch (error) {
-        console.error(`Error loading progress for Personality:`, error);
+        console.error("Error fetching user's data:", error);
+        return;
       }
+
+      // Fetch partner's data
+      try {
+        const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
+        const myParams = { user: auth.currentUser?.uid };
+        const result = await checkPartnerResponsesFunction(myParams);
+        const results = result.data as { success: boolean, responses: { familyResponses: string[] }, message: string };
+        if (results.success) {
+          partnerAnswers = results.responses.familyResponses;
+        } else {
+          console.error("Error fetching partner's data:", results.message);
+          return;
+        }
+      } catch (error: any) {
+        console.error("Error calling seePartnerResponses:", error.message || error);
+        if (error.code) {
+          console.error("Error code:", error.code);
+        }
+        if (error.details) {
+          console.error("Error details:", error.details);
+        }
+        return;
+      }
+
+      // Combine user and partner data for the bar chart
+      const section = questionnaire.family;
+      setSectionTitles(Object.keys(section));
+      const subsections = Object.values(section);
+      const subsectionLengths = subsections.map((subsection) => Object.keys(subsection).length);
+
+      let startIndex = 0;
+      const newCombinedData: barDataItem[] = [];
+      subsectionLengths.forEach((length, index) => {
+        const userSubsectionAnswers = userAnswers
+          .slice(startIndex, startIndex + length)
+          .map((value) => parseFloat(value));
+        const partnerSubsectionAnswers = partnerAnswers
+          .slice(startIndex, startIndex + length)
+          .map((value) => parseFloat(value));
+
+        const userAverage = userSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
+        const partnerAverage = partnerSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
+
+        newCombinedData.push({ value: userAverage, spacing: 0.5, barBorderRadius: 3 });
+        newCombinedData.push({ value: partnerAverage, barBorderRadius: 3 });
+
+        startIndex += length;
+      });
+
+      setCombinedData(newCombinedData);
     }
   };
-
+  
   useEffect(() => {
     loadData();
   }, []);
-
+  
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
-      <Text style={{color: '#000'}}>Family</Text>
-      <BarChart data={data} />
-    </View>
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <View style={styles.centeredContent}>
+          {/* Legend */}
+          <View style={styles.legendContainer}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: '#DD90A8' }]} />
+              <Text style={styles.legendText}>You</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: '#6178AE' }]} />
+              <Text style={styles.legendText}>Your Partner</Text>
+            </View>
+          </View>
+
+          {/* Bar Chart */}
+          <View style={styles.chartContainer}>
+            <BarChart
+              data={combinedData.map((bar, index) => {
+                const isUser = index % 2 === 0;
+                const pair = Math.floor(index / 2);
+                const selected = pair === selectedSectionIndex;
+                const base = isUser ? '#FFCDD9' : '#AAC1F7';
+                const border = isUser ? '#DD90A8' : '#6178AE';
+
+                return {
+                  ...bar,
+                  frontColor: selected ? border : base,
+                  barBorderColor: border,
+                  barBorderWidth: 1.5,
+                  onPress: () => {
+                    setSelectedSectionIndex(pair);
+                    scrollViewRef.current?.scrollTo({
+                      x: pair * (Dimensions.get("window").width - 40),
+                      animated: true,
+                    });
+                  },
+                };
+              })}
+              barWidth={barWidth}
+              spacing={spacing}
+              initialSpacing={(screenWidth - (barCount * barWidth + (barCount - 1) * spacing)) / 2 + spacing / 2}
+              hideRules
+              noOfSections={sectionTitles.length}
+              yAxisLabelTexts={['—', '—', '—', '—', '—', '—']}
+              yAxisThickness={0}
+              xAxisThickness={0}
+              maxValue={5}
+              height={250}
+            />
+          </View>
+
+          {/* Section Info */}
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            ref={scrollViewRef}
+            onMomentumScrollEnd={(e) => {
+              const newIndex = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - 40));
+              setSelectedSectionIndex(newIndex);
+            }}
+            style={styles.scrollSection}
+            contentContainerStyle={[styles.scrollContent]}
+          >
+            {sectionTitles.map((title, index) => (
+              <View key={index} style={styles.sectionPage}>
+                <Text style={styles.sectionTitle}>{title}</Text>
+                <Text style={styles.sectionDescription}>{sectionDescriptions[index]}</Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          {/* Page Control */}
+          <View style={styles.pageControlContainer}>
+            {sectionTitles.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.pageControlDot,
+                  selectedSectionIndex === index && styles.pageControlDotSelected,
+                ]}
+              />
+            ))}
+          </View>
+        </View>
+      </View>
+    </LinearGradient>
   );
 }
-
+  
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#fff',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    input: {
-        width: '100%',
-        padding: 10,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-    },
-    button: {
-        width: '100%',
-        padding: 15,
-        backgroundColor: '#007bff',
-        alignItems: 'center',
-        borderRadius: 5,
-        marginTop: 10,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    linkText: {
-        marginTop: 15,
-        color: '#007bff',
-        fontSize: 14,
-    },
+  container: {
+    flex: 1,
+  },
+  centeredContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  legendColor: {
+    width: 15,
+    height: 15,
+    marginRight: 6,
+    borderRadius: 3,
+  },
+  legendText: {
+    color: '#000',
+    fontSize: 14,
+  },
+  chartContainer: {
+    width: '100%',
+    backgroundColor: '#EDEDED',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  scrollSection: {
+    maxHeight: 120,
+    width: '100%',
+  },
+  scrollContent: {
+    alignItems: 'center',
+  },
+  sectionPage: {
+    width: Dimensions.get("window").width - 40,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  sectionDescription: {
+    fontSize: 14,
+    color: '#000',
+    textAlign: 'center',
+  },
+  pageControlContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  pageControlDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#ccc',
+    marginHorizontal: 5,
+  },
+  pageControlDotSelected: {
+    backgroundColor: '#DD90A8',
+  },
 });

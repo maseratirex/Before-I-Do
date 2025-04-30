@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { View, StyleSheet, Text, ScrollView, Dimensions } from "react-native";
 import { BarChart, barDataItem } from "react-native-gifted-charts";
 import { auth, db, functions } from '@/firebaseConfig';
@@ -18,10 +19,10 @@ export default function PersonalityScreen() {
     "A sense of self-assurance and inner security allows individuals to express themselves clearly and confidently. It reduces the need for constant reassurance and promotes mutual respect.",
     "The tendency to feel safe and supported in close relationships builds trust and emotional intimacy. It helps partners remain connected and resilient through challenges."]
 
-    const screenWidth = Dimensions.get('window').width * 0.9; // chart container width
-    const barCount = combinedData.length;
-    const barWidth = 20;
-    const spacing = barCount > 1 ? (screenWidth - barCount * barWidth) / (barCount - 1) : 0;
+  const screenWidth = Dimensions.get('window').width * 0.9;
+  const barCount = combinedData.length;
+  const barWidth = 20;
+  const spacing = barCount > 1 ? (screenWidth - barCount * barWidth) / (barCount - 1) : 0;
 
   const loadData = async () => {
     const user = auth.currentUser;
@@ -102,99 +103,100 @@ export default function PersonalityScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.centeredContent}>
-        {/* Legend */}
-        <View style={styles.legendContainer}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: '#DD90A8' }]} />
-            <Text style={styles.legendText}>You</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: '#6178AE' }]} />
-            <Text style={styles.legendText}>Your Partner</Text>
-          </View>
-        </View>
-  
-        {/* Bar Chart */}
-        <View style={styles.chartContainer}>
-          <BarChart
-            data={combinedData.map((bar, index) => {
-              const isUser = index % 2 === 0;
-              const pair = Math.floor(index / 2);
-              const selected = pair === selectedSectionIndex;
-              const base = isUser ? '#FFCDD9' : '#AAC1F7';
-              const border = isUser ? '#DD90A8' : '#6178AE';
-
-              return {
-                ...bar,
-                frontColor: selected ? border : base,
-                barBorderColor: border,
-                barBorderWidth: 1.5,
-                onPress: () => {
-                  setSelectedSectionIndex(pair);
-                  scrollViewRef.current?.scrollTo({
-                    x: pair * (Dimensions.get("window").width - 40),
-                    animated: true,
-                  });
-                },
-              };
-            })}
-            barWidth={barWidth}
-            spacing={spacing}
-            initialSpacing={spacing / 2}
-            hideRules
-            noOfSections={5}
-            yAxisLabelTexts={['—', '—', '—', '—', '—', '—']}
-            yAxisThickness={0}
-            xAxisThickness={0}
-            maxValue={5}
-            height={250}
-          />
-        </View>
-  
-        {/* Section Info */}
-        <ScrollView
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          ref={scrollViewRef}
-          onMomentumScrollEnd={(e) => {
-            const newIndex = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - 40));
-            setSelectedSectionIndex(newIndex);
-          }}
-          style={styles.scrollSection}
-          contentContainerStyle={[styles.scrollContent]}
-        >
-          {sectionTitles.map((title, index) => (
-            <View key={index} style={styles.sectionPage}>
-              <Text style={styles.sectionTitle}>{title}</Text>
-              <Text style={styles.sectionDescription}>{sectionDescriptions[index]}</Text>
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <View style={styles.centeredContent}>
+          {/* Legend */}
+          <View style={styles.legendContainer}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: '#DD90A8' }]} />
+              <Text style={styles.legendText}>You</Text>
             </View>
-          ))}
-        </ScrollView>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: '#6178AE' }]} />
+              <Text style={styles.legendText}>Your Partner</Text>
+            </View>
+          </View>
 
-        {/* Page Control */}
-        <View style={styles.pageControlContainer}>
-          {sectionTitles.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.pageControlDot,
-                selectedSectionIndex === index && styles.pageControlDotSelected,
-              ]}
+          {/* Bar Chart */}
+          <View style={styles.chartContainer}>
+            <BarChart
+              data={combinedData.map((bar, index) => {
+                const isUser = index % 2 === 0;
+                const pair = Math.floor(index / 2);
+                const selected = pair === selectedSectionIndex;
+                const base = isUser ? '#FFCDD9' : '#AAC1F7';
+                const border = isUser ? '#DD90A8' : '#6178AE';
+
+                return {
+                  ...bar,
+                  frontColor: selected ? border : base,
+                  barBorderColor: border,
+                  barBorderWidth: 1.5,
+                  onPress: () => {
+                    setSelectedSectionIndex(pair);
+                    scrollViewRef.current?.scrollTo({
+                      x: pair * (Dimensions.get("window").width - 40),
+                      animated: true,
+                    });
+                  },
+                };
+              })}
+              barWidth={barWidth}
+              spacing={spacing}
+              initialSpacing={(screenWidth - (barCount * barWidth + (barCount - 1) * spacing)) / 2 + spacing / 2}
+              hideRules
+              noOfSections={sectionTitles.length}
+              yAxisLabelTexts={['—', '—', '—', '—', '—', '—']}
+              yAxisThickness={0}
+              xAxisThickness={0}
+              maxValue={5}
+              height={250}
             />
-          ))}
+          </View>
+
+          {/* Section Info */}
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            ref={scrollViewRef}
+            onMomentumScrollEnd={(e) => {
+              const newIndex = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - 40));
+              setSelectedSectionIndex(newIndex);
+            }}
+            style={styles.scrollSection}
+            contentContainerStyle={[styles.scrollContent]}
+          >
+            {sectionTitles.map((title, index) => (
+              <View key={index} style={styles.sectionPage}>
+                <Text style={styles.sectionTitle}>{title}</Text>
+                <Text style={styles.sectionDescription}>{sectionDescriptions[index]}</Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          {/* Page Control */}
+          <View style={styles.pageControlContainer}>
+            {sectionTitles.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.pageControlDot,
+                  selectedSectionIndex === index && styles.pageControlDotSelected,
+                ]}
+              />
+            ))}
+          </View>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
   },
   centeredContent: {
     flex: 1,
