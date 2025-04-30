@@ -37,35 +37,33 @@ export default function RootLayout() {
   };
 
   const setupAssessmentSubmittedLocally = async () => {
+    // Setup assessmentSubmitted boolean in AsyncStorage
     // If it's not in local storage, check if it's stored remotely (the user may have submitted before)
     // If it's stored remotely, store it locally as true
     // If it's not stored remotely, store it locally as false
     try {
-      const value = await AsyncStorage.getItem('assessmentSubmitted');
+      const assessmentSubmittedResponse = await AsyncStorage.getItem('assessmentSubmitted');
       // If it's in local storage, return
-      if (value) {
+      if (assessmentSubmittedResponse === 'true') {
         console.log("Found assessment submission status in local storage");
-        return;
       } else {
         console.log("Did not find assessment status in local storage");
         const remotelySubmitted = await isAssessmentSubmittedRemotely();
         if(remotelySubmitted) {
           console.log("Assessment was remotely submitted");
           await storeAssessmentSubmissionStatusLocally(true); 
-          return;
         } else {
           console.log("Assessment was not remotely submitted");
           await storeAssessmentSubmissionStatusLocally(false);
-          return;
         }
       }
     } catch (e) {
       console.error('Failed to fetch assessment status from local storage', e);
-      return;
     }
   };
 
   useEffect(() => {
+    // Runs on mount
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user || !user.emailVerified) {
         console.log('Auth listener: redirecting to login');
@@ -73,7 +71,7 @@ export default function RootLayout() {
       } else {
         setupAssessmentSubmittedLocally();
       }
- });
+    });
 
     return () => unsubscribe();
   }, []);
