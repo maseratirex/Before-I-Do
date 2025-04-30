@@ -163,7 +163,7 @@ export default function FamilyScreen() {
               setSelectedSectionIndex(newIndex);
             }}
             style={styles.scrollSection}
-            contentContainerStyle={[styles.scrollContent]}
+            contentContainerStyle={styles.scrollContent}
           >
             {sectionTitles.map((title, index) => (
               <View key={index} style={styles.sectionPage}>
@@ -235,9 +235,13 @@ const styles = StyleSheet.create({
   scrollSection: {
     maxHeight: 120,
     width: '100%',
+    borderRadius: 12, 
+    backgroundColor: '#FFF', 
+    padding: 10
   },
   scrollContent: {
     alignItems: 'center',
+    paddingVertical: 10
   },
   sectionPage: {
     width: Dimensions.get("window").width - 40,
@@ -245,7 +249,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
     textAlign: 'center',
@@ -255,6 +259,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
     textAlign: 'center',
+    lineHeight: 20
   },
   pageControlContainer: {
     flexDirection: 'row',
