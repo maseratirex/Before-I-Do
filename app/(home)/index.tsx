@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ScrollView, Text } from "react-native";
-import { useFocusEffect, useRouter } from "expo-router";
-import { useHeaderHeight } from '@react-navigation/elements';
+import React, { useState } from "react";
+import { StyleSheet, ScrollView } from "react-native";
+import { useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { TouchableOpacity, Alert } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, db, functions } from '@/firebaseConfig'
-import { doc, getDoc } from 'firebase/firestore';
-import { httpsCallable } from "firebase/functions";
+import { auth } from '@/firebaseConfig'
 
 import PairPartnerCard from '@/components/PairPartnerCard';
 import ReportCard from '@/components/ReportCard'
@@ -18,80 +13,54 @@ import AssessmentCard from '@/components/AssessmentCard'
 import ResourcesCard from '@/components/ResourcesCard'
 
 export default function HomeScreen() {
-  const router = useRouter();
-  const [hasStarted, setHasStarted] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isPartnerFinished, setIsPartnerFinished] = useState(false);
+  // Assessment statuses
+  const [hasStartedAssessment, setHasStartedAssessment] = useState(false);
+  const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false);
 
-  const checkStatus = async () => {
-    const names = ["Personality", "Family", "Couple", "Cultural"];
+  const setupAssessmentStatuses = async () => {
+    console.log("Setting up isAssessmentSubmitted and hasStartedAssessment")
+    // Determine assessment progress
     const user = auth.currentUser;
-    if (user) {
-      const userRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(userRef);
-      let localIsSubmitted = false;
-      let localIsPartnerFinished = false;
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        localIsSubmitted = data.coupleDynamics !== null && data.cultureDynamics !== null && data.familyDynamics !== null && data.personalityDynamics !== null;
-        const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
-        const myParams = { user: auth.currentUser?.uid };
-        const result = await checkPartnerResponsesFunction(myParams);
-        const results = result.data as { success: boolean };
-        localIsPartnerFinished = results.success;
+    if(user) { // This will always be true because HomeScreen would not be loaded if user were null
+      const assessmentSubmittedResponse = await AsyncStorage.getItem('assessmentSubmitted');
+      setIsAssessmentSubmitted(assessmentSubmittedResponse === 'true'); // Convert string to boolean
+      if(isAssessmentSubmitted) {
+        setHasStartedAssessment(true);
       } else {
-        console.log("No such document!");
-      }
-
-      let localHasStarted = localIsSubmitted;
-      if (!localIsSubmitted) {
+        // Determine whether assessment has been started
+        const names = ["personality", "family", "couple", "cultural"];
         for (let name of names) {
-          const storageKey = `answers-${user.uid}-${name.toLowerCase()}`;
+          const storageKey = `answers-${user.uid}-${name}`;
           try {
             const savedAnswers = await AsyncStorage.getItem(storageKey);
             if (savedAnswers) {
               const answers = JSON.parse(savedAnswers);
               if (answers.some((answer: number) => answer !== 0)) {
-                localHasStarted = true;
+                setHasStartedAssessment(true);
                 break;
               }
             }
           } catch (error) {
-            console.error(`Error loading progress for ${name}:`, error);
+            console.error(`Could not load assessment progress for ${name} section:`, error);
           }
         }
       }
-
-      // Update state after all calculations
-      setIsSubmitted(localIsSubmitted);
-      setIsPartnerFinished(localIsPartnerFinished);
-      setHasStarted(localHasStarted);
-    } else {
-      console.log("No user is signed in");
+      console.log("isAssessmentSubmitted:", isAssessmentSubmitted);
+      console.log("hasStartedAssessment:", hasStartedAssessment);
     }
   }
-
-  useFocusEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user && user.emailVerified) {
-        checkStatus();
-      } else {
-        console.log("User is not authenticated or email not verified.");
-        router.replace('/auth/login');
-      }
-    });
-
-    return () => unsubscribe(); // Cleanup the listener on unmount
-  });
+  useFocusEffect(
+    () => {
+      setupAssessmentStatuses()
+    }
+  );
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
       <ScrollView>
         <SafeAreaView style={styles.containerForCards}>
-          <Text>started questionaire: {String(hasStarted)} submitted questionaire: {String(isSubmitted)} partner finished: {String(isPartnerFinished)}</Text>
-          {/* This shows Assessment or Report and Resources */}
-          {isSubmitted ? (isPartnerFinished ? <><ReportCard isPartnerAssessmentSubmitted={true} /><ResourcesCard /></> : <><ReportCard isPartnerAssessmentSubmitted={false} /><ResourcesCard /></>) : <AssessmentCard hasUserStarted={hasStarted}/>}
+          {/* If assessment submitted, show Report and Resources cards; otherwise, show Assessment card */}
+          {isAssessmentSubmitted ? <><ReportCard/><ResourcesCard /></> : <AssessmentCard hasUserStarted={hasStartedAssessment}/>}
           <PairPartnerCard />
         </SafeAreaView>
       </ScrollView>
