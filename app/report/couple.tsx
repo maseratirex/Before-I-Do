@@ -11,15 +11,28 @@ export default function CoupleScreen() {
   const [combinedData, setCombinedData] = useState<barDataItem[]>([]);
   const [sectionTitles, setSectionTitles] = useState<string[]>([]);
   const [selectedSectionIndex, setSelectedSectionIndex] = useState<number>(0);
+  const [userScores, setUserScores] = useState<Record<string, string>>({});
+  const [partnerScores, setPartnerScores] = useState<Record<string, string>>({});
   const scrollViewRef = useRef<ScrollView>(null);
-  const sectionDescriptions = [
-    "The ability to work together with mutual respect and understanding supports a balanced and cooperative relationship dynamic. It reflects how well partners align on goals, responsibilities, and everyday interactions.",
-    "The way a couple navigates disagreements and difficulties reveals resilience and emotional maturity. It captures how partners respond to tension, miscommunication, and differing needs."]
+  const sectionDescriptions: Record<string, string> = {
+    "Harmony and Cooperation": "The ability to work together with mutual respect and understanding supports a balanced and cooperative relationship dynamic. It reflects how well partners align on goals, responsibilities, and everyday interactions.",
+    "Relationship Challenges": "The way a couple navigates disagreements and difficulties reveals resilience and emotional maturity. It captures how partners respond to tension, miscommunication, and differing needs."};
+
+  const thresholds: Record<string, [number, number, number]> = {
+    "Harmony and Cooperation": [3.0, 4.0, 5.0],
+    "Relationship Challenges": [1.71, 2.75, 5.0],
+  };
 
   const screenWidth = Dimensions.get('window').width * 0.9;
   const barCount = combinedData.length;
   const barWidth = 40;
   const spacing = barCount > 1 ? (screenWidth - barCount * barWidth) / (barCount - 1) : 0;
+
+  const determineCategory = (value: number, thresholds: [number, number, number]) => {
+    if (value <= thresholds[0]) return "Low";
+    if (value <= thresholds[1]) return "Med";
+    return "High";
+  };
 
   const loadData = async () => {
     const user = auth.currentUser;
@@ -57,23 +70,20 @@ export default function CoupleScreen() {
         }
       } catch (error: any) {
         console.error("Error calling seePartnerResponses:", error.message || error);
-        if (error.code) {
-          console.error("Error code:", error.code);
-        }
-        if (error.details) {
-          console.error("Error details:", error.details);
-        }
         return;
       }
 
       // Combine user and partner data for the bar chart
       const section = questionnaire.couple;
-      setSectionTitles(Object.keys(section));
+      const titles = Object.keys(section);
+      setSectionTitles(titles);
       const subsections = Object.values(section);
       const subsectionLengths = subsections.map((subsection) => Object.keys(subsection).length);
 
       let startIndex = 0;
       const newCombinedData: barDataItem[] = [];
+      const newUserScores: Record<string, string> = {};
+      const newPartnerScores: Record<string, string> = {};
       subsectionLengths.forEach((length, index) => {
         const userSubsectionAnswers = userAnswers
           .slice(startIndex, startIndex + length)
@@ -85,12 +95,18 @@ export default function CoupleScreen() {
         const userAverage = userSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
         const partnerAverage = partnerSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
 
+        const sectionTitle = titles[index];
+        newUserScores[sectionTitle] = determineCategory(userAverage, thresholds[sectionTitle]);
+        newPartnerScores[sectionTitle] = determineCategory(partnerAverage, thresholds[sectionTitle]);
+
         newCombinedData.push({ value: userAverage, spacing: 0.5, barBorderRadius: 3 });
         newCombinedData.push({ value: partnerAverage, barBorderRadius: 3 });
 
         startIndex += length;
       });
 
+      setUserScores(newUserScores);
+      setPartnerScores(newPartnerScores);
       setCombinedData(newCombinedData);
     }
   };
@@ -107,11 +123,11 @@ export default function CoupleScreen() {
           <View style={styles.legendContainer}>
             <View style={styles.legendItem}>
               <View style={[styles.legendColor, { backgroundColor: '#DD90A8' }]} />
-              <Text style={{fontSize: 14}}>You</Text>
+              <Text style={{fontSize: 16, fontWeight: 'bold'}}>You</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendColor, { backgroundColor: '#6178AE' }]} />
-              <Text style={{fontSize: 14}}>Your Partner</Text>
+              <Text style={{fontSize: 16, fontWeight: 'bold'}}>Your Partner</Text>
             </View>
           </View>
 
@@ -166,7 +182,41 @@ export default function CoupleScreen() {
           {sectionTitles.map((title, index) => (
             <View key={index} style={styles.sectionPage}>
               <Text style={styles.sectionTitle}>{title}</Text>
-              <Text style={styles.sectionDescription}>{sectionDescriptions[index]}</Text>
+              <Text style={styles.sectionDescription}>{sectionDescriptions[title]}</Text>
+              <View style={styles.divider} />
+                <Text style={styles.sectionTitle}>Strength in this Area</Text>
+                <View style={styles.strengthRow}>
+                    <View style={[styles.strengthRowWithScore, {paddingRight: 30}]}>
+                      <Text
+                        style={[
+                          styles.strengthValue,
+                          userScores[title] === "Low"
+                            ? styles.lowScore
+                            : userScores[title] === "Med"
+                            ? styles.mediumScore
+                            : styles.highScore,
+                        ]}
+                      >
+                        {userScores[title]}
+                      </Text>
+                      <Text style={styles.strengthLabel}>You</Text>
+                    </View>
+                    <View style={styles.strengthRowWithScore}>
+                      <Text
+                        style={[
+                          styles.strengthValue,
+                          partnerScores[title] === "Low"
+                            ? styles.lowScore
+                            : partnerScores[title] === "Med"
+                            ? styles.mediumScore
+                            : styles.highScore,
+                        ]}
+                      >
+                        {partnerScores[title]}
+                      </Text>
+                      <Text style={styles.strengthLabel}>Your{'\n'}Partner</Text>
+                    </View>
+                </View>
             </View>
           ))}
         </ScrollView>
@@ -229,7 +279,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     borderRadius: 12,
     backgroundColor: '#FFF',
-    maxHeight: 120,
   },
   sectionPage: {
     width: Dimensions.get("window").width - 40,
@@ -240,13 +289,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
-    fontSize: 20, 
+    fontSize: 21,  
   },
   sectionDescription: {
-    fontSize: 15,
+    fontSize: 17,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
     paddingHorizontal: 12,
+  },
+  divider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "#ccc",
+    marginVertical: 15,
   },
   pageControlWrapper: {
     alignSelf: 'center',
@@ -273,5 +328,47 @@ const styles = StyleSheet.create({
   },
   pageControlDotSelected: {
     backgroundColor: '#DD90A8',
+  },
+  strengthRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingHorizontal: 50,
+  },
+  strengthRowWithScore: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10
+  },
+  strengthLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  strengthValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    textAlign: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  lowScore: {
+    backgroundColor: '#FFCDD2', // Light red background
+    color: '#D32F2F', // Red text
+  },
+  mediumScore: {
+    backgroundColor: '#FFF9C4', // Light yellow background
+    color: '#FBC02D', // Yellow text
+  },
+  highScore: {
+    backgroundColor: '#C8E6C9', // Light green background
+    color: '#388E3C', // Green text
   },
 });
