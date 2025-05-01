@@ -17,8 +17,8 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
             const sendPairRequestFunction = httpsCallable(functions, "pairRequest");
             const auth = getAuth();
             const myParams = {
-            email: email,
-            user: auth.currentUser?.uid,
+                email: email,
+                user: auth.currentUser?.uid,
             }
             const result = await sendPairRequestFunction(myParams);
             const data = result.data;
@@ -63,7 +63,7 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
 
     const sentRequestReturn = () => {
         return (
-            <View> 
+            <View>
                 <Text style={styles.title}>Pairing Request Sent</Text>
                 <Text style={styles.message}>You have already sent a pairing request to {sentRequestEmail}.</Text>
                 <TouchableOpacity style={styles.button} onPress={cancelPairRequest}>
@@ -75,7 +75,8 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
 
     const noSentRequestReturn = () => {
         return (
-            <View> 
+            <View>
+                <Text style={styles.invPartnerText}>Invite Partner</Text>
                 <View style={styles.emailRequest}>
                     <TextInput
                         style={styles.input}
@@ -103,15 +104,15 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
     },
     container: {
-      width: "83%",
-      paddingVertical: 20,
-      paddingHorizontal: 15,
-      backgroundColor: "white",
-      borderRadius: 16,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 2,
+        width: "83%",
+        paddingVertical: 20,
+        paddingHorizontal: 15,
+        backgroundColor: "white",
+        borderRadius: 16,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
     },
     title: {
         fontSize: 15,
@@ -127,24 +128,35 @@ const styles = StyleSheet.create({
         borderRadius: 9,
     },
     button: {
-        width: '100%',
         padding: 8,
-        backgroundColor: '#FF9FB8',
+        backgroundColor: '#EEEEEE',
         alignItems: 'center',
-        borderRadius: 15,
+        borderRadius: 8,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1,
+
     },
     buttonText: {
-        color: '#fff',
-        fontSize: 16,
+        color: '#4a4a4a',
+        fontSize: 15,
+        lineHeight: 15,
+        textAlign: 'center',
         fontWeight: 'bold',
-        lineHeight: 22,
     },
+
     emailRequest: {
-        // flexDirection: 'row',
+        padding: 10,
     },
     message: {
-        // marginBottom: 20,
+        marginBottom: 20,
     },
+    invPartnerText: {
+        fontWeight: 'bold',
+        margin: 10,
+        color: "#4a4a4a",
+    }
 });
 
 export default SendRequestsComp;
