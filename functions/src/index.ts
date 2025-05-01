@@ -310,3 +310,66 @@ export const seePartnerResponses = onCall(async (request) => {
     return { success: false, message: "Partner does not exist" };
   }
 });
+
+export const deleteUserData = onCall(async (request) => {
+  // Get parameters from request
+  const userId = request.data.user;
+  
+  // Get user document
+  const userDoc = await admin.firestore().collection("users").doc(userId).get();
+  if (userDoc.exists) {
+    const userData = userDoc.data();
+
+    // handle a paired user
+    if (userData && userData.isPaired) {
+      const partnerId = userData.partner;
+      // get partner document and unpair
+      const partnerRef = await admin.firestore().collection("users").doc(partnerId);
+      await partnerRef.update({ isPaired: false, partner: null });
+
+      // remove all pair requests associated with the user
+      const requestRecipientSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).get();
+      if (!requestRecipientSnapshot.empty) {
+        for (const doc of requestRecipientSnapshot.docs) {
+          await doc.ref.delete();
+        }
+      }
+      const requestSenderSnapshot = await admin.firestore().collection('requests').where('senderId', '==', userId).get();
+      if (!requestSenderSnapshot.empty) {
+        for (const doc of requestSenderSnapshot.docs) {
+          await doc.ref.delete();
+        }
+      }
+
+      // delete the user document
+      await userDoc.ref.delete();
+      return { success: true, message: "User and associated data deleted successfully from firestore" };
+    }
+    // handle an unpaired user
+    else if (userData && !userData.isPaired) {
+      // remove all pair requests associated with the user
+      const requestRecipientSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).get();
+      if (!requestRecipientSnapshot.empty) {
+        for (const doc of requestRecipientSnapshot.docs) {
+          await doc.ref.delete();
+        }
+      }
+      const requestSenderSnapshot = await admin.firestore().collection('requests').where('senderId', '==', userId).get();
+      if (!requestSenderSnapshot.empty) {
+        for (const doc of requestSenderSnapshot.docs) {
+          await doc.ref.delete();
+        }
+      }
+
+      // delete the user document
+      await userDoc.ref.delete();
+      return { success: true, message: "User and associated data deleted successfully from firestore" };
+    }
+    else {
+      return { success: false, message: "User does not exist" };
+    }
+  }
+  else {
+    return { success: false, message: "User does not exist" };
+  }
+});

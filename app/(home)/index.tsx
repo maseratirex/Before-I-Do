@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth } from '@/firebaseConfig'
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 import PairPartnerCard from '@/components/PairPartnerCard';
 import ReportCard from '@/components/ReportCard'
@@ -21,7 +21,7 @@ export default function HomeScreen() {
   const [hasStartedAssessment, setHasStartedAssessment] = useState(false);
   const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false);
 
-  const setupAssessmentStatuses = async (user) => {
+  const setupAssessmentStatuses = async (user: User) => {
     console.log("Setting up isAssessmentSubmitted and hasStartedAssessment")
     // Determine assessment progress
     try {
