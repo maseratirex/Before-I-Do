@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { StyleSheet, ScrollView, ActivityIndicator, KeyboardAvoidingView } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,6 +12,8 @@ import PairPartnerCard from '@/components/PairPartnerCard';
 import ReportCard from '@/components/ReportCard'
 import AssessmentCard from '@/components/AssessmentCard'
 import ResourcesCard from '@/components/ResourcesCard'
+import { useHeaderHeight } from '@react-navigation/elements'
+
 
 export default function HomeScreen() {
   // Loading state
@@ -20,6 +22,8 @@ export default function HomeScreen() {
   // Assessment statuses
   const [hasStartedAssessment, setHasStartedAssessment] = useState(false);
   const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false);
+
+  const headerHeight = useHeaderHeight?.() ?? 0;   // optional
 
   const setupAssessmentStatuses = async (user) => {
     console.log("Setting up isAssessmentSubmitted and hasStartedAssessment")
@@ -80,7 +84,7 @@ export default function HomeScreen() {
   if (isLoading || !isUserReady) {
     return (
       <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-        <ScrollView>
+        <ScrollView style={styles.root}>
           <SafeAreaView style={styles.containerForCards}>
             <ActivityIndicator size="large" color="#FF6780" />
           </SafeAreaView>
@@ -91,13 +95,15 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-      <ScrollView>
-        <SafeAreaView style={styles.containerForCards}>
-          {/* If assessment submitted, show Report and Resources cards; otherwise, show Assessment card */}
-          {isAssessmentSubmitted ? <><ReportCard/><ResourcesCard /></> : <AssessmentCard hasUserStarted={hasStartedAssessment}/>}
-          <PairPartnerCard />
-        </SafeAreaView>
-      </ScrollView>
+      <KeyboardAvoidingView style={{flex: 1}} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
+        <ScrollView>
+          <SafeAreaView style={styles.containerForCards}>
+            {/* If assessment submitted, show Report and Resources cards; otherwise, show Assessment card */}
+            {isAssessmentSubmitted ? <><ReportCard /><ResourcesCard /></> : <AssessmentCard hasUserStarted={hasStartedAssessment} />}
+            <PairPartnerCard />
+          </SafeAreaView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </LinearGradient >
   );
 }
