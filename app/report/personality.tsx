@@ -45,79 +45,83 @@ export default function PersonalityScreen() {
   const loadData = async () => {
     const user = auth.currentUser;
     if (user) {
-        let userAnswers: string[] = [];
-        let partnerAnswers: string[] = [];
+      console.log("Loading data");
+      let userAnswers: string[] = [];
+      let partnerAnswers: string[] = [];
 
-        // Fetch current user's data
-        try {
-            const userRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(userRef);
-            if (docSnap.exists()) {
-                const userData = docSnap.data();
-                userAnswers = userData.personalityDynamics as string[];
-            } else {
-                console.error("User document does not exist.");
-                return;
-            }
-        } catch (error) {
-            console.error("Error fetching user's data:", error);
-            return;
+      // Fetch current user's data
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          userAnswers = userData.personalityDynamics as string[];
+          console.log("User answers from Firestore", userAnswers);
+        } else {
+          console.error("User document does not exist.");
+          return;
         }
+      } catch (error) {
+        console.error("Error fetching user's data:", error);
+        return;
+      }
 
-        // Fetch partner's data
-        try {
-            const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
-            const myParams = { user: auth.currentUser?.uid };
-            const result = await checkPartnerResponsesFunction(myParams);
-            const results = result.data as { success: boolean, responses: { personalityResponses: string[] }, message: string };
-            if (results.success) {
-                partnerAnswers = results.responses.personalityResponses;
-            } else {
-                console.error("Error fetching partner's data:", results.message);
-                return;
-            }
-        } catch (error: any) {
-            console.error("Error calling seePartnerResponses:", error.message || error);
-            return;
+      // Fetch partner's data
+      try {
+        const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
+        const myParams = { user: auth.currentUser?.uid };
+        const result = await checkPartnerResponsesFunction(myParams);
+        const results = result.data as { success: boolean, responses: { personalityResponses: string[] }, message: string };
+        if (results.success) {
+          partnerAnswers = results.responses.personalityResponses;
+        } else {
+          console.error("Error fetching partner's data:", results.message);
+          return;
         }
+      } catch (error: any) {
+        console.error("Error calling seePartnerResponses:", error.message || error);
+        return;
+      }
 
-        // Combine user and partner data for the bar chart
-        const section = questionnaire.personality;
-        const titles = Object.keys(section);
-        setSectionTitles(titles);
+      // Combine user and partner data for the bar chart
+      const section = questionnaire.personality;
+      const titles = Object.keys(section);
+      setSectionTitles(titles);
 
-        const subsections = Object.values(section);
-        const subsectionLengths = subsections.map((subsection) => Object.keys(subsection).length);
+      const subsections = Object.values(section);
+      const subsectionLengths = subsections.map((subsection) => Object.keys(subsection).length);
 
-        let startIndex = 0;
-        const newCombinedData: barDataItem[] = [];
-        const newUserScores: Record<string, string> = {};
-        const newPartnerScores: Record<string, string> = {};
+      let startIndex = 0;
+      const newCombinedData: barDataItem[] = [];
+      const newUserScores: Record<string, string> = {};
+      const newPartnerScores: Record<string, string> = {};
 
-        subsectionLengths.forEach((length, index) => {
-            const userSubsectionAnswers = userAnswers
-                .slice(startIndex, startIndex + length)
-                .map((value) => parseFloat(value));
-            const partnerSubsectionAnswers = partnerAnswers
-                .slice(startIndex, startIndex + length)
-                .map((value) => parseFloat(value));
+      subsectionLengths.forEach((length, index) => {
+        const userSubsectionAnswers = userAnswers
+          .slice(startIndex, startIndex + length)
+          .map((value) => parseFloat(value));
+        const partnerSubsectionAnswers = partnerAnswers
+          .slice(startIndex, startIndex + length)
+          .map((value) => parseFloat(value));
 
-            const userAverage = userSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
-            const partnerAverage = partnerSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
+        const userAverage = userSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
+        console.log("user average", userAverage);
+        const partnerAverage = partnerSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
+        console.log("user average", partnerAverage);
 
-            const sectionTitle = titles[index];
-            newUserScores[sectionTitle] = determineCategory(userAverage, thresholds[sectionTitle]);
-            newPartnerScores[sectionTitle] = determineCategory(partnerAverage, thresholds[sectionTitle]);
+        const sectionTitle = titles[index];
+        newUserScores[sectionTitle] = determineCategory(userAverage, thresholds[sectionTitle]);
+        newPartnerScores[sectionTitle] = determineCategory(partnerAverage, thresholds[sectionTitle]);
 
-            newCombinedData.push({ value: userAverage, spacing: 0.5, barBorderRadius: 3 });
-            newCombinedData.push({ value: partnerAverage, barBorderRadius: 3 });
+        newCombinedData.push({ value: userAverage, spacing: 0.5, barBorderRadius: 3 });
+        newCombinedData.push({ value: partnerAverage, barBorderRadius: 3 });
 
-            startIndex += length;
-        });
+        startIndex += length;
+      });
 
-        setUserScores(newUserScores);
-        setPartnerScores(newPartnerScores);
-        setCombinedData(newCombinedData);
+      setUserScores(newUserScores);
+      setPartnerScores(newPartnerScores);
+      setCombinedData(newCombinedData);
     }
   };
 

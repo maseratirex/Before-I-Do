@@ -1,13 +1,13 @@
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function ResourcesCard() {
     const router = useRouter();
     return (
-        <TouchableOpacity style={styles.card} onPress={() => router.push("/directory")}>
+        <TouchableOpacity style={styles.card} onPress={() => Alert.alert("Not ready yet! Client gave us consultation resources during the final week.")}>
             <Text style={styles.title}>Resources</Text>
             <Text style={styles.description}>
-                Explore general self-help resources NOT READY YET
+                Explore general self-help resources
             </Text>
             <View style={styles.divider} />
             <Text style={styles.actionText}>View Resources</Text>
