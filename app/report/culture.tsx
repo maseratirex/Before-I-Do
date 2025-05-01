@@ -105,77 +105,78 @@ export default function CultureScreen() {
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
       <View style={styles.container}>
-        <View style={styles.centeredContent}>
-          <View style={styles.chartContainer}>
-            {/* Legend */}
-            <View style={styles.legendContainer}>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: '#DD90A8' }]} />
-                <Text style={styles.legendText}>You</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: '#6178AE' }]} />
-                <Text style={styles.legendText}>Your Partner</Text>
-              </View>
+        <View style={styles.chartContainer}>
+          {/* Legend */}
+          <View style={styles.legendContainer}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: '#DD90A8' }]} />
+              <Text style={{fontSize: 14}}>You</Text>
             </View>
-
-            <BarChart
-              data={combinedData.map((bar, index) => {
-                const isUser = index % 2 === 0;
-                const pair = Math.floor(index / 2);
-                const selected = pair === selectedSectionIndex;
-                const base = isUser ? '#FFCDD9' : '#AAC1F7';
-                const border = isUser ? '#DD90A8' : '#6178AE';
-
-                return {
-                  ...bar,
-                  frontColor: selected ? border : base,
-                  barBorderColor: border,
-                  barBorderWidth: 1.5,
-                  onPress: () => {
-                    setSelectedSectionIndex(pair);
-                    scrollViewRef.current?.scrollTo({
-                      x: pair * (Dimensions.get("window").width - 40),
-                      animated: true,
-                    });
-                  },
-                };
-              })}
-              barWidth={barWidth}
-              spacing={spacing}
-              initialSpacing={(screenWidth - (barCount * barWidth + (barCount - 1) * spacing)) / 2 + spacing / 2}
-              hideRules
-              noOfSections={5}
-              yAxisLabelTexts={['—', '—', '—', '—', '—', '—']}
-              yAxisThickness={0}
-              xAxisThickness={0}
-              maxValue={5}
-              height={250}
-            />
+            <View style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: '#6178AE' }]} />
+              <Text style={{fontSize: 14}}>Your Partner</Text>
+            </View>
           </View>
 
-          {/* Section Info */}
-          <ScrollView
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            ref={scrollViewRef}
-            onMomentumScrollEnd={(e) => {
-              const newIndex = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - 40));
-              setSelectedSectionIndex(newIndex);
-            }}
-            style={styles.scrollSection}
-            contentContainerStyle={styles.scrollContent}
-          >
-            {sectionTitles.map((title, index) => (
-              <View key={index} style={styles.sectionPage}>
-                <Text style={styles.sectionTitle}>{title}</Text>
-                <Text style={styles.sectionDescription}>{sectionDescriptions[index]}</Text>
-              </View>
-            ))}
-          </ScrollView>
+          <BarChart
+            data={combinedData.map((bar, index) => {
+              const isUser = index % 2 === 0;
+              const pair = Math.floor(index / 2);
+              const selected = pair === selectedSectionIndex;
+              const base = isUser ? '#FFCDD9' : '#AAC1F7';
+              const border = isUser ? '#DD90A8' : '#6178AE';
 
-          {/* Page Control */}
+              return {
+                ...bar,
+                frontColor: selected ? border : base,
+                barBorderColor: border,
+                barBorderWidth: 1.5,
+                onPress: () => {
+                  setSelectedSectionIndex(pair);
+                  scrollViewRef.current?.scrollTo({
+                    x: pair * (Dimensions.get("window").width - 40),
+                    animated: true,
+                  });
+                },
+              };
+            })}
+            barWidth={barWidth}
+            spacing={spacing}
+            initialSpacing={(screenWidth - (barCount * barWidth + (barCount - 1) * spacing)) / 2 + spacing / 2}
+            disableScroll
+            hideRules
+            isAnimated
+            noOfSections={5}
+            yAxisLabelTexts={['—', '—', '—', '—', '—', '—']}
+            yAxisThickness={0}
+            xAxisThickness={0}
+            maxValue={5}
+            height={250}
+                        />
+        </View>
+
+        <View style={styles.sectionInfo}>
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          ref={scrollViewRef}
+          onMomentumScrollEnd={(e) => {
+            const newIndex = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - 40));
+            setSelectedSectionIndex(newIndex);
+          }}
+        >
+          {sectionTitles.map((title, index) => (
+            <View key={index} style={styles.sectionPage}>
+              <Text style={styles.sectionTitle}>{title}</Text>
+              <Text style={styles.sectionDescription}>{sectionDescriptions[index]}</Text>
+            </View>
+          ))}
+        </ScrollView>
+        </View>
+        
+        {/* Page Control */}
+        <View style={styles.pageControlWrapper}>
           <View style={styles.pageControlContainer}>
             {sectionTitles.map((_, index) => (
               <View
@@ -196,11 +197,7 @@ export default function CultureScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  centeredContent: {
-    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     paddingHorizontal: 20,
   },
   legendContainer: {
@@ -210,7 +207,6 @@ const styles = StyleSheet.create({
   },
   legendItem: {
     flexDirection: 'row',
-    alignItems: 'center',
     marginHorizontal: 10,
   },
   legendColor: {
@@ -219,13 +215,8 @@ const styles = StyleSheet.create({
     marginRight: 6,
     borderRadius: 3,
   },
-  legendText: {
-    color: '#000',
-    fontSize: 14,
-  },
   chartContainer: {
-    width: '100%',
-    backgroundColor: '#EDEDED',
+    backgroundColor: '#FFF',
     padding: 12,
     borderRadius: 12,
     marginBottom: 20,
@@ -234,39 +225,47 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
   },
-  scrollSection: {
+  sectionInfo: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    borderRadius: 12,
+    backgroundColor: '#FFF',
     maxHeight: 120,
-    width: '100%',
-    borderRadius: 12, 
-    backgroundColor: '#FFF', 
-    padding: 10
-  },
-  scrollContent: {
-    alignItems: 'center',
-    paddingVertical: 10
   },
   sectionPage: {
     width: Dimensions.get("window").width - 40,
-    paddingHorizontal: 20,
-    alignItems: 'center',
+    padding: 10,
+
   },
   sectionTitle: {
-    fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
     textAlign: 'center',
     marginBottom: 10,
+    fontSize: 20, 
   },
   sectionDescription: {
-    fontSize: 14,
-    color: '#000',
+    fontSize: 15,
     textAlign: 'center',
-    lineHeight: 20
+    lineHeight: 20,
+    paddingHorizontal: 12,
+  },
+  pageControlWrapper: {
+    alignSelf: 'center',
+    backgroundColor: '#FFF',
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   pageControlContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 10,
   },
   pageControlDot: {
     width: 10,
