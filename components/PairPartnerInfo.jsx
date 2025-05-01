@@ -129,7 +129,7 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
                     <View style={styles.divider} />
                     <View style={styles.refreshBox}>
                         <Text style={styles.refreshText}>Check for invites</Text>
-                        <TouchableOpacity style={styles.refreshButton} onPress={seePairRequests}>
+                        <TouchableOpacity style={styles.refreshButton} onPress={updatePairStatus}>
                             <MaterialIcons name="refresh" size={36} />
                         </TouchableOpacity>
                     </View>
