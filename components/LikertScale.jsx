@@ -3,11 +3,11 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-nati
 
 const options = ["1", "2", "3", "4", "5"];
 const labels = [
-  "Strongly disagree",
+  "Strongly Disagree",
   "Disagree",
   "Neutral",
   "Agree",
-  "Strongly agree",
+  "Strongly \nAgree",
 ];
 const reverseScoreIndexes = {"personality": [], "family": [17, 27], "couple": [26], "cultural": [7, 14]}
 
@@ -23,7 +23,7 @@ const LikertScale = ({ section, subsections, answers, setAnswers }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text>Your progress is saved automatically when you press ‘Complete’ or ‘Back’</Text>
+      <Text style={styles.subtitleText}>Your progress is saved automatically when you press ‘Complete’ or ‘Back’</Text>
       {Object.entries(subsections).map(([subsection, questions]) => (
         <View key={subsection} style={styles.subsectionContainer}>
           <Text style={styles.subsectionTitle}>{subsection}</Text>
@@ -54,16 +54,39 @@ const LikertScale = ({ section, subsections, answers, setAnswers }) => {
           })}
         </View>
       ))}
-      <Text style={styles.answerText}>Answers: {answers.join(', ')}</Text>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: { padding: 20 },
-  subsectionTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10, justifyContent: "center" },
-  questionContainer: { marginBottom: 30 },
-  questionText: { fontSize: 16, marginBottom: 10, fontWeight: "bold" },
+  subsectionTitle: { fontSize: 24, fontWeight: "bold", marginBottom: 15, textAlign: 'center'},
+  questionText: { fontSize: 18, marginBottom: 10, fontWeight: "bold", textAlign: 'center' },
+
+  questionContainer: { 
+    marginBottom: 20,
+    backgroundColor: '#FFF',
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 20, 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+
+  subtitleText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    color: '#4A4A4A',
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
   
   radioGroup: {
     flexDirection: "row",
@@ -87,14 +110,14 @@ const styles = StyleSheet.create({
   },
   
   selectedRadioButton: {
-    borderColor: "#4CAF50",
+    borderColor: "#5856ce",
   },
   
   radioInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#5856ce",
   },
   
   radioLabel: {
@@ -102,8 +125,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
   },
-
-  answerText: { marginTop: 20, fontSize: 16, fontWeight: "bold" },
 });
 
 export default LikertScale;

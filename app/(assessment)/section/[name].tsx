@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, AppState, Text, View, ScrollView } from "react-native";
+import { Pressable, AppState, Text, View, ScrollView, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useFocusEffect } from "@react-navigation/native";
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -97,22 +97,51 @@ export default function QuestionnaireScreen() {
                     <View style={{ flex: 1, alignItems: "center", paddingTop: headerHeight }}>
                         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
                             <LikertScale section={section} subsections={subsections} answers={answers} setAnswers={setAnswers} />
-                            <Pressable onPress={() => router.back()}>
-                                <Text>Complete</Text>
-                            </Pressable>
+                            {isLoaded && progress === 1 && (
+                                <TouchableOpacity style={{
+                                    backgroundColor: '#fff',
+                                    paddingVertical: 12,
+                                    paddingHorizontal: 30,
+                                    marginBottom: 10,
+                                    borderRadius: 30,
+                                    shadowColor: '#000',
+                                    shadowOffset: { width: 0, height: 2 },
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 4,
+                                    elevation: 4,
+                                }} onPress={() => router.back()}>
+                                    <Text style={{
+                                        color: '#5856ce',
+                                        fontWeight: 'bold',
+                                        fontSize: 16,
+                                        textAlign: 'center'
+                                    }}>Complete</Text>
+                                </TouchableOpacity>
+                            )}
                         </ScrollView>
-                        <View>
-                            <Text>{Math.round(progress * 100)}%</Text>
+                        <View style={{ 
+                            flexDirection: "row", 
+                            alignItems: "center", 
+                            marginBottom: 25, 
+                            marginTop: 10,
+                            paddingHorizontal: 15,
+                            paddingVertical: 10,
+                            backgroundColor: '#FFF',
+                            borderRadius: 20,
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 4 },
+                            shadowOpacity: 0.2,
+                            shadowRadius: 2, }}>
                             <Progress.Bar
                                 progress={progress}
                                 width={300}
-                                height={10}
-                                color="purple"
+                                height={8}
+                                color="#5856ce"
                                 unfilledColor="lightgray"
                                 borderWidth={0}
                                 borderRadius={5}
-                                style={{ marginVertical: 20 }}
                             />
+                            <Text style={{ marginLeft: 10 }}>{Math.round(progress * 100)}%</Text>
                         </View>
                     </View>
                 </LinearGradient>
