@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { auth, db } from '@/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
+import { LinearGradient } from "expo-linear-gradient";
+import { useHeaderHeight } from '@react-navigation/elements'
 
 export default function CreateAccountScreen() {
   const [email, setEmail] = useState('');
   const [initials, setInitials] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  const headerHeight = useHeaderHeight?.() ?? 0;   // optional
 
   const handleSignUp = async () => {
     if (!email || !password) {
@@ -60,49 +63,57 @@ export default function CreateAccountScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Initials"
-        keyboardType="default"
-        autoCapitalize="characters"
-        onChangeText={setInitials}
-        value={initials}
-        maxLength={3}
-        placeholderTextColor="#888"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        onChangeText={setEmail}
-        value={email}
-        placeholderTextColor="#888"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        onChangeText={setPassword}
-        value={password}
-        placeholderTextColor="#888"
-      />
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
-    </View>
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
+        <View style={styles.container}>
+          <Text style={styles.title}>Create Account</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Initials"
+            keyboardType="default"
+            autoCapitalize="characters"
+            onChangeText={setInitials}
+            value={initials}
+            maxLength={3}
+            placeholderTextColor="#888"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            onChangeText={setEmail}
+            value={email}
+            placeholderTextColor="#888"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            onChangeText={setPassword}
+            value={password}
+            placeholderTextColor="#888"
+          />
+          <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1, // Occupy the entire screen vertically and horizontally.
+    // ScrollView requires a bounded height; flex: 1 informs the LinearGradient's child
+    // that the height is the entire screen
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,

@@ -1,7 +1,7 @@
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 
-export default function AssessmentCard(hasUserStarted) {
+export default function AssessmentCard({hasUserStarted}) {
     const router = useRouter();
     return (
         <TouchableOpacity style={styles.card} onPress={() => router.push("/directory")}>
