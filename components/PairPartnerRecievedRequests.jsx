@@ -97,7 +97,7 @@ const SeeRequestsComp = ({ setIsPaired, pairRequests, setRequests, setPartnerIni
                 ))}
                 <TouchableOpacity style={styles.button} onPress={acceptPairRequest}>
                     <Text style={styles.buttonText} >
-                        Accept invite from{"\n"}
+                        {(acceptPartner == "") ? "Select partner" : "Accept invite from\n"}
                         <Text style={{ fontWeight: 'normal' }}>{acceptPartner}</Text>
                     </Text>
                 </TouchableOpacity>

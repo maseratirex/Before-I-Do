@@ -191,9 +191,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     notPairedContainer: {
-        // flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
+        width: "100%",
+        padding: 0,
     },
     titlePaired: {
         fontSize: 24,
@@ -207,7 +208,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: "left",
         alignSelf: "flex-start",
-        paddingLeft: '5%',
     },
     overlapContainer: {
         flexDirection: 'row',
@@ -273,7 +273,6 @@ const styles = StyleSheet.create({
     pairDescription: {
         textAlign: "left",
         alignSelf: "flex-start",
-        paddingLeft: '5%',
         color: '#4a4a4a',
         paddingTop: 7,
     }
