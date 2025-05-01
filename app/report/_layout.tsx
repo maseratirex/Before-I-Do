@@ -1,34 +1,33 @@
 import { Tabs } from "expo-router";
-import { Platform } from 'react-native';
 
 export default function ReportLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
       }}>
       <Tabs.Screen
         name="personality"
         options={{
-          title: "Personality",
+          title: "Personality Dynamics",
         }}
       />
       <Tabs.Screen
         name="couple"
         options={{
-          title: "Couple",
+          title: "Couple Dynamics",
         }}
       />
       <Tabs.Screen
         name="family"
         options={{
-          title: "Family",
+          title: "Family Dynamics",
         }}
       />
       <Tabs.Screen
         name="culture"
         options={{
-          title: "Culture",
+          title: "Culture Dynamics",
         }}
       />
     </Tabs>

@@ -67,7 +67,7 @@ export default function HomeScreen() {
         if (user) {
           setupAssessmentStatuses(user);
         } else {
-          console.error("No user found — should be logged in");
+          console.log("No user found — should be logged in");
           setIsLoading(false); // still stop loading
         }
         setIsUserReady(true);
