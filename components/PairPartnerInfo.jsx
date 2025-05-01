@@ -101,7 +101,7 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
     const isPairedReturn = () => {
         return (
             <View style={{ alignItems: 'center', marginTop: 5 }}>
-                <Text style={styles.title}>Paired</Text>
+                <Text style={styles.titlePaired}>Paired</Text>
                 <View style={styles.overlapContainer}>
                     <View style={[styles.circle, styles.leftCircle]}>
                         <Text style={styles.initialsText}>{userInitial}</Text>
@@ -110,9 +110,6 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
                         <Text style={styles.initialsText}>{partnerInitials}</Text>
                     </View>
                 </View>
-                {/* <Text style={{ marginTop: 10 }}>
-                    You are paired with {partnerInitials} ({partnerEmail}).
-                </Text> */}
                 <TouchableOpacity style={styles.button} onPress={unpairUsers}>
                     <Text style={styles.buttonText}>Unpair{'\n'}{partnerEmail}</Text>
                 </TouchableOpacity>
@@ -197,6 +194,13 @@ const styles = StyleSheet.create({
         // flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
+    },
+    titlePaired: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: "left",
+        alignSelf: "flex-start",
+        alignSelf: "center",
     },
     title: {
         fontSize: 24,
