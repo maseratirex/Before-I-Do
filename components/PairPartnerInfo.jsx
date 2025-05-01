@@ -191,10 +191,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     notPairedContainer: {
+        // flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        width: "100%",
-        padding: 0,
     },
     titlePaired: {
         fontSize: 24,
@@ -262,7 +261,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        paddingHorizontal: 10,
     },
 
     refreshText: {
