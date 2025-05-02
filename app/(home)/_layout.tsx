@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 const TAB_BAR_HEIGHT = 75
 const TAB_ITEM_SIZE = 30
 const TAB_ICON_SIZE = 30
+const TAB_MARGIN_BOTTOM = 40
 
 export default function HomeLayout() {
   return (
@@ -26,7 +27,7 @@ export default function HomeLayout() {
           },
           tabBarStyle: {
             backgroundColor: "white",
-            bottom: 40, // Shifts the tab bar up and down
+            bottom: TAB_MARGIN_BOTTOM, // Shifts the tab bar up and down
             position: "absolute", // Shows your screen under the tab bar
             height: TAB_BAR_HEIGHT,
             width: "83%", // The tab bar is 83% of the screen's width

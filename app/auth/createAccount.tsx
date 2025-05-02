@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { auth, db } from '@/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { LinearGradient } from "expo-linear-gradient";
-import { useHeaderHeight } from '@react-navigation/elements'
 
 export default function CreateAccountScreen() {
   const [email, setEmail] = useState('');
   const [initials, setInitials] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const headerHeight = useHeaderHeight?.() ?? 0;   // optional
 
   const handleSignUp = async () => {
     if (!email || !password) {
@@ -64,8 +62,8 @@ export default function CreateAccountScreen() {
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
-        <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.root} keyboardShouldPersistTaps="handled">
+        <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
           <Text style={styles.title}>Create Account</Text>
           <TextInput
             style={styles.input}
@@ -98,8 +96,8 @@ export default function CreateAccountScreen() {
           <TouchableOpacity style={styles.button} onPress={handleSignUp}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </ScrollView>
     </LinearGradient>
   );
 };
@@ -111,12 +109,13 @@ const styles = StyleSheet.create({
     // that the height is the entire screen
   },
   container: {
-    flex: 1,
+    // flexGrow: 1,
+    paddingTop: 160,
+    justifyContent: 'space-between',
     alignItems: 'center',
     gap: 16,
   },
   title: {
-    marginTop: 170,
     fontSize: 24,
     fontWeight: 'bold',
   },

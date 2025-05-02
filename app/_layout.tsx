@@ -86,7 +86,7 @@ export default function RootLayout() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [isUserNotFirstTime]); // Depends on isUserNotFirstTime
 
   const checkFirstTimeUser = async () => {
     // Returns true if user has submitted assessment answers remotely and false otherwise

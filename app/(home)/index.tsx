@@ -14,6 +14,8 @@ import AssessmentCard from '@/components/AssessmentCard'
 import ResourcesCard from '@/components/ResourcesCard'
 import { useHeaderHeight } from '@react-navigation/elements'
 
+const TAB_BAR_HEIGHT = 75
+const TAB_MARGIN_BOTTOM = 40
 
 export default function HomeScreen() {
   // Loading state
@@ -95,8 +97,9 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
-        <ScrollView>
+      {/* <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}> */}
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'}>
+        <ScrollView keyboardShouldPersistTaps='handled'>
           <SafeAreaView style={styles.containerForCards}>
             {/* If assessment submitted, show Report and Resources cards; otherwise, show Assessment card */}
             {isAssessmentSubmitted ? <><ReportCard /><ResourcesCard /></> : <AssessmentCard hasUserStarted={hasStartedAssessment} />}
@@ -104,7 +107,7 @@ export default function HomeScreen() {
           </SafeAreaView>
         </ScrollView>
       </KeyboardAvoidingView>
-    </LinearGradient >
+    </LinearGradient>
   );
 }
 const styles = StyleSheet.create({
@@ -114,9 +117,10 @@ const styles = StyleSheet.create({
     // that the height is the entire screen
   },
   containerForCards: {
+    paddingTop: 20,
     gap: 20, // Adds spacing between the cards
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 100, // Update this magic number so it depends on the tab bar height and margin/padding
+    paddingBottom: TAB_BAR_HEIGHT+TAB_MARGIN_BOTTOM+20,
   },
 });

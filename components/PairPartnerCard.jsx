@@ -112,25 +112,4 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
   },
-  description: {
-    fontSize: 14,
-    color: "#333",
-    marginBottom: 10,
-  },
-  divider: {
-    width: "100%",
-    height: 1,
-    backgroundColor: "#ccc",
-    marginVertical: 10,
-  },
-  actionText: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "#4a4a4a",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
 });

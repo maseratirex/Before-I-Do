@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig'
 import { useRouter } from 'expo-router';
@@ -34,41 +34,41 @@ export default function LoginScreen() {
     };
 
     return (
-        <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
-                <View style={styles.container}>
-                    <View style={styles.titleAndButtonsContainer}>
-                        <Text style={styles.title}>Sign in</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Email"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            onChangeText={setEmail}
-                            value={email}
-                            placeholderTextColor="#888"
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Password"
-                            secureTextEntry
-                            onChangeText={setPassword}
-                            value={password}
-                            placeholderTextColor="#888"
-                        />
-                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                            <Text style={styles.buttonText}>Login</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.textContainer}>
-                        <Text style={styles.infoText}>Don't have an account?</Text>
-                        <Text style={[styles.buttonText, styles.blueText]} onPress={() => { router.push('./createAccount') }}>
-                            Sign Up
-                        </Text>
-                    </View>
-                </View>
-            </KeyboardAvoidingView>
-        </LinearGradient>
+      <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+        <ScrollView contentContainerStyle={styles.root} keyboardShouldPersistTaps="handled">
+          <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
+            <View style={styles.titleAndButtonsContainer}>
+              <Text style={styles.title}>Sign in</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={setEmail}
+                value={email}
+                placeholderTextColor="#888"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                secureTextEntry
+                onChangeText={setPassword}
+                value={password}
+                placeholderTextColor="#888"
+              />
+              <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                <Text style={styles.buttonText}>Login</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.infoText}>Don't have an account?</Text>
+              <Text style={[styles.buttonText, styles.blueText]} onPress={() => { router.push('./createAccount') }}>
+                Sign Up
+              </Text>
+            </View>
+          </KeyboardAvoidingView>
+        </ScrollView>
+      </LinearGradient>
     );
 };
 
@@ -79,17 +79,18 @@ const styles = StyleSheet.create({
     // that the height is the entire screen
   },
   container: {
-    flex: 1,
+    flexGrow: 1,
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   titleAndButtonsContainer: {
-    flex: 1,
+    paddingTop: 170,
     width: '100%',
     alignItems: 'center',
     gap: 16,
   },
   title: {
-    marginTop: 170,
+    // marginTop: 170,
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -131,6 +132,6 @@ const styles = StyleSheet.create({
   textContainer: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 80,
+    paddingBottom: 20,
   }
 });
