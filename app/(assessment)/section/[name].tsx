@@ -154,6 +154,7 @@ export default function QuestionnaireScreen() {
                 <View onLayout={e => setFooterHeight(e.nativeEvent.layout.height)} style={{
                     alignSelf: 'center',
                     flexDirection: "row",
+                    justifyContent: 'space-between',
                     alignItems: "center",
                     marginBottom: 25,
                     paddingHorizontal: 15,
@@ -167,7 +168,8 @@ export default function QuestionnaireScreen() {
                     width: '83%',
                 }}>
                     <Progress.Bar
-                        style={{width: '83%'}}
+                        style={{flex: 1,}}
+                        width={null}
                         progress={progress}
                         height={8}
                         color="#5856ce"
