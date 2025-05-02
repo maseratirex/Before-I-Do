@@ -30,13 +30,31 @@ export default function QuestionnaireScreen() {
 
     const loadAnswers = React.useCallback(async () => {
         try {
+            const testing = true;
             const savedAnswers = await AsyncStorage.getItem(storageKey);
             if (savedAnswers) {
                 const parsedAnswers = JSON.parse(savedAnswers);
-                const adjustedAnswers = Array(questions.length)
-                    .fill(0)
-                    .map((defaultValue, index) => parsedAnswers[index] ?? defaultValue); // Merge saved answers
-                setAnswers(adjustedAnswers);
+                if(testing) {
+                    console.log("Simulating answers");
+                    const adjustedAnswers = questions.map((_, index) =>
+                        Math.floor(Math.random() * 5) + 1
+                    );
+                    setAnswers(adjustedAnswers);
+                } else {
+                    console.log("Loading answers");
+                    const adjustedAnswers = Array(questions.length)
+                        .fill(0)
+                        .map((defaultValue, index) => parsedAnswers[index] ?? defaultValue); // Merge saved answers
+                    setAnswers(adjustedAnswers);
+                }
+            } else {
+                console.log("Simulating answers to save time");
+                if(testing) {
+                    const adjustedAnswers = questions.map((_, index) =>
+                        Math.floor(Math.random() * 5) + 1
+                    );
+                    setAnswers(adjustedAnswers);
+                }
             }
         } catch (error) {
             console.error("Error loading saved answers:", error);
@@ -115,10 +133,12 @@ export default function QuestionnaireScreen() {
                                 zIndex: 1,
                             }}
                             pointerEvents="none"/>
-                <ScrollView style={{flex: 1 }} contentContainerStyle={{ flexGrow: 1, }}>
+                <ScrollView style={{flex: 1 }} contentContainerStyle={{ flexGrow: 1, paddingBottom: 10, }}>
                     <LikertScale section={section} subsections={subsections} answers={answers} setAnswers={setAnswers} />
                     {isLoaded && progress === 1 && (
                         <TouchableOpacity style={{
+                            alignSelf: 'center',
+                            width: '40%',
                             backgroundColor: '#fff',
                             paddingVertical: 12,
                             paddingHorizontal: 30,

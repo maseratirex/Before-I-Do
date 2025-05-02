@@ -67,11 +67,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     // Runs on mount
-    checkFirstTimeUser();
-  });
-
-  useEffect(() => {
-    // Runs on mount
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!isUserNotFirstTime) {
         // User's first time, send them to entry screen
@@ -87,7 +82,7 @@ export default function RootLayout() {
 
     return () => unsubscribe();
   }, [isUserNotFirstTime]); // Depends on isUserNotFirstTime
-
+  
   const checkFirstTimeUser = async () => {
     // Returns true if user has submitted assessment answers remotely and false otherwise
     console.log("Checking if first time user");
@@ -101,6 +96,11 @@ export default function RootLayout() {
       router.replace('/auth/entry');
     }
   };
+
+  useEffect(() => {
+    // Runs on mount
+    checkFirstTimeUser();
+  });
 
   return (
     <Stack>
