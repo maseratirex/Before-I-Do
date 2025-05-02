@@ -114,9 +114,10 @@ export default function AssessmentDirectoryScreen() {
           {progressData[name] !== undefined && (
             <View style={styles.progressContainer}>
               <Progress.Bar
+                style={{ flex: 1, }}
+                width={null}
                 progress={progressData[name]}
-                width={260}
-                height={6}
+                height={8}
                 color="#5856ce"
                 unfilledColor="lightgray"
                 borderWidth={0}

@@ -93,9 +93,11 @@ export default function QuestionnaireScreen() {
 
     if (!isLoaded) {
         return (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <Text>Loading...</Text>
-            </View>
+            <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Text>Loading...</Text>
+                </View>
+            </LinearGradient>
         );
     }
 

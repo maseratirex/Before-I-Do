@@ -132,6 +132,6 @@ const styles = StyleSheet.create({
   textContainer: {
     flexDirection: 'row',
     gap: 12,
-    paddingBottom: 20,
+    paddingBottom: 40,
   }
 });
