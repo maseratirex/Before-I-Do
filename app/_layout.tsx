@@ -1,5 +1,5 @@
 import { Stack, useRouter } from "expo-router";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/firebaseConfig';
@@ -8,6 +8,7 @@ import { doc, getDoc } from 'firebase/firestore';
 
 export default function RootLayout() {
   const router = useRouter();
+  const [isUserNotFirstTime, setIsUserNotFirstTime] = useState(false);
 
   const isAssessmentSubmittedRemotely = async () => {
     // Returns true if user has submitted assessment answers remotely and false otherwise
@@ -66,8 +67,17 @@ export default function RootLayout() {
 
   useEffect(() => {
     // Runs on mount
+    checkFirstTimeUser();
+  });
+
+  useEffect(() => {
+    // Runs on mount
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user || !user.emailVerified) {
+      if (!isUserNotFirstTime) {
+        // User's first time, send them to entry screen
+        console.log('Sending user to entry screen');
+        router.replace('/auth/entry');
+      } else if (!user || !user.emailVerified) {
         console.log('Auth listener: redirecting to login');
         router.replace('/auth/login');
       } else {
@@ -76,7 +86,21 @@ export default function RootLayout() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [isUserNotFirstTime]); // Depends on isUserNotFirstTime
+
+  const checkFirstTimeUser = async () => {
+    // Returns true if user has submitted assessment answers remotely and false otherwise
+    console.log("Checking if first time user");
+    const notFirstTimeUserResponse = await AsyncStorage.getItem('notFirstTimeUser');
+    const notFirstTime = notFirstTimeUserResponse === 'true'; // Convert string | null to boolean
+    if (notFirstTime) {
+      setIsUserNotFirstTime(true);
+      console.log('Not first time user');
+    } else {
+      console.log('First time user');
+      router.replace('/auth/entry');
+    }
+  };
 
   return (
     <Stack>

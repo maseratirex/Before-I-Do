@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { auth, db } from '@/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { LinearGradient } from "expo-linear-gradient";
-import { useHeaderHeight } from '@react-navigation/elements'
 
 export default function CreateAccountScreen() {
   const [email, setEmail] = useState('');
   const [initials, setInitials] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const headerHeight = useHeaderHeight?.() ?? 0;   // optional
 
   const handleSignUp = async () => {
     if (!email || !password) {
@@ -64,8 +62,8 @@ export default function CreateAccountScreen() {
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
-        <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.root} keyboardShouldPersistTaps="handled">
+        <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
           <Text style={styles.title}>Create Account</Text>
           <TextInput
             style={styles.input}
@@ -94,12 +92,12 @@ export default function CreateAccountScreen() {
             value={password}
             placeholderTextColor="#888"
           />
+          <Text style={styles.infoText}>You will be sent a verification email. Please click the link to confirm your email address before logging in.</Text>
           <TouchableOpacity style={styles.button} onPress={handleSignUp}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
-          <Text style={{ marginTop: 20, color: '#888' }}>When signing up, you will be sent a verification email. Please click the link to confirm your email address before logging in.</Text>
-        </View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </ScrollView>
     </LinearGradient>
   );
 };
@@ -111,39 +109,47 @@ const styles = StyleSheet.create({
     // that the height is the entire screen
   },
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    // flexGrow: 1,
+    paddingTop: 160,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    gap: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  infoText: {
-    fontSize: 16,
-    marginBottom: 20,
-    width: '80%',
   },
   input: {
-    width: '100%',
-    padding: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
     backgroundColor: '#fff',
+    width: '83%',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  infoText: {
+    fontSize: 14,
+    width: '75%',
+    color: '#4A4A4A',
+    textAlign: 'center',
   },
   button: {
-    width: '100%',
-    padding: 15,
-    backgroundColor: '#007bff',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    backgroundColor: '#fff',
     alignItems: 'center',
-    borderRadius: 5,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   buttonText: {
-    color: '#fff',
+    color: '#4A4A4A',
     fontSize: 16,
     fontWeight: 'bold',
   },

@@ -7,6 +7,7 @@ export default function RootLayout() {
       title: '',
       headerTransparent: true,
     }}>
+      <Stack.Screen name="entry" />
       <Stack.Screen name="login" />
       <Stack.Screen name="createAccount" />
     </Stack>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig'
 import { useRouter } from 'expo-router';
@@ -34,81 +34,104 @@ export default function LoginScreen() {
     };
 
     return (
-        <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>Login</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Email"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        onChangeText={setEmail}
-                        value={email}
-                        placeholderTextColor="#888"
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Password"
-                        secureTextEntry
-                        onChangeText={setPassword}
-                        value={password}
-                        placeholderTextColor="#888"
-                    />
-                    <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                        <Text style={styles.buttonText}>Log In</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={() => { router.push('./createAccount') }}>
-                        <Text style={styles.buttonText}>Sign Up</Text>
-                    </TouchableOpacity>
-                </View>
-            </KeyboardAvoidingView>
-        </LinearGradient>
+      <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+        <ScrollView contentContainerStyle={styles.root} keyboardShouldPersistTaps="handled">
+          <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
+            <View style={styles.titleAndButtonsContainer}>
+              <Text style={styles.title}>Sign in</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={setEmail}
+                value={email}
+                placeholderTextColor="#888"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                secureTextEntry
+                onChangeText={setPassword}
+                value={password}
+                placeholderTextColor="#888"
+              />
+              <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                <Text style={styles.buttonText}>Login</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.infoText}>Don't have an account?</Text>
+              <Text style={[styles.buttonText, styles.blueText]} onPress={() => { router.push('./createAccount') }}>
+                Sign Up
+              </Text>
+            </View>
+          </KeyboardAvoidingView>
+        </ScrollView>
+      </LinearGradient>
     );
 };
 
 const styles = StyleSheet.create({
-    root: {
-        flex: 1, // Occupy the entire screen vertically and horizontally.
-        // ScrollView requires a bounded height; flex: 1 informs the LinearGradient's child
-        // that the height is the entire screen
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    input: {
-        width: '100%',
-        padding: 10,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        backgroundColor: '#fff',
-    },
-    button: {
-        width: '100%',
-        padding: 15,
-        backgroundColor: '#007bff',
-        alignItems: 'center',
-        borderRadius: 5,
-        marginTop: 10,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    linkText: {
-        marginTop: 15,
-        color: '#007bff',
-        fontSize: 14,
-    },
+  root: {
+    flex: 1, // Occupy the entire screen vertically and horizontally.
+    // ScrollView requires a bounded height; flex: 1 informs the LinearGradient's child
+    // that the height is the entire screen
+  },
+  container: {
+    flexGrow: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  titleAndButtonsContainer: {
+    paddingTop: 170,
+    width: '100%',
+    alignItems: 'center',
+    gap: 16,
+  },
+  title: {
+    // marginTop: 170,
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  input: {
+    backgroundColor: '#fff',
+    width: '83%',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  button: {
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  buttonText: {
+    color: '#4A4A4A',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  infoText: {
+    color: '#4A4A4A',
+    fontSize: 16,
+  },
+  blueText: {
+    color: '#007AFF',
+  },
+  textContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingBottom: 20,
+  }
 });
