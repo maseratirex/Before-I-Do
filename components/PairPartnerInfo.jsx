@@ -49,7 +49,7 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
                 if (statusData.type == "paired") {
                     setIsPaired(true);
                     setPartnerInitials(statusData.partnerInitials);
-                    setPartnerEmail(statusData.partnerData);
+                    setPartnerEmail(statusData.partner);
                 }
                 else {
                     setIsPaired(false);
