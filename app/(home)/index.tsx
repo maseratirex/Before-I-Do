@@ -97,12 +97,11 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-      {/* <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}> */}
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'}>
         <ScrollView keyboardShouldPersistTaps='handled'>
           <SafeAreaView style={styles.containerForCards}>
             {/* If assessment submitted, show Report and Resources cards; otherwise, show Assessment card */}
-            {isAssessmentSubmitted ? <><ReportCard /><ResourcesCard /></> : <AssessmentCard hasUserStarted={hasStartedAssessment} />}
+            {isAssessmentSubmitted ? <><ReportCard /><ResourcesCard /></> : <AssessmentCard hasUserStarted={hasStartedAssessment}/>}
             <PairPartnerCard />
           </SafeAreaView>
         </ScrollView>
@@ -117,10 +116,9 @@ const styles = StyleSheet.create({
     // that the height is the entire screen
   },
   containerForCards: {
-    paddingTop: 20,
     gap: 20, // Adds spacing between the cards
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: TAB_BAR_HEIGHT+TAB_MARGIN_BOTTOM+20,
+    paddingBottom: TAB_BAR_HEIGHT+TAB_MARGIN_BOTTOM,
   },
 });

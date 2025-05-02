@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, AppState, Text, View, ScrollView, TouchableOpacity } from "react-native";
+import { AppState, Text, View, ScrollView, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useFocusEffect } from "@react-navigation/native";
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -20,6 +20,7 @@ export default function QuestionnaireScreen() {
     const questions = subsections ? Object.values(subsections).flat() : [];
     const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(0));
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
+    const [footerHeight, setFooterHeight] = useState(0);
 
     const auth = getAuth();
     const userId = auth.currentUser ? auth.currentUser.uid : 'guest';
@@ -90,68 +91,93 @@ export default function QuestionnaireScreen() {
         );
     }
 
+    if (!isLoaded) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Text>Loading...</Text>
+            </View>
+        );
+    }
+
     return (
-        <View style={{ flex: 1 }}>
-            {isLoaded ? (
-                <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
-                    <View style={{ flex: 1, alignItems: "center", paddingTop: headerHeight }}>
-                        <ScrollView contentContainerStyle={{ alignItems: "center" }}>
-                            <LikertScale section={section} subsections={subsections} answers={answers} setAnswers={setAnswers} />
-                            {isLoaded && progress === 1 && (
-                                <TouchableOpacity style={{
-                                    backgroundColor: '#fff',
-                                    paddingVertical: 12,
-                                    paddingHorizontal: 30,
-                                    marginBottom: 10,
-                                    borderRadius: 30,
-                                    shadowColor: '#000',
-                                    shadowOffset: { width: 0, height: 2 },
-                                    shadowOpacity: 0.2,
-                                    shadowRadius: 4,
-                                    elevation: 4,
-                                }} onPress={() => router.back()}>
-                                    <Text style={{
-                                        color: '#5856ce',
-                                        fontWeight: 'bold',
-                                        fontSize: 16,
-                                        textAlign: 'center'
-                                    }}>Complete</Text>
-                                </TouchableOpacity>
-                            )}
-                        </ScrollView>
-                        <View style={{ 
-                            flexDirection: "row", 
-                            alignItems: "center", 
-                            marginBottom: 25, 
-                            marginTop: 10,
-                            paddingHorizontal: 15,
-                            paddingVertical: 10,
-                            backgroundColor: '#FFF',
-                            borderRadius: 20,
-                            shadowColor: "#000",
-                            shadowOffset: { width: 0, height: 4 },
+        <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
+            <View style={{ flex: 1, paddingTop: headerHeight }}>
+            <LinearGradient
+                            colors={['rgba(255, 228, 235, 1)', 'rgba(255, 228, 235, 0)']}
+                            style={{
+                                position: 'absolute',
+                                top: headerHeight,
+                                left: 0,
+                                right: 0,
+                                height: 40,
+                                zIndex: 1,
+                            }}
+                            pointerEvents="none"/>
+                <ScrollView style={{flex: 1 }} contentContainerStyle={{ flexGrow: 1, }}>
+                    <LikertScale section={section} subsections={subsections} answers={answers} setAnswers={setAnswers} />
+                    {isLoaded && progress === 1 && (
+                        <TouchableOpacity style={{
+                            backgroundColor: '#fff',
+                            paddingVertical: 12,
+                            paddingHorizontal: 30,
+                            marginBottom: 10,
+                            borderRadius: 30,
+                            shadowColor: '#000',
+                            shadowOffset: { width: 0, height: 2 },
                             shadowOpacity: 0.2,
-                            shadowRadius: 2, }}>
-                            <Progress.Bar
-                                progress={progress}
-                                width={300}
-                                height={8}
-                                color="#5856ce"
-                                unfilledColor="lightgray"
-                                borderWidth={0}
-                                borderRadius={5}
-                            />
-                            <Text style={{ marginLeft: 10 }}>{Math.round(progress * 100)}%</Text>
-                        </View>
-                    </View>
-                </LinearGradient>
-            ) : (
-                <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
-                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                        <Text>Loading...</Text>
-                    </View>
-                </LinearGradient>
-            )}
-        </View>
+                            shadowRadius: 4,
+                            elevation: 4,
+                        }} onPress={() => router.back()}>
+                            <Text style={{
+                                color: '#5856ce',
+                                fontWeight: 'bold',
+                                fontSize: 16,
+                                textAlign: 'center'
+                            }}>Complete</Text>
+                        </TouchableOpacity>
+                    )}
+                </ScrollView>
+                {footerHeight > 0 && (
+                    <LinearGradient
+                            colors={['rgba(255, 228, 235, 0)', '#FFC6D5']}
+                            style={{
+                                position: 'absolute',
+                                left: 0,
+                                right: 0,
+                                bottom: footerHeight+25,
+                                height: footerHeight,
+                                zIndex: 1,
+                            }}
+                            pointerEvents="none"
+                        />
+                )}
+                <View onLayout={e => setFooterHeight(e.nativeEvent.layout.height)} style={{
+                    alignSelf: 'center',
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 25,
+                    paddingHorizontal: 15,
+                    paddingVertical: 10,
+                    backgroundColor: '#FFF',
+                    borderRadius: 20,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 2,
+                    width: '83%',
+                }}>
+                    <Progress.Bar
+                        style={{width: '83%'}}
+                        progress={progress}
+                        height={8}
+                        color="#5856ce"
+                        unfilledColor="lightgray"
+                        borderWidth={0}
+                        borderRadius={5}
+                    />
+                    <Text style={{ marginLeft: 10 }}>{Math.round(progress * 100)}%</Text>
+                </View>
+            </View>
+        </LinearGradient>
     );
 }
