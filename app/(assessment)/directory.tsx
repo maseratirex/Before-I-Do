@@ -5,7 +5,7 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import { LinearGradient } from "expo-linear-gradient";
 import * as Progress from 'react-native-progress';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAuth } from "firebase/auth";
+import { getAuth, User } from "firebase/auth";
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebaseConfig'
 
@@ -57,7 +57,7 @@ export default function AssessmentDirectoryScreen() {
     loadProgress();
   }, [userId]);
 
-  const storeAssessmentSubmissionStatusLocally = async (user, status: boolean) => {
+  const storeAssessmentSubmissionStatusLocally = async (user: User, status: boolean) => {
     console.log("Storing assessment submission status in local storage as", status);
     // Store user assessment submitted false in local storage
     try {
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   unsubmittableButton: {
-    backgroundColor: '#bbb',
+    backgroundColor: '#cdcdcd',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 30,

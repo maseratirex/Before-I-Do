@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,
+        backgroundColor: '#fff',
     },
     button: {
         width: '100%',

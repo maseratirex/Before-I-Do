@@ -65,7 +65,7 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
         return (
             <View>
                 <Text style={styles.title}>Pairing Request Sent</Text>
-                <Text style={styles.message}>You have already sent a pairing request to {sentRequestEmail}.</Text>
+                <Text style={styles.message}>You have sent a pairing request to {sentRequestEmail}.</Text>
                 <TouchableOpacity style={styles.button} onPress={cancelPairRequest}>
                     <Text style={styles.buttonText}>Cancel Request</Text>
                 </TouchableOpacity>
