@@ -97,6 +97,7 @@ export default function CreateAccountScreen() {
           <TouchableOpacity style={styles.button} onPress={handleSignUp}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
+          <Text style={{ marginTop: 20, color: '#888' }}>When signing up, you will be sent a verification email. Please click the link to confirm your email address before logging in.</Text>
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>
@@ -120,6 +121,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
+  infoText: {
+    fontSize: 16,
+    marginBottom: 20,
+    width: '80%',
+  },
   input: {
     width: '100%',
     padding: 10,
@@ -127,6 +133,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
+    backgroundColor: '#fff',
   },
   button: {
     width: '100%',
