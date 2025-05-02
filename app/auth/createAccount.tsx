@@ -94,10 +94,10 @@ export default function CreateAccountScreen() {
             value={password}
             placeholderTextColor="#888"
           />
+          <Text style={styles.infoText}>You will be sent a verification email. Please click the link to confirm your email address before logging in.</Text>
           <TouchableOpacity style={styles.button} onPress={handleSignUp}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
-          <Text style={{ marginTop: 20, color: '#888' }}>When signing up, you will be sent a verification email. Please click the link to confirm your email address before logging in.</Text>
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>
@@ -112,38 +112,45 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    gap: 16,
   },
   title: {
+    marginTop: 170,
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  infoText: {
-    fontSize: 16,
-    marginBottom: 20,
-    width: '80%',
   },
   input: {
-    width: '100%',
-    padding: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
     backgroundColor: '#fff',
+    width: '83%',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  infoText: {
+    fontSize: 14,
+    width: '75%',
+    color: '#4A4A4A',
+    textAlign: 'center',
   },
   button: {
-    width: '100%',
-    padding: 15,
-    backgroundColor: '#007bff',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    backgroundColor: '#fff',
     alignItems: 'center',
-    borderRadius: 5,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   buttonText: {
-    color: '#fff',
+    color: '#4A4A4A',
     fontSize: 16,
     fontWeight: 'bold',
   },

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig'
 import { useRouter } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
 import { useHeaderHeight } from '@react-navigation/elements'
 
-export default function LoginScreen() {
+export default function EntryScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const router = useRouter();
@@ -33,38 +34,39 @@ export default function LoginScreen() {
             });
     };
 
+    const setUserNotFirstimeLocally = async () => {
+        console.log("Setting not first time status in local storage");
+        try {
+            await AsyncStorage.setItem('notFirstTimeUser', JSON.stringify(true));
+        } catch (e) {
+            console.error('Failed to save not first time user status', e);
+        }
+    };
+
     return (
         <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
             <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
                 <View style={styles.container}>
                     <View style={styles.titleAndButtonsContainer}>
-                        <Text style={styles.title}>Sign in</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Email"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            onChangeText={setEmail}
-                            value={email}
-                            placeholderTextColor="#888"
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Password"
-                            secureTextEntry
-                            onChangeText={setPassword}
-                            value={password}
-                            placeholderTextColor="#888"
-                        />
-                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                            <Text style={styles.buttonText}>Login</Text>
-                        </TouchableOpacity>
+                        <Text style={styles.appTitle}>Before I Do</Text>
+                        <Text style={styles.appDescription}>Scientific assessment, relationship report, and counseling resources for you and your partner!</Text>
                     </View>
-                    <View style={styles.textContainer}>
-                        <Text style={styles.infoText}>Don't have an account?</Text>
-                        <Text style={[styles.buttonText, styles.blueText]} onPress={() => { router.push('./createAccount') }}>
-                            Sign Up
-                        </Text>
+                    <View style={styles.actionAreaContainer}>
+                        <TouchableOpacity style={styles.button} onPress={() => {
+                            setUserNotFirstimeLocally();
+                            router.push('./createAccount')
+                        }}>
+                            <Text style={styles.buttonText}>Let's get started</Text>
+                        </TouchableOpacity>
+                        <View style={styles.textContainer}>
+                            <Text style={styles.infoText}>Already have an account?</Text>
+                            <Text style={[styles.buttonText, styles.blueText]} onPress={() => {
+                                setUserNotFirstimeLocally();
+                                router.push('./login')
+                            }}>
+                                Sign In
+                            </Text>
+                        </View>
                     </View>
                 </View>
             </KeyboardAvoidingView>
@@ -88,24 +90,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
-  title: {
+  appTitle: {
     marginTop: 170,
-    fontSize: 24,
+    fontSize: 56,
     fontWeight: 'bold',
   },
-  input: {
-    backgroundColor: '#fff',
-    width: '83%',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    marginBottom: 10,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+  appDescription: {
+    width: '60%',
+    color: '#4A4A4A',
+    fontSize: 20,
+    // textAlign: 'center',
+  },
+  actionAreaContainer: {
+    width: '100%',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 80,
   },
   button: {
+    width: '83%',
     paddingVertical: 16,
     paddingHorizontal: 32,
     backgroundColor: '#fff',
@@ -131,6 +134,5 @@ const styles = StyleSheet.create({
   textContainer: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 80,
   }
 });
