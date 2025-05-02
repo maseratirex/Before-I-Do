@@ -64,7 +64,7 @@ export default function HomeScreen() {
       setIsLoading(false);
     }
   }
-  
+
   useFocusEffect(
     useCallback(() => {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -95,7 +95,7 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-      <KeyboardAvoidingView style={{flex: 1}} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
         <ScrollView>
           <SafeAreaView style={styles.containerForCards}>
             {/* If assessment submitted, show Report and Resources cards; otherwise, show Assessment card */}
