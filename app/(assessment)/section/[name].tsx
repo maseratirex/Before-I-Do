@@ -10,6 +10,7 @@ import { questionnaire } from "../../../components/questionnaire";
 import { getAuth } from "firebase/auth";
 import { LinearGradient } from "expo-linear-gradient";
 
+
 type SectionName = 'personality' | 'family' | 'couple' | 'cultural';
 
 export default function QuestionnaireScreen() {
@@ -95,7 +96,19 @@ export default function QuestionnaireScreen() {
             {isLoaded ? (
                 <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
                     <View style={{ flex: 1, alignItems: "center", paddingTop: headerHeight }}>
-                        <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+                        <LinearGradient
+                            colors={['rgba(255, 228, 235, 1)', 'rgba(255, 228, 235, 0)']}
+                            style={{
+                                position: 'absolute',
+                                top: headerHeight,
+                                left: 0,
+                                right: 0,
+                                height: 40,
+                                zIndex: 1,
+                            }}
+                            pointerEvents="none"
+                        />
+                        <ScrollView contentContainerStyle={{ alignItems: "center", paddingBottom: 100 }}>
                             <LikertScale section={section} subsections={subsections} answers={answers} setAnswers={setAnswers} />
                             {isLoaded && progress === 1 && (
                                 <TouchableOpacity style={{
@@ -119,10 +132,23 @@ export default function QuestionnaireScreen() {
                                 </TouchableOpacity>
                             )}
                         </ScrollView>
-                        <View style={{ 
-                            flexDirection: "row", 
-                            alignItems: "center", 
-                            marginBottom: 25, 
+                        <LinearGradient
+                            colors={['rgba(255, 228, 235, 0)', '#FFC6D5']}
+                            style={{
+                                position: 'absolute',
+                                left: 0,
+                                right: 0,
+                                bottom: 72,
+                                height: 40,
+                                zIndex: 1,
+                            }}
+                            pointerEvents="none"
+                        />
+
+                        <View style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            marginBottom: 25,
                             marginTop: 10,
                             paddingHorizontal: 15,
                             paddingVertical: 10,
@@ -131,7 +157,8 @@ export default function QuestionnaireScreen() {
                             shadowColor: "#000",
                             shadowOffset: { width: 0, height: 4 },
                             shadowOpacity: 0.2,
-                            shadowRadius: 2, }}>
+                            shadowRadius: 2,
+                        }}>
                             <Progress.Bar
                                 progress={progress}
                                 width={300}
