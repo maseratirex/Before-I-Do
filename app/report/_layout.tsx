@@ -29,9 +29,9 @@ export default function ReportLayout() {
             bottom: 40, // Shifts the tab bar up and down
             position: "absolute", // Shows your screen under the tab bar
             height: TAB_BAR_HEIGHT,
-            width: "90%", // The tab bar is 90% of the screen's width
+            width: "83%", // The tab bar is 83% of the screen's width
             // This next line centers the tab bar horizontally
-            marginLeft: "5%", // (100-90)% divided by 2
+            marginLeft: "8.5%", // (100-83)% divided by 2
             borderRadius: 16,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 4 },
