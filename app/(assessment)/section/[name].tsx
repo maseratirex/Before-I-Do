@@ -30,7 +30,7 @@ export default function QuestionnaireScreen() {
 
     const loadAnswers = React.useCallback(async () => {
         try {
-            const testing = true;
+            const testing = false;
             const savedAnswers = await AsyncStorage.getItem(storageKey);
             if (savedAnswers) {
                 const parsedAnswers = JSON.parse(savedAnswers);
