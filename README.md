@@ -40,5 +40,9 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/), requiring XCode tools
 
 6. Access the running app via 2 options
-* Install Expo Go App (on iPhone) and scan the QR code in the running console. Currently this option does not work! The simulator app, Expo Go, on the iPhone App Store updated Friday, May 2nd. This causes a non-trivial bug to fix for Firebase and React Native; in fact, after working on it for several hours, one of our team members identified several Stackoverflow and Reddit posts talking about this same issue.
+* Install Expo Go App (on iPhone) and scan the QR code in the running console.
+  * Currently, the fuctionality of this option is in flux. The simulator app, Expo Go, on the iPhone App Store updated to version 2.33.13 on Thursday, May 1st. This update makes the app require the use Expo SDK 53, however the upgraded version has a significant bug with Firebase. We have found a work around for this bug and accordingly have published it on the upgrade-sdk branch of our repository. Therefore, if running Expo Go app version 2.33.13 pull the code from the upgrade-sdk branch. This should work but is liable to change as the Expo SDK is updated.
 * Install XCode Tools and the iOS Simulator and type "i" in the running console
+
+
+
