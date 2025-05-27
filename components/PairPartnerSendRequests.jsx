@@ -4,7 +4,7 @@ import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 
-const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) => {
+export default function SendRequestsComp({ hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) {
     const [email, setEmail] = useState("");
 
     const sendPairRequest = async () => {
@@ -61,7 +61,26 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
         }
     };
 
-    const sentRequestReturn = () => {
+    const confirmSendPairRequest = () => {
+        Alert.alert(
+            'Confirm pairing',
+            'Pairing will share your questionnaire responses',
+            [
+            { 
+                text: 'Cancel',
+                onPress: () => console.log('Cancelled pairing'), 
+                style: 'cancel'
+            },
+            {
+                text: 'OK',
+                onPress: () => sendPairRequest(),
+            }
+            ],
+            { cancelable: false }
+        );
+    }
+
+    if(hasSentRequest) {
         return (
             <View>
                 <Text style={styles.title}>Pairing Request Sent</Text>
@@ -71,9 +90,7 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
                 </TouchableOpacity>
             </View>
         );
-    }
-
-    const noSentRequestReturn = () => {
+    } else {
         return (
             <View>
                 <Text style={styles.invPartnerText}>Invite Partner</Text>
@@ -88,15 +105,13 @@ const SendRequestsComp = ({ hasSentRequest, setHasSentRequest, sentRequestEmail,
                         placeholderTextColor="#888"
                     />
                     <View style={styles.spacing}></View>
-                    <TouchableOpacity style={styles.button} onPress={sendPairRequest}>
+                    <TouchableOpacity style={styles.button} onPress={confirmSendPairRequest}>
                         <Text style={styles.buttonText}>Send Pair Request</Text>
                     </TouchableOpacity>
                 </View>
             </View>
         );
     }
-
-    return hasSentRequest ? sentRequestReturn() : noSentRequestReturn();
 }
 
 const styles = StyleSheet.create({
@@ -158,5 +173,3 @@ const styles = StyleSheet.create({
         color: "#4a4a4a",
     }
 });
-
-export default SendRequestsComp;

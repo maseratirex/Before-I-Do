@@ -35,6 +35,25 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
         }
     }
 
+    const confirmUnpairUsers = () => {
+        Alert.alert(
+            'Confirm unpairing',
+            'Unpairing will remove your access to your partner\'s data and your partner\'s access to your data',
+            [
+            { 
+                text: 'Cancel',
+                onPress: () => console.log('Cancelled pairing'), 
+                style: 'cancel'
+            },
+            {
+                text: 'OK',
+                onPress: () => unpairUsers(),
+            }
+            ],
+            { cancelable: false }
+        );
+    }
+
     const updatePairStatus = async () => {
         try {
             const checkPairStatusFunction = httpsCallable(functions, "seePairStatus");
@@ -98,7 +117,7 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
     }, []);
 
 
-    const isPairedReturn = () => {
+    const showIsPaired = () => {
         return (
             <View style={{ alignItems: 'center', marginTop: 5 }}>
                 <Text style={styles.titlePaired}>Paired</Text>
@@ -110,14 +129,14 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
                         <Text style={styles.initialsText}>{partnerInitials}</Text>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.button} onPress={unpairUsers}>
+                <TouchableOpacity style={styles.button} onPress={confirmUnpairUsers}>
                     <Text style={styles.buttonText}>Unpair{'\n'}{partnerEmail}</Text>
                 </TouchableOpacity>
             </View>
         );
     };
 
-    const isNotPairedReturn = () => {
+    const showIsNotPaired = () => {
         return (
             <>
                 <View style={styles.notPairedContainer}>
@@ -151,7 +170,7 @@ const PairingInfo = ({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest
 
     return (
         <View>
-            {isPaired ? isPairedReturn() : isNotPairedReturn()}
+            {isPaired ? showIsPaired() : showIsNotPaired()}
         </View>
     );
 }

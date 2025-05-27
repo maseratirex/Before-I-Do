@@ -50,12 +50,31 @@ const SeeRequestsComp = ({ setIsPaired, pairRequests, setRequests, setPartnerIni
         );
     }
 
+    const confirmAcceptPairRequest = () => {
+        Alert.alert(
+            'Confirm pairing',
+            'Pairing will share your questionnaire responses',
+            [
+            { 
+                text: 'Cancel',
+                onPress: () => console.log('Cancelled pairing'), 
+                style: 'cancel'
+            },
+            {
+                text: 'OK',
+                onPress: () => acceptPairRequest(),
+            }
+            ],
+            { cancelable: false }
+        );
+    }
+
     const oneRecievedRequestReturn = () => {
         return (
             <View>
                 <Text style={styles.warnPartAccept}>Accepting an invite shares your data with them</Text>
                 <Text style={styles.messageOne}>{pairRequests[0].email} sent you a pair request</Text>
-                <TouchableOpacity style={styles.buttonOneRequest} onPress={acceptPairRequest}>
+                <TouchableOpacity style={styles.buttonOneRequest} onPress={confirmAcceptPairRequest}>
                     <Text style={styles.buttonText}>
                         Accept
                     </Text>
@@ -95,7 +114,7 @@ const SeeRequestsComp = ({ setIsPaired, pairRequests, setRequests, setPartnerIni
                         <Text style={styles.item}>{request.email} </Text>
                     </Pressable>
                 ))}
-                <TouchableOpacity style={styles.button} onPress={acceptPairRequest}>
+                <TouchableOpacity style={styles.button} onPress={confirmAcceptPairRequest}>
                     <Text style={styles.buttonText} >
                         {(acceptPartner == "") ? "Select partner" : "Accept invite from\n"}
                         <Text style={{ fontWeight: 'normal' }}>{acceptPartner}</Text>
