@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Text } from "react-native";
-import PairingInfo from '@/components/PairPartnerInfo';
-import SeeRequestsComp from '@/components/PairPartnerRecievedRequests';
-import SendRequestsComp from '@/components/PairPartnerSendRequests';
+import PairedBlock from '@/components/pairing/PairedBlock';
+import NotPairedBlock from '@/components/pairing/NotPairedBlock';
+import IncomingPairRequestsBlock from '@/components/pairing/IncomingPairRequestsBlock';
+import OutgoingPairRequestsBlock from '@/components/pairing/OutgoingPairRequestsBlock';
 import { auth } from '@/firebaseConfig'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { functions } from "@/firebaseConfig";
@@ -91,13 +92,17 @@ export default function PairPartnerCard() {
   }, []
   );
 
-  return (
-    <View style={styles.card}>
-      <PairingInfo isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} partnerInitials={partnerInitials} setPartnerInitials={setPartnerInitials} partnerEmail={partnerEmail} setPartnerEmail={setPartnerEmail} />
-      {isPaired ? <></> : <SeeRequestsComp setIsPaired={setIsPaired} pairRequests={requests} setRequests={setRequests} setPartnerInitials={setPartnerInitials} setPartnerEmail={setPartnerEmail} />}
-      {isPaired ? <></> : <SendRequestsComp hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest} />}
+  if(isPaired) {
+    return <View style={styles.card}>
+      <PairedBlock isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} partnerInitials={partnerInitials} setPartnerInitials={setPartnerInitials} partnerEmail={partnerEmail} setPartnerEmail={setPartnerEmail} />
     </View>
-  )
+  } else {
+    return <View style={styles.card}>
+      <NotPairedBlock isPaired={isPaired} setIsPaired={setIsPaired} hasSentRequest={hasSentRequest} numRecievedRequest={requests.length} setRequests={setRequests} partnerInitials={partnerInitials} setPartnerInitials={setPartnerInitials} partnerEmail={partnerEmail} setPartnerEmail={setPartnerEmail} />
+      <IncomingPairRequestsBlock setIsPaired={setIsPaired} pairRequests={requests} setRequests={setRequests} setPartnerInitials={setPartnerInitials} setPartnerEmail={setPartnerEmail} />
+      <OutgoingPairRequestsBlock hasSentRequest={hasSentRequest} setHasSentRequest={setHasSentRequest} sentRequestEmail={sentRequest} setSentRequest={setSentRequest} />
+    </View>
+  }
 }
 
 const styles = StyleSheet.create({

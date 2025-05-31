@@ -4,7 +4,7 @@ import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 
-export default function SendRequestsComp({ hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) {
+export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) {
     const [email, setEmail] = useState("");
 
     const sendPairRequest = async () => {
@@ -83,18 +83,22 @@ export default function SendRequestsComp({ hasSentRequest, setHasSentRequest, se
     if(hasSentRequest) {
         return (
             <View>
-                <Text style={styles.title}>Pairing Request Sent</Text>
-                <Text style={styles.message}>You have sent a pairing request to {sentRequestEmail}.</Text>
-                <TouchableOpacity style={styles.button} onPress={cancelPairRequest}>
-                    <Text style={styles.buttonText}>Cancel Request</Text>
-                </TouchableOpacity>
+                <View style={styles.divider} />
+                <View style={styles.spacing}>
+                    <Text style={styles.subheading}>Invite partner</Text>
+                    <Text style={styles.body}>You have sent a pairing request to {sentRequestEmail}.</Text>
+                    <TouchableOpacity style={styles.button} onPress={cancelPairRequest}>
+                        <Text style={styles.buttonText}>Cancel Request</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     } else {
         return (
             <View>
-                <Text style={styles.invPartnerText}>Invite Partner</Text>
-                <View style={styles.emailRequest}>
+                <View style={styles.divider} />
+                <View style={styles.spacing}>
+                    <Text style={styles.subheading}>Invite Partner</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Enter email address"
@@ -104,9 +108,8 @@ export default function SendRequestsComp({ hasSentRequest, setHasSentRequest, se
                         autoCapitalize="none"
                         placeholderTextColor="#888"
                     />
-                    <View style={styles.spacing}></View>
                     <TouchableOpacity style={styles.button} onPress={confirmSendPairRequest}>
-                        <Text style={styles.buttonText}>Send Pair Request</Text>
+                        <Text style={styles.buttonText}>Send Request</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -115,25 +118,19 @@ export default function SendRequestsComp({ hasSentRequest, setHasSentRequest, se
 }
 
 const styles = StyleSheet.create({
+    divider: {
+        width: "100%",
+        height: 1,
+        backgroundColor: "#ccc",
+        marginVertical: 10,
+    },
     spacing: {
-        paddingVertical: 8,
+        gap: 10,
     },
-    container: {
-        width: "83%",
-        paddingVertical: 20,
-        paddingHorizontal: 15,
-        backgroundColor: "white",
-        borderRadius: 16,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-    },
-    title: {
+    subheading: {
         fontSize: 15,
         fontWeight: "bold",
         color: "#4a4a4a",
-        paddingBottom: 20,
     },
     input: {
         width: '100%',
@@ -160,16 +157,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: 'bold',
     },
-
-    emailRequest: {
-        padding: 10,
+    invitePartnerBox: {
+        width: "100%",
     },
-    message: {
-        marginBottom: 20,
+    body: {
+        color: '#4a4a4a',
     },
-    invPartnerText: {
-        fontWeight: 'bold',
-        margin: 10,
-        color: "#4a4a4a",
-    }
 });

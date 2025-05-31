@@ -5,7 +5,7 @@ import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 import { Pressable } from 'react-native';
 
-const SeeRequestsComp = ({ setIsPaired, pairRequests, setRequests, setPartnerInitials, setPartnerEmail }) => {
+export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, setRequests, setPartnerInitials, setPartnerEmail }) {
     const numPairRequests = pairRequests.length;
     const [acceptPartner, setAcceptPartner] = useState("");
 
@@ -44,12 +44,6 @@ const SeeRequestsComp = ({ setIsPaired, pairRequests, setRequests, setPartnerIni
         }
     }
 
-    const noRequestsReturn = () => {
-        return (
-            <View></View>
-        );
-    }
-
     const confirmAcceptPairRequest = () => {
         Alert.alert(
             'Confirm pairing',
@@ -69,21 +63,6 @@ const SeeRequestsComp = ({ setIsPaired, pairRequests, setRequests, setPartnerIni
         );
     }
 
-    const oneRecievedRequestReturn = () => {
-        return (
-            <View>
-                <Text style={styles.warnPartAccept}>Accepting an invite shares your data with them</Text>
-                <Text style={styles.messageOne}>{pairRequests[0].email} sent you a pair request</Text>
-                <TouchableOpacity style={styles.buttonOneRequest} onPress={confirmAcceptPairRequest}>
-                    <Text style={styles.buttonText}>
-                        Accept
-                    </Text>
-                </TouchableOpacity>
-                <View style={styles.divider} />
-            </View>
-        );
-    }
-
     const handleListAccepting = useCallback((index) => {
         setRequests((prevRequests) => {
             return prevRequests.map((request, i) => {
@@ -97,11 +76,24 @@ const SeeRequestsComp = ({ setIsPaired, pairRequests, setRequests, setPartnerIni
         });
     }, [setRequests, setAcceptPartner]);
 
-    const multiRecievedRequestsReturn = () => {
+    if(numPairRequests == 0) {
+        return <View></View>;
+    } else if(numPairRequests == 1) {
         return (
             <View>
-                <Text style={styles.warnPartAccept}>Accepting an invite shares your data with them</Text>
-                {/* <Text style={styles.message}>You have the following pair requests:</Text> */}
+                <View style={styles.divider} />
+                <TouchableOpacity style={styles.buttonOneRequest} onPress={confirmAcceptPairRequest}>
+                    <Text style={styles.buttonText}>
+                        {"Accept invite from\n"}
+                        <Text style={{ fontWeight: 'normal' }}>{pairRequests[0].email}</Text>
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        );
+    } else {
+        return (
+            <View>
+                <View style={styles.divider} />
                 {pairRequests.map((request, index) => (
                     <Pressable
                         key={index}
@@ -120,12 +112,9 @@ const SeeRequestsComp = ({ setIsPaired, pairRequests, setRequests, setPartnerIni
                         <Text style={{ fontWeight: 'normal' }}>{acceptPartner}</Text>
                     </Text>
                 </TouchableOpacity>
-                <View style={styles.divider} />
             </View>
         );
     }
-
-    return numPairRequests == 0 ? noRequestsReturn() : numPairRequests == 1 ? oneRecievedRequestReturn() : multiRecievedRequestsReturn();
 }
 
 const styles = StyleSheet.create({
@@ -141,6 +130,7 @@ const styles = StyleSheet.create({
         shadowRadius: 1,
     },
     button: {
+        width: '100%',
         padding: 8,
         backgroundColor: '#EEEEEE',
         alignItems: 'center',
@@ -149,7 +139,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.2,
         shadowRadius: 1,
-        width: '94%',
         alignSelf: 'center',
     },
     buttonText: {
@@ -160,7 +149,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     buttonOneRequest: {
-        width: '94%',
+        width: "100%",
         padding: 8,
         backgroundColor: '#EEEEEE',
         alignItems: 'center',
@@ -176,13 +165,11 @@ const styles = StyleSheet.create({
     },
 
     messageOne: {
-        padding: 15,
         fontWeight: 'bold',
     },
     radioItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10,
         margin: 10,
     },
 
@@ -209,18 +196,13 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: "#ccc",
         marginVertical: 10,
-        marginTop: 20,
     },
     warnPartAccept: {
-        marginLeft: 5,
         color: '#4a4a4a',
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 2,
-        padding: 10,
     }
 
 });
-
-export default SeeRequestsComp;

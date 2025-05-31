@@ -8,7 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth } from '@/firebaseConfig'
 import { onAuthStateChanged, User } from 'firebase/auth';
 
-import PairPartnerCard from '@/components/PairPartnerCard';
+import PairPartnerCard from '@/components/pairing/PairPartnerCard';
 import ReportCard from '@/components/ReportCard'
 import AssessmentCard from '@/components/AssessmentCard'
 import ResourcesCard from '@/components/ResourcesCard'
