@@ -49,7 +49,7 @@ export default function EntryScreen() {
                 <View style={styles.container}>
                     <View style={styles.titleAndButtonsContainer}>
                         <Text style={styles.appTitle}>Before I Do</Text>
-                        <Text style={styles.appDescription}>Scientific assessment, relationship report, and counseling resources for you and your partner!</Text>
+                        <Text style={styles.appDescription}>Scientific assessment, relationship report, and targeted resources for you and your partner!</Text>
                     </View>
                     <View style={styles.actionAreaContainer}>
                         <TouchableOpacity style={styles.button} onPress={() => {
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     width: '60%',
     color: '#4A4A4A',
     fontSize: 20,
-    // textAlign: 'center',
+    textAlign: 'center',
   },
   actionAreaContainer: {
     width: '100%',

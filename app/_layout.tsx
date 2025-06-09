@@ -141,6 +141,13 @@ export default function RootLayout() {
           title: '',
         }}
       />
+      <Stack.Screen
+        name="resources"
+        options={{
+          headerTransparent: true,
+          title: '',
+        }}
+      />
     </Stack>
   );
 }
