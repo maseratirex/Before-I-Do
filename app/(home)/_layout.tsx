@@ -14,11 +14,8 @@ export default function HomeLayout() {
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: "black", // Use this to set the color of the icons
-          tabBarIconStyle: {
-            
-          },
           tabBarLabelStyle: { // Use this to style the labels
-            fontSize: 12,
+            fontSize: 10,
             fontWeight: 'bold',
           },
           tabBarItemStyle: {
@@ -26,6 +23,7 @@ export default function HomeLayout() {
             marginTop: -10 + (TAB_BAR_HEIGHT-TAB_ITEM_SIZE)/2, // The -10 aligns the top of the icon/label pair to the top of the tab bar
           },
           tabBarStyle: {
+            paddingHorizontal: 10,
             backgroundColor: "white",
             bottom: TAB_MARGIN_BOTTOM, // Shifts the tab bar up and down
             position: "absolute", // Shows your screen under the tab bar
