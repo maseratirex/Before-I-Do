@@ -7,7 +7,7 @@ export default function Card({ children }) {
 const styles = StyleSheet.create({
   card: {
     width: "83%",
-    paddingVertical: 20,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     backgroundColor: "white",
     borderRadius: 16,
