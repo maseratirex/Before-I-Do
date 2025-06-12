@@ -48,7 +48,90 @@ export default function PersonalityScreen() {
             </View>
           </ExpandableButton>
           <ExpandableButton title="Openness to Experience">
-            <Text>Wassup</Text>
+            <Text style={{ fontStyle: "italic", color: Colors.textSecondary, }}>A willingness to embrace new ideas, people, experiences, and perspectives.</Text>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Traits Reflected</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Curiosity and adventurousness</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Appreciation of diversity</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Adaptability to change</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Comfort with uncertainty and novelty</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Relationship Relevance</Text>
+              <Text style={{ color: Colors.textSecondary, }}>Partners high in openness help the relationship grow dynamically. They encourage exploration, diversity in thought, and continuous evolution of the couple’s identity.</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Growth Strategies</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Schedule regular “new experiences” together—classes, travel, hobbies</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Be open to learning from cultural and ideological differences</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Embrace flexibility when plans change or expectations shift</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Regularly reflect together on what you’ve learned as a couple</Text>
+            </View>
+          </ExpandableButton>
+          <ExpandableButton title="Empathy">
+            <Text style={{ fontStyle: "italic", color: Colors.textSecondary, }}>The ability to recognize, understand, and respond to the emotions of others with
+              care and sensitivity.</Text>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Traits Reflected</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Emotional insight into others</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Respect for others' feelings and perspectives</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Responsiveness to social and relational needs</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Ability to read nonverbal emotional cues</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Relationship Relevance</Text>
+              <Text style={{ color: Colors.textSecondary, }}>Empathy deepens emotional intimacy. It fosters better communication, reduces conflict, and allows each partner to feel seen, heard, and understood.</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Growth Strategies</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Practice active listening by reflecting back what your partner expresses</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Validate your partner’s emotions, even when you don’t fully agree</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Engage in empathy-building activities like role reversal discussions</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Ask open-ended questions about your partner’s emotional experiences</Text>
+            </View>
+          </ExpandableButton>
+          <ExpandableButton title="Self-Confidence">
+            <Text style={{ fontStyle: "italic", color: Colors.textSecondary, }}>A sense of self-assurance rooted in self-worth and competence.</Text>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Traits Reflected</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Assertiveness and initiative</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Comfort expressing thoughts and taking leadership</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Positive self-perception</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Inner belief in one’s abilities</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Relationship Relevance</Text>
+              <Text style={{ color: Colors.textSecondary, }}>Self-confidence enables healthy interdependence. Confident individuals can express needs clearly, set boundaries respectfully, and contribute to balanced decision-making.</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Growth Strategies</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Encourage each other’s professional and personal growth</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Give sincere affirmations about strengths and achievements</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Challenge limiting beliefs through mutual support</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Respect differences in confidence levels without shaming or comparison</Text>
+            </View>
+          </ExpandableButton>
+          <ExpandableButton title="Secure Attachment">
+            <Text style={{ fontStyle: "italic", color: Colors.textSecondary, }}>The capacity to build and maintain close, trusting, emotionally safe relationships.</Text>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Traits Reflected</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Comfort with intimacy</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Open emotional communications</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Respect for partner’s individuality and boundaries</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Commitment to mutual support and shared responsibility</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Use of constructive strategies in conflict</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Relationship Relevance</Text>
+              <Text style={{ color: Colors.textSecondary, }}>Secure attachment is the cornerstone of lasting relationships. It promotes trust, emotional availability, and consistent caregiving. Couples with secure attachment are better able to navigate adversity without distancing.</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Growth Strategies</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Foster rituals of reassurance and connection (e.g., daily affirmations, affectionate routines)</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Discuss emotional needs and attachment triggers openly</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Repair emotional ruptures with constructive language and sincerity</Text>
+              <Text style={{ color: Colors.textSecondary }}>• Engage in relationship education or therapy focused on attachment styles</Text>
+            </View>
           </ExpandableButton>
         </Card>
 
@@ -76,51 +159,51 @@ export default function PersonalityScreen() {
 
         <Card>
           <View style={{ gap: 16, }}>
-          <Text style={{ fontWeight: "bold", fontSize: 24, color: Colors.textPrimary }}>
-            Strategies for Compatibility
-          </Text>
-          <View style={{ gap: 16, }}>
-            <View>
-              <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
-                Develop a Strengths-Based Understanding
-              </Text>
-              <Text style={{ color: Colors.textSecondary }}>
-                Personality shapes how partners think, feel, and act within the relationship
-              </Text>
+            <Text style={{ fontWeight: "bold", fontSize: 24, color: Colors.textPrimary }}>
+              Strategies for Compatibility
+            </Text>
+            <View style={{ gap: 16, }}>
+              <View>
+                <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
+                  Develop a Strengths-Based Understanding
+                </Text>
+                <Text style={{ color: Colors.textSecondary }}>
+                  Personality shapes how partners think, feel, and act within the relationship
+                </Text>
+              </View>
+              <View>
+                <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
+                  Trait-Informed Communication
+                </Text>
+                <Text style={{ color: Colors.textSecondary }}>
+                  Acknowledge personality tendencies when expressing needs. For example, “I know I’m less emotionally expressive than you, but I care deeply and want to show it more.”
+                </Text>
+              </View>
+              <View>
+                <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
+                  Support Trait Development
+                </Text>
+                <Text style={{ color: Colors.textSecondary }}>
+                  Encourage growth in areas like emotional regulation or confidence with patience—not pressure.
+                </Text>
+              </View>
+              <View>
+                <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
+                  Shared Learning Experiences
+                </Text>
+                <Text style={{ color: Colors.textSecondary }}>
+                  Read about personality psychology together or take relationship courses to deepen your understanding.
+                </Text>
+              </View>
+              <View>
+                <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
+                  Use Personality as a Planning Tool
+                </Text>
+                <Text style={{ color: Colors.textSecondary }}>
+                  Design routines, vacations, or decision-making processes with your differing traits in mind (e.g., a spontaneous weekend vs. structured itinerary).
+                </Text>
+              </View>
             </View>
-            <View>
-              <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
-                Trait-Informed Communication
-              </Text>
-              <Text style={{ color: Colors.textSecondary }}>
-                Acknowledge personality tendencies when expressing needs. For example, “I know I’m less emotionally expressive than you, but I care deeply and want to show it more.”
-              </Text>
-            </View>
-            <View>
-              <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
-                Support Trait Development
-              </Text>
-              <Text style={{ color: Colors.textSecondary }}>
-                Encourage growth in areas like emotional regulation or confidence with patience—not pressure.
-              </Text>
-            </View>
-            <View>
-              <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
-                Shared Learning Experiences
-              </Text>
-              <Text style={{ color: Colors.textSecondary }}>
-                Read about personality psychology together or take relationship courses to deepen your understanding.
-              </Text>
-            </View>
-            <View>
-              <Text style={{ fontWeight: "bold", color: Colors.textPrimary }}>
-                Use Personality as a Planning Tool
-              </Text>
-              <Text style={{ color: Colors.textSecondary }}>
-                Design routines, vacations, or decision-making processes with your differing traits in mind (e.g., a spontaneous weekend vs. structured itinerary).
-              </Text>
-            </View>
-          </View>
           </View>
         </Card>
       </ScrollView>
