@@ -40,3 +40,6 @@ app-example
 
 # vscode
 .vscode
+
+# xcode prebuild
+/ios
