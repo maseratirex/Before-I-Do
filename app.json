@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Before-I-Do",
+    "name": "Before I Do",
     "slug": "Before-I-Do",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.maseratirex.BeforeIDo",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationCategoryType": "public.app-category.lifestyle"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -30,12 +35,19 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#FFB8CB"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a43bd34e-48c9-4f65-b851-475d0ac64f69"
+      }
+    },
+    "owner": "maseratirex"
   }
 }

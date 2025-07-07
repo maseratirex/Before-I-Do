@@ -100,7 +100,7 @@ export default function RootLayout() {
   useEffect(() => {
     // Runs on mount
     checkFirstTimeUser();
-  });
+  }, []); // Add this empty dependency array to prevent infinite re-renders
 
   return (
     <Stack>

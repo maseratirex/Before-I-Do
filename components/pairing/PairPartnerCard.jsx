@@ -5,11 +5,13 @@ import NotPairedBlock from '@/components/pairing/NotPairedBlock';
 import IncomingPairRequestsBlock from '@/components/pairing/IncomingPairRequestsBlock';
 import OutgoingPairRequestsBlock from '@/components/pairing/OutgoingPairRequestsBlock';
 import { auth } from '@/firebaseConfig'
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
+import { useRouter } from "expo-router";
 
 export default function PairPartnerCard() {
+  const router = useRouter();
   const [isPaired, setIsPaired] = useState("");
   const [hasSentRequest, setHasSentRequest] = useState("");
   const [sentRequest, setSentRequest] = useState("");
@@ -19,10 +21,14 @@ export default function PairPartnerCard() {
 
   const seePairRequests = async () => {
     try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        console.log("No authenticated user in seePairRequests");
+        return;
+      }
       const checkPairRequestFunction = httpsCallable(functions, "checkPairRequest");
-      const auth = getAuth();
       const myParams = {
-        user: auth.currentUser?.uid,
+        user: currentUser.uid,
       };
 
       const result = await checkPairRequestFunction(myParams);
@@ -49,10 +55,14 @@ export default function PairPartnerCard() {
 
   const seePairStatus = async () => {
     try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        console.log("No authenticated user in seePairStatus");
+        return;
+      }
       const seePairStatusFunction = httpsCallable(functions, "seePairStatus");
-      const auth = getAuth();
       const myParams = {
-        user: auth.currentUser?.uid,
+        user: currentUser.uid,
       };
       console.log("Checking pairing status for user:", myParams);
       const result = await seePairStatusFunction(myParams);
@@ -83,7 +93,9 @@ export default function PairPartnerCard() {
         seePairRequests();
       } else {
         console.log("User is not authenticated or email not verified.");
-        console.log("User", auth.currentUser.email, "has verified email:", auth.currentUser.emailVerified)
+        if (auth.currentUser) {
+          console.log("User", auth.currentUser.email, "has verified email:", auth.currentUser.emailVerified);
+        }
         router.replace('/auth/login');
       }
     });
