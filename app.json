@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Before-I-Do",
+    "name": "Before I Do",
     "slug": "Before-I-Do",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.maseratirex.BeforeIDo",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationCategoryType": "public.app-category.lifestyle"
       }
     },
     "android": {
