@@ -1,38 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/firebaseConfig'
 import { useRouter } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
 import { useHeaderHeight } from '@react-navigation/elements'
 
 export default function EntryScreen() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const router = useRouter();
     const headerHeight = useHeaderHeight?.() ?? 0;   // optional
-
-    const handleLogin = async () => {
-        if (!email || !password) {
-            Alert.alert('Error', 'Please enter both email and password');
-            return;
-        }
-
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                if (userCredential.user.emailVerified) {
-                    // Signed in 
-                    router.replace('/');
-                } else {
-                    Alert.alert('Please verify your email or resend email verification');
-                }
-            })
-            .catch((error) => {
-                // TODO change alert based on error.code
-                Alert.alert('Incorrect email or password', error.message);
-            });
-    };
 
     const setUserNotFirstimeLocally = async () => {
         console.log("Setting not first time status in local storage");

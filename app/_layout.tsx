@@ -1,14 +1,17 @@
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const router = useRouter();
-  const [isUserNotFirstTime, setIsUserNotFirstTime] = useState(false);
+  const [isUserNotFirstTime, setIsUserNotFirstTime] = useState(true);
 
   const isAssessmentSubmittedRemotely = async () => {
     // Returns true if user has submitted assessment answers remotely and false otherwise
@@ -48,9 +51,11 @@ export default function RootLayout() {
       const assessmentSubmittedResponse = await AsyncStorage.getItem(submittedStorageKey);
       // If it's in local storage, return
       if (assessmentSubmittedResponse === 'true') {
-        console.log("Found assessment submission status in local storage");
+        console.log("Assessment is submitted");
+      } else if (assessmentSubmittedResponse === 'false') {
+        console.log("Assessment is not submitted");
       } else {
-        console.log("Did not find assessment status in local storage");
+        console.log("Did not find assessment status in local storage, response was ", assessmentSubmittedResponse);
         const remotelySubmitted = await isAssessmentSubmittedRemotely();
         if(remotelySubmitted) {
           console.log("Assessment was remotely submitted");
@@ -65,24 +70,6 @@ export default function RootLayout() {
     }
   };
 
-  useEffect(() => {
-    // Runs on mount
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!isUserNotFirstTime) {
-        // User's first time, send them to entry screen
-        console.log('Sending user to entry screen');
-        router.replace('/auth/entry');
-      } else if (!user || !user.emailVerified) {
-        console.log('Auth listener: redirecting to login');
-        router.replace('/auth/login');
-      } else {
-        setupAssessmentSubmittedLocally(user);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [isUserNotFirstTime]); // Depends on isUserNotFirstTime
-  
   const checkFirstTimeUser = async () => {
     // Returns true if user has submitted assessment answers remotely and false otherwise
     console.log("Checking if first time user");
@@ -102,6 +89,27 @@ export default function RootLayout() {
     checkFirstTimeUser();
   }, []); // Add this empty dependency array to prevent infinite re-renders
 
+  useEffect(() => {
+    console.log("Setting up auth listener");
+    // Runs on mount
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user || !user.emailVerified) {
+        if(isUserNotFirstTime) {
+          console.log('[RootLayout] AuthListener: Redirecting to login screen');
+          router.replace('/auth/login');
+        } else {
+          console.log('[RootLayout] AuthListener: Redirecting to entry screen');
+          router.replace('/auth/entry');
+        }
+      } else {
+        // TODO Move this to the login screen on successful login
+        setupAssessmentSubmittedLocally(user);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [isUserNotFirstTime]); // Depends on isUserNotFirstTime
+  
   return (
     <Stack>
       <Stack.Screen

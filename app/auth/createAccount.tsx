@@ -37,8 +37,7 @@ export default function CreateAccountScreen() {
               coupleDynamics: null,
               cultureDynamics: null,
           });
-        }
-        else {
+        } else {
             throw new Error("User not authenticated");
         }
         });

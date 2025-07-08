@@ -1,75 +1,100 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig'
 import { useRouter } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
-import { useHeaderHeight } from '@react-navigation/elements'
+import * as SplashScreen from 'expo-splash-screen';
+import { InteractionManager } from 'react-native';
 
 export default function LoginScreen() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const router = useRouter();
-    const headerHeight = useHeaderHeight?.() ?? 0;   // optional
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
+  const [hasLaidOut, setHasLaidOut] = useState(false);
 
-    const handleLogin = async () => {
-        if (!email || !password) {
-            Alert.alert('Error', 'Please enter both email and password');
-            return;
+  const onLayoutRootView = useCallback(() => {
+    setHasLaidOut(true);
+  }, []);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        if (userCredential.user.emailVerified) {
+          // Signed in 
+          router.replace('/');
+        } else {
+          Alert.alert('Please verify your email or resend email verification');
         }
+      })
+      .catch((error) => {
+        // TODO change alert based on error.code
+        Alert.alert('Incorrect email or password', error.message);
+      });
+  };
 
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                if (userCredential.user.emailVerified) {
-                    // Signed in 
-                    router.replace('/');
-                } else {
-                    Alert.alert('Please verify your email or resend email verification');
-                }
-            })
-            .catch((error) => {
-                // TODO change alert based on error.code
-                Alert.alert('Incorrect email or password', error.message);
-            });
-    };
+  useEffect(() => {
+    if (!hasLaidOut) return;
+  
+    // Wait for all interactions first
+    const interactionHandle = InteractionManager.runAfterInteractions(() => {
+      console.log('[LoginScreen] Hiding splash screen in 1 s');
+  
+      const timer = setTimeout(async () => {
+        console.log('[LoginScreen] Actually hiding splash screen');
+        SplashScreen.hide();
+      }, 1000);
+  
+      // clean-up the timer if the component unmounts early
+      return () => clearTimeout(timer);
+    });
+  
+    // clean-up the InteractionManager handle
+    return () => interactionHandle.cancel();
+  }, [hasLaidOut]);
 
-    return (
-      <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-        <ScrollView contentContainerStyle={styles.root} keyboardShouldPersistTaps="handled">
-          <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
-            <View style={styles.titleAndButtonsContainer}>
-              <Text style={styles.title}>Sign in</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onChangeText={setEmail}
-                value={email}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                secureTextEntry
-                onChangeText={setPassword}
-                value={password}
-                placeholderTextColor="#888"
-              />
-              <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Login</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.textContainer}>
-              <Text style={styles.infoText}>Don't have an account?</Text>
-              <Text style={[styles.buttonText, styles.blueText]} onPress={() => { router.push('./createAccount') }}>
-                Sign Up
-              </Text>
-            </View>
-          </KeyboardAvoidingView>
-        </ScrollView>
-      </LinearGradient>
-    );
+  return (
+    <LinearGradient onLayout={onLayoutRootView} colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+      <ScrollView contentContainerStyle={styles.root} keyboardShouldPersistTaps="handled">
+        <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
+          <View style={styles.titleAndButtonsContainer}>
+            <Text style={styles.title}>Sign in</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onChangeText={setEmail}
+              value={email}
+              placeholderTextColor="#888"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              onChangeText={setPassword}
+              value={password}
+              placeholderTextColor="#888"
+            />
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.infoText}>Don't have an account?</Text>
+            <Text style={[styles.buttonText, styles.blueText]} onPress={() => { router.push('./createAccount') }}>
+              Sign Up
+            </Text>
+          </View>
+        </KeyboardAvoidingView>
+      </ScrollView>
+    </LinearGradient>
+  );
 };
 
 const styles = StyleSheet.create({
