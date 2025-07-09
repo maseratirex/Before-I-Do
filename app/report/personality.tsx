@@ -7,8 +7,11 @@ import { doc, getDoc } from "firebase/firestore";
 import { questionnaire } from "../../components/questionnaire";
 import { httpsCallable } from "firebase/functions";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import createLogger from '@/utilities/logger';
 
 export default function PersonalityScreen() {
+  const logger = createLogger('PersonalityScreen');
+
   const [combinedData, setCombinedData] = useState<barDataItem[]>([]);
   const [sectionTitles, setSectionTitles] = useState<string[]>([]);
   const [selectedSectionIndex, setSelectedSectionIndex] = useState<number>(0);
@@ -46,7 +49,7 @@ export default function PersonalityScreen() {
   const loadData = async () => {
     const user = auth.currentUser;
     if (user) {
-      console.log("Loading data");
+      logger.info("Loading data");
       let userAnswers: string[] = [];
       let partnerAnswers: string[] = [];
 
@@ -57,13 +60,13 @@ export default function PersonalityScreen() {
         if (docSnap.exists()) {
           const userData = docSnap.data();
           userAnswers = userData.personalityDynamics as string[];
-          console.log("User answers from Firestore", userAnswers);
+          logger.debug("User answers from Firestore", userAnswers);
         } else {
-          console.error("User document does not exist.");
+          logger.error("User document does not exist.");
           return;
         }
       } catch (error) {
-        console.error("Error fetching user's data:", error);
+        logger.error("Error fetching user's data:", error);
         return;
       }
 
@@ -76,11 +79,11 @@ export default function PersonalityScreen() {
         if (results.success) {
           partnerAnswers = results.responses.personalityResponses;
         } else {
-          console.error("Error fetching partner's data:", results.message);
+          logger.error("Error fetching partner's data:", results.message);
           return;
         }
       } catch (error: any) {
-        console.error("Error calling seePartnerResponses:", error.message || error);
+        logger.error("Error calling seePartnerResponses:", error.message || error);
         return;
       }
 
@@ -106,9 +109,9 @@ export default function PersonalityScreen() {
           .map((value) => parseFloat(value));
 
         const userAverage = userSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
-        console.log("user average", userAverage);
+        logger.debug("user average", userAverage);
         const partnerAverage = partnerSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
-        console.log("user average", partnerAverage);
+        logger.debug("user average", partnerAverage);
 
         const sectionTitle = titles[index];
         newUserScores[sectionTitle] = determineCategory(userAverage, thresholds[sectionTitle]);

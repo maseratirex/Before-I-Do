@@ -4,17 +4,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
 import { useHeaderHeight } from '@react-navigation/elements'
+import createLogger from '@/utilities/logger';
 
 export default function EntryScreen() {
+  const logger = createLogger('EntryScreen');
+
     const router = useRouter();
     const headerHeight = useHeaderHeight?.() ?? 0;   // optional
 
     const setUserNotFirstimeLocally = async () => {
-        console.log("Setting not first time status in local storage");
+        logger.info("Setting not first time status in local storage");
         try {
             await AsyncStorage.setItem('notFirstTimeUser', JSON.stringify(true));
         } catch (e) {
-            console.error('Failed to save not first time user status', e);
+            logger.error('Failed to save not first time user status', e);
         }
     };
 

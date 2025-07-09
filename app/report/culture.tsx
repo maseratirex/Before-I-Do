@@ -7,8 +7,11 @@ import { questionnaire } from "../../components/questionnaire";
 import { httpsCallable } from "firebase/functions";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import createLogger from '@/utilities/logger';
 
 export default function CultureScreen() {
+  const logger = createLogger('CultureScreen');
+
   const [combinedData, setCombinedData] = useState<barDataItem[]>([]);
   const [sectionTitles, setSectionTitles] = useState<string[]>([]);
   const [selectedSectionIndex, setSelectedSectionIndex] = useState<number>(0);
@@ -53,11 +56,11 @@ export default function CultureScreen() {
           const userData = docSnap.data();
           userAnswers = userData.cultureDynamics as string[];
         } else {
-          console.error("User document does not exist.");
+          logger.error("User document does not exist.");
           return;
         }
       } catch (error) {
-        console.error("Error fetching user's data:", error);
+        logger.error("Error fetching user's data:", error);
         return;
       }
 
@@ -70,11 +73,11 @@ export default function CultureScreen() {
         if (results.success) {
           partnerAnswers = results.responses.cultureResponses;
         } else {
-          console.error("Error fetching partner's data:", results.message);
+          logger.error("Error fetching partner's data:", results.message);
           return;
         }
       } catch (error: any) {
-        console.error("Error calling seePartnerResponses:", error.message || error);
+        logger.error("Error calling seePartnerResponses:", error.message || error);
         return;
       }
 

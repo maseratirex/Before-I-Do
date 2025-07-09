@@ -7,8 +7,11 @@ import { questionnaire } from "../../components/questionnaire";
 import { httpsCallable } from "firebase/functions";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import createLogger from '@/utilities/logger';
 
 export default function CoupleScreen() {
+  const logger = createLogger('CoupleScreen');
+
   const [combinedData, setCombinedData] = useState<barDataItem[]>([]);
   const [sectionTitles, setSectionTitles] = useState<string[]>([]);
   const [selectedSectionIndex, setSelectedSectionIndex] = useState<number>(0);
@@ -49,11 +52,11 @@ export default function CoupleScreen() {
           const userData = docSnap.data();
           userAnswers = userData.coupleDynamics as string[];
         } else {
-          console.error("User document does not exist.");
+          logger.error("User document does not exist.");
           return;
         }
       } catch (error) {
-        console.error("Error fetching user's data:", error);
+        logger.error("Error fetching user's data:", error);
         return;
       }
 
@@ -66,11 +69,11 @@ export default function CoupleScreen() {
         if (results.success) {
           partnerAnswers = results.responses.coupleResponses;
         } else {
-          console.error("Error fetching partner's data:", results.message);
+          logger.error("Error fetching partner's data:", results.message);
           return;
         }
       } catch (error: any) {
-        console.error("Error calling seePartnerResponses:", error.message || error);
+        logger.error("Error calling seePartnerResponses:", error.message || error);
         return;
       }
 

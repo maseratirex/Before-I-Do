@@ -5,8 +5,10 @@ import { useRouter } from 'expo-router';
 import { auth, db } from '@/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { LinearGradient } from "expo-linear-gradient";
+import createLogger from '@/utilities/logger';
 
 export default function CreateAccountScreen() {
+  const logger = createLogger('CreateAccountScreen');
   const [email, setEmail] = useState('');
   const [initials, setInitials] = useState('');
   const [password, setPassword] = useState('');
@@ -21,7 +23,7 @@ export default function CreateAccountScreen() {
     // Email verification sent!
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log('Created user with email and password');
+        logger.info('Created user with email and password');
 
         //add user to firestore
         onAuthStateChanged(auth, async (user) => {
@@ -55,7 +57,7 @@ export default function CreateAccountScreen() {
         if (error.code === 'auth/invalid-email') {
           Alert.alert('This email is invalid!');
         }
-        console.log(error);
+        logger.error(error);
       });
   };
 

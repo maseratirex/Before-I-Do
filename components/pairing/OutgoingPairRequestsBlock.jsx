@@ -3,9 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from "reac
 import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
+import createLogger from '@/utilities/logger';
 
 export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) {
     const [email, setEmail] = useState("");
+    const logger = createLogger('OutgoingPairRequestsBlock');
 
     const sendPairRequest = async () => {
         if (!email) {
@@ -26,14 +28,14 @@ export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRe
                 setHasSentRequest(true) // Update the state to indicate that a request has been sent
                 setSentRequest(email) // Update the state to indicate that a request has been sent
                 Alert.alert("Success", "Pair request sent successfully.");
-                console.log("Pair request sent successfully.");
+                logger.info("Pair request sent successfully.");
             }
             else {
                 Alert.alert("Error", "Failed to send pair request: " + data.message);
-                console.log("Failed to send pair request:", data.message);
+                logger.error("Failed to send pair request:", data.message);
             }
         } catch (error) {
-            console.log("Error sending pair requests:", error);
+            logger.error("Error sending pair requests:", error);
         }
     };
 
@@ -50,14 +52,14 @@ export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRe
                 setHasSentRequest(false) // Update the state to indicate that a request has been sent
                 setSentRequest("") // Update the state to indicate that a request has been sent
                 Alert.alert("Success", "Pair request cancelled successfully.");
-                console.log("Pair request cancelled successfully.");
+                logger.info("Pair request cancelled successfully.");
             }
             else {
                 Alert.alert("Error", "Failed to cancel pair request: " + data.message);
-                console.log("Failed to cancel pair request:", data.message);
+                logger.error("Failed to cancel pair request:", data.message);
             }
         } catch (error) {
-            console.log("Error cancelling pair requests:", error);
+            logger.error("Error cancelling pair requests:", error);
         }
     };
 
@@ -68,7 +70,7 @@ export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRe
             [
             { 
                 text: 'Cancel',
-                onPress: () => console.log('Cancelled pairing'), 
+                onPress: () => logger.info('Cancelled pairing'), 
                 style: 'cancel'
             },
             {

@@ -14,10 +14,14 @@ import ReportCard from '@/components/ReportCard'
 import AssessmentCard from '@/components/AssessmentCard'
 import ResourcesCard from '@/components/ResourcesCard'
 
+import createLogger from '@/utilities/logger';
+
 const TAB_BAR_HEIGHT = 75
 const TAB_MARGIN_BOTTOM = 40
 
 export default function HomeScreen() {
+  const logger = createLogger('HomeScreen');
+
   // Loading state
   const [isLoading, setIsLoading] = useState(true);
   // Assessment statuses
@@ -25,7 +29,7 @@ export default function HomeScreen() {
   const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false);
 
   const setupAssessmentStatuses = async (user: User) => {
-    console.log("Setting up isAssessmentSubmitted and hasStartedAssessment")
+    logger.info("Setting up isAssessmentSubmitted and hasStartedAssessment")
     // Determine assessment progress
     try {
       const submittedStorageKey = user.uid + 'assessment-submitted';
@@ -47,7 +51,7 @@ export default function HomeScreen() {
               }
             }
           } catch (error) {
-            console.error(`Could not load assessment progress for ${name} section:`, error);
+            logger.error(`Could not load assessment progress for ${name} section:`, error);
           }
         }
       } else {
@@ -55,10 +59,10 @@ export default function HomeScreen() {
       }
       setIsAssessmentSubmitted(submitted);
       setHasStartedAssessment(started);
-      console.log("Assessment submitted:", submitted);
-      console.log("Started assessment:", started);
+      logger.info("Assessment submitted:", submitted);
+      logger.info("Started assessment:", started);
     } catch (e) {
-      console.error("Error during assessment status setup:", e);
+      logger.error("Error during assessment status setup:", e);
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +74,7 @@ export default function HomeScreen() {
         if (user) {
           setupAssessmentStatuses(user);
         } else {
-          console.log("[HomeScreen] No user found — should be logged in");
+          logger.warn("No user found — should be logged in");
         }
       });
 
@@ -79,9 +83,9 @@ export default function HomeScreen() {
   );
 
   const onLayoutRootView = useCallback(() => {
-    console.log("[HomeScreen] Layout triggered");
+    logger.info("Layout triggered");
     if (!isLoading) {
-      console.log("[HomeScreen] Hiding splash screen");
+      logger.info("Hiding splash screen");
       SplashScreen.hide();
     }
   }, [isLoading]);

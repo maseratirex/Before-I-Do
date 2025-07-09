@@ -6,8 +6,11 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
 import * as SplashScreen from 'expo-splash-screen';
 import { InteractionManager } from 'react-native';
+import createLogger from '@/utilities/logger';
 
 export default function LoginScreen() {
+  const logger = createLogger('LoginScreen');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -43,10 +46,10 @@ export default function LoginScreen() {
   
     // Wait for all interactions first
     const interactionHandle = InteractionManager.runAfterInteractions(() => {
-      console.log('[LoginScreen] Hiding splash screen in 1 s');
+      logger.info('Hiding splash screen in 1 s');
   
       const timer = setTimeout(async () => {
-        console.log('[LoginScreen] Actually hiding splash screen');
+        logger.info('Actually hiding splash screen');
         SplashScreen.hide();
       }, 1000);
   

@@ -8,8 +8,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth, User } from "firebase/auth";
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebaseConfig'
+import createLogger from '@/utilities/logger';
 
 export default function AssessmentDirectoryScreen() {
+  const logger = createLogger('AssessmentDirectoryScreen');
+
   const names = ["Personality", "Family", "Couple", "Cultural"];
   const [progressData, setProgressData] = useState<any>({});
 
@@ -47,7 +50,7 @@ export default function AssessmentDirectoryScreen() {
           progress[name] = 0;
         }
       } catch (error) {
-        console.error(`Error loading progress for ${name}:`, error);
+        logger.error(`Error loading progress for ${name}:`, error);
       }
     }
     setProgressData(progress);
@@ -58,19 +61,19 @@ export default function AssessmentDirectoryScreen() {
   }, [userId]);
 
   const storeAssessmentSubmissionStatusLocally = async (user: User, status: boolean) => {
-    console.log("Storing assessment submission status in local storage as", status);
+    logger.info("Storing assessment submission status in local storage as", status);
     // Store user assessment submitted false in local storage
     try {
       const submittedStorageKey = user.uid + 'assessment-submitted'
       await AsyncStorage.setItem(submittedStorageKey, JSON.stringify(status));
     } catch (e) {
-      console.error('Failed to save assessment submission in local storage', e);
+      logger.error('Failed to save assessment submission in local storage', e);
     }
   };
 
 
   const submitResults = async () => {
-    console.log("Submitting results...");
+    logger.info("Submitting results...");
     const user = auth.currentUser;
     if (user) {
       let answers = [];
@@ -82,10 +85,10 @@ export default function AssessmentDirectoryScreen() {
             const sectionAnswers = JSON.parse(savedAnswers);
             answers.push(sectionAnswers);
           } else {
-            console.error("Failed to locate saved answers in local storage");
+            logger.error("Failed to locate saved answers in local storage");
           }
         } catch (error) {
-          console.error(`Error loading progress for ${name}:`, error);
+          logger.error(`Error loading progress for ${name}:`, error);
         }
       }
       const userRef = doc(db, "users", user.uid);
@@ -95,12 +98,12 @@ export default function AssessmentDirectoryScreen() {
         coupleDynamics: answers[2],
         cultureDynamics: answers[3],
       }, { merge: true });
-      console.log("Results submitted successfully");
+      logger.info("Results submitted successfully");
       Alert.alert("Results Submitted", "Your results have been submitted successfully.");
       await storeAssessmentSubmissionStatusLocally(user, true);
       router.back();
     } else {
-      console.error("No user found — should be logged in");
+      logger.error("No user found — should be logged in");
     }
   }
 
@@ -136,7 +139,7 @@ export default function AssessmentDirectoryScreen() {
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
       ) :
-        (<TouchableOpacity style={styles.submitButton} onPress={() => { Alert.alert("Finish before submitting", "Please complete the questionnaire before submitting"); console.log("User tried to submit before completing the questionnaire") }}>
+        (<TouchableOpacity style={styles.submitButton} onPress={() => { Alert.alert("Finish before submitting", "Please complete the questionnaire before submitting"); logger.info("User tried to submit before completing the questionnaire") }}>
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>)}
     </LinearGradient>

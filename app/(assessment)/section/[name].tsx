@@ -9,10 +9,12 @@ import LikertScale from '@/components/LikertScale'
 import { questionnaire } from "../../../components/questionnaire";
 import { getAuth } from "firebase/auth";
 import { LinearGradient } from "expo-linear-gradient";
+import createLogger from "@/utilities/logger";
 
 type SectionName = 'personality' | 'family' | 'couple' | 'cultural';
 
 export default function QuestionnaireScreen() {
+    const logger = createLogger('QuestionnaireScreen');
     const { name } = useLocalSearchParams<{ name: string }>();
     const router = useRouter();
     const section = name.toLowerCase() as SectionName;
@@ -35,20 +37,20 @@ export default function QuestionnaireScreen() {
             if (savedAnswers) {
                 const parsedAnswers = JSON.parse(savedAnswers);
                 if(testing) {
-                    console.log("Simulating answers");
+                    logger.info("Simulating answers");
                     const adjustedAnswers = questions.map((_, index) =>
                         Math.floor(Math.random() * 5) + 1
                     );
                     setAnswers(adjustedAnswers);
                 } else {
-                    console.log("Loading answers");
+                    logger.info("Loading answers");
                     const adjustedAnswers = Array(questions.length)
                         .fill(0)
                         .map((defaultValue, index) => parsedAnswers[index] ?? defaultValue); // Merge saved answers
                     setAnswers(adjustedAnswers);
                 }
             } else {
-                console.log("Simulating answers to save time");
+                logger.info("Simulating answers to save time");
                 if(testing) {
                     const adjustedAnswers = questions.map((_, index) =>
                         Math.floor(Math.random() * 5) + 1
@@ -57,7 +59,7 @@ export default function QuestionnaireScreen() {
                 }
             }
         } catch (error) {
-            console.error("Error loading saved answers:", error);
+            logger.error("Error loading saved answers:", error);
         } finally {
             setIsLoaded(true);
         }
@@ -67,7 +69,7 @@ export default function QuestionnaireScreen() {
         try {
             await AsyncStorage.setItem(storageKey, JSON.stringify(answers));
         } catch (error) {
-            console.error("Failed to save answers:", error);
+            logger.error("Failed to save answers:", error);
         }
     }, [answers, section]);
 

@@ -4,9 +4,11 @@ import { functions, db } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 import { MaterialIcons } from "@expo/vector-icons";
-import { doc, getDoc } from "firebase/firestore";
+import createLogger from '@/utilities/logger';
 
 export default function NotPairedBlock({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests, partnerInitials, setPartnerInitials, partnerEmail, setPartnerEmail }) {
+    const logger = createLogger('NotPairedBlock');
+
     const updatePairStatus = async () => {
         try {
             const checkPairStatusFunction = httpsCallable(functions, "seePairStatus");
@@ -40,17 +42,17 @@ export default function NotPairedBlock({ isPaired, setIsPaired, hasSentRequest, 
                             })
                         }
                         setRequests(temp);
-                        console.log("Pair requests:", temp);
+                        logger.debug("Pair requests:", temp);
                     } else {
                         setRequests([]);
                     }
                 }
             }
             else {
-                console.log("Failed to check pair status:", statusData.message);
+                logger.error("Failed to check pair status:", statusData.message);
             }
         } catch (error) {
-            console.error("seePairRequests: Error occurred:", error);
+            logger.error("seePairRequests: Error occurred:", error);
         }
     }
 
