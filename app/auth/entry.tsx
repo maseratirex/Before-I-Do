@@ -1,55 +1,51 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
-import { useHeaderHeight } from '@react-navigation/elements'
 import createLogger from '@/utilities/logger';
 
 export default function EntryScreen() {
   const logger = createLogger('EntryScreen');
 
-    const router = useRouter();
-    const headerHeight = useHeaderHeight?.() ?? 0;   // optional
+  const router = useRouter();
 
-    const setUserNotFirstimeLocally = async () => {
-        logger.info("Setting not first time status in local storage");
-        try {
-            await AsyncStorage.setItem('notFirstTimeUser', JSON.stringify(true));
-        } catch (e) {
-            logger.error('Failed to save not first time user status', e);
-        }
-    };
+  const setUserNotFirstimeLocally = async () => {
+    logger.info("Setting not first time status in local storage");
+    try {
+      await AsyncStorage.setItem('notFirstTimeUser', JSON.stringify(true));
+    } catch (e) {
+      logger.error('Failed to save not first time user status', e);
+    }
+  };
 
-    return (
-        <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'} keyboardVerticalOffset={headerHeight}>
-                <View style={styles.container}>
-                    <View style={styles.titleAndButtonsContainer}>
-                        <Text style={styles.appTitle}>Before I Do</Text>
-                        <Text style={styles.appDescription}>Scientific assessment, relationship report, and targeted resources for you and your partner!</Text>
-                    </View>
-                    <View style={styles.actionAreaContainer}>
-                        <TouchableOpacity style={styles.button} onPress={() => {
-                            setUserNotFirstimeLocally();
-                            router.push('./createAccount')
-                        }}>
-                            <Text style={styles.buttonText}>Let's get started</Text>
-                        </TouchableOpacity>
-                        <View style={styles.textContainer}>
-                            <Text style={styles.infoText}>Already have an account?</Text>
-                            <Text style={[styles.buttonText, styles.blueText]} onPress={() => {
-                                setUserNotFirstimeLocally();
-                                router.push('./login')
-                            }}>
-                                Sign In
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-            </KeyboardAvoidingView>
-        </LinearGradient>
-    );
+  return (
+    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+      <View style={styles.container}>
+        <View style={styles.titleAndButtonsContainer}>
+          <Text style={styles.appTitle}>Before I Do</Text>
+          <Text style={styles.appDescription}>Scientific assessment, relationship report, and targeted resources for you and your partner!</Text>
+        </View>
+        <View style={styles.actionAreaContainer}>
+          <TouchableOpacity style={styles.button} onPress={() => {
+            setUserNotFirstimeLocally();
+            router.push('./createAccount')
+          }}>
+            <Text style={styles.buttonText}>Let's get started</Text>
+          </TouchableOpacity>
+          <View style={styles.textContainer}>
+            <Text style={styles.infoText}>Already have an account?</Text>
+            <Text style={[styles.buttonText, styles.blueText]} onPress={() => {
+              setUserNotFirstimeLocally();
+              router.push('./login')
+            }}>
+              Sign In
+            </Text>
+          </View>
+        </View>
+      </View>
+    </LinearGradient>
+  );
 };
 
 const styles = StyleSheet.create({
