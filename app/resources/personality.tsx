@@ -69,8 +69,7 @@ export default function PersonalityScreen() {
             </View>
           </ExpandableButton>
           <ExpandableButton title="Empathy">
-            <Text style={{ fontStyle: "italic", color: Colors.textSecondary, }}>The ability to recognize, understand, and respond to the emotions of others with
-              care and sensitivity.</Text>
+            <Text style={{ fontStyle: "italic", color: Colors.textSecondary, }}>The ability to recognize, understand, and respond to the emotions of others with care and sensitivity.</Text>
             <View>
               <Text style={{ fontWeight: "bold", color: Colors.textPrimary, }}>Traits Reflected</Text>
               <Text style={{ color: Colors.textSecondary }}>• Emotional insight into others</Text>
