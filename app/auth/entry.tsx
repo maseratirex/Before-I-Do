@@ -1,14 +1,41 @@
-import React from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
 import createLogger from '@/utilities/logger';
+import * as SplashScreen from 'expo-splash-screen';
+import { InteractionManager } from 'react-native';
 
 export default function EntryScreen() {
   const logger = createLogger('EntryScreen');
 
   const router = useRouter();
+  const [hasLaidOut, setHasLaidOut] = useState(false);
+
+  const onLayoutRootView = useCallback(() => {
+    setHasLaidOut(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLaidOut) return;
+  
+    // Wait for all interactions first
+    const interactionHandle = InteractionManager.runAfterInteractions(() => {
+      logger.info('Hiding splash screen in 1 s');
+  
+      const timer = setTimeout(async () => {
+        logger.info('Actually hiding splash screen');
+        SplashScreen.hide();
+      }, 1000);
+  
+      // clean-up the timer if the component unmounts early
+      return () => clearTimeout(timer);
+    });
+  
+    // clean-up the InteractionManager handle
+    return () => interactionHandle.cancel();
+  }, [hasLaidOut]);
 
   const setUserNotFirstimeLocally = async () => {
     logger.info("Setting not first time status in local storage");
@@ -20,7 +47,7 @@ export default function EntryScreen() {
   };
 
   return (
-    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+    <LinearGradient onLayout={onLayoutRootView} colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
       <View style={styles.container}>
         <View style={styles.titleAndButtonsContainer}>
           <Text style={styles.appTitle}>Before I Do</Text>
@@ -35,12 +62,12 @@ export default function EntryScreen() {
           </TouchableOpacity>
           <View style={styles.textContainer}>
             <Text style={styles.infoText}>Already have an account?</Text>
-            <Text style={[styles.buttonText, styles.blueText]} onPress={() => {
+            <TouchableOpacity onPress={() => {
               setUserNotFirstimeLocally();
               router.push('./login')
             }}>
-              Sign In
-            </Text>
+              <Text style={[styles.buttonText, styles.blueText]}>Sign In</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

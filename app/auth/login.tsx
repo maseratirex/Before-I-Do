@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/firebaseConfig'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
 import * as SplashScreen from 'expo-splash-screen';
@@ -10,6 +9,7 @@ import createLogger from '@/utilities/logger';
 
 export default function LoginScreen() {
   const logger = createLogger('LoginScreen');
+  const auth = getAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,8 +36,7 @@ export default function LoginScreen() {
         }
       })
       .catch((error) => {
-        // TODO change alert based on error.code
-        Alert.alert('Incorrect email or password', error.message);
+        Alert.alert('Incorrect email or password');
       });
   };
 
