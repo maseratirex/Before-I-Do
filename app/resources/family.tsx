@@ -23,7 +23,7 @@ export default function FamilyScreen() {
                 </Card>
                 <Card>
                     <Text style={{ fontWeight: "bold", fontSize: 24, color: Colors.textPrimary }}>
-                        Key Areas of Personality Traits
+                        Key Areas of Family Dynamics
                     </Text>
                     <ExpandableButton title="Family Closeness">
                         <Text style={{ fontStyle: "italic", color: Colors.textSecondary, }}>Refers to the emotional bonds, support systems, and communication patterns experienced in one's family of origin.</Text>
