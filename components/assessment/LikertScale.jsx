@@ -2,12 +2,12 @@ import React from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 
 const options = ["1", "2", "3", "4", "5"];
-const labels = [
+const likertLabels = [
   "Strongly Disagree",
   "Disagree",
   "Neutral",
   "Agree",
-  "Strongly \nAgree",
+  "Strongly Agree",
 ];
 const reverseScoreIndices = { "personality": [], "family": [17, 27], "couple": [26], "cultural": [7, 14] }
 
@@ -44,7 +44,7 @@ export default function LikertScale({ section, subsections, answers, setAnswers 
                       >
                         {answers[index] === ((reverseScoreIndices[section].includes(index)) ? String(6 - value) : value) && <View style={styles.radioInner} />}
                       </TouchableOpacity>
-                      <Text style={styles.radioLabel}>{labels[idx]}</Text>
+                      <Text style={styles.radioLabel}>{likertLabels[idx]}</Text>
                     </View>
                   ))}
                 </View>

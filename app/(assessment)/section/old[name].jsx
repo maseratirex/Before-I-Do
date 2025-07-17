@@ -5,38 +5,36 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useHeaderHeight } from '@react-navigation/elements';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Progress from 'react-native-progress';
-import LikertScale from '@/components/LikertScale'
+import LikertScale from '@/components/assessment/LikertScale'
 import { questionnaire } from "../../../components/questionnaire";
 import { getAuth } from "firebase/auth";
 import { LinearGradient } from "expo-linear-gradient";
 import createLogger from "@/utilities/logger";
 
-type SectionName = 'personality' | 'family' | 'couple' | 'cultural';
-
 export default function QuestionnaireScreen() {
     const logger = createLogger('QuestionnaireScreen');
-    const { name } = useLocalSearchParams<{ name: string }>();
+    const { name } = useLocalSearchParams();
     const router = useRouter();
-    const section = name.toLowerCase() as SectionName;
+    const section = name.toLowerCase();
     const subsections = questionnaire[section];
-    const questions = subsections ? Object.values(subsections).flat() : [];
-    const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(0));
-    const [isLoaded, setIsLoaded] = useState<boolean>(false);
+    const questions = Object.values(subsections).flat();
+    const [answers, setAnswers] = useState(Array(questions.length).fill(0));
+    const [isLoaded, setIsLoaded] = useState(false);
     const [footerHeight, setFooterHeight] = useState(0);
 
     const auth = getAuth();
-    const userId = auth.currentUser ? auth.currentUser.uid : 'guest';
+    const userId = auth.currentUser.uid;
     const storageKey = `answers-${userId}-${section}`;
 
     const headerHeight = useHeaderHeight();
 
     const loadAnswers = React.useCallback(async () => {
         try {
-            const testing = true;
+            const testing = false;
             const savedAnswers = await AsyncStorage.getItem(storageKey);
             if (savedAnswers) {
                 const parsedAnswers = JSON.parse(savedAnswers);
-                if(testing) {
+                if (testing) {
                     logger.info("Simulating answers");
                     const adjustedAnswers = questions.map((_, index) =>
                         Math.floor(Math.random() * 5) + 1
@@ -50,8 +48,8 @@ export default function QuestionnaireScreen() {
                     setAnswers(adjustedAnswers);
                 }
             } else {
-                logger.info("Simulating answers to save time");
-                if(testing) {
+                if (testing) {
+                    logger.info("Simulating answers to save time");
                     const adjustedAnswers = questions.map((_, index) =>
                         Math.floor(Math.random() * 5) + 1
                     );
@@ -124,18 +122,17 @@ export default function QuestionnaireScreen() {
     return (
         <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
             <View style={{ flex: 1, paddingTop: headerHeight }}>
-            <LinearGradient
-                            colors={['rgba(255, 228, 235, 1)', 'rgba(255, 228, 235, 0)']}
-                            style={{
-                                position: 'absolute',
-                                top: headerHeight,
-                                left: 0,
-                                right: 0,
-                                height: 40,
-                                zIndex: 1,
-                            }}
-                            pointerEvents="none"/>
-                <ScrollView style={{flex: 1 }} contentContainerStyle={{ flexGrow: 1, paddingBottom: 10, }}>
+                <LinearGradient colors={['rgba(255, 228, 235, 1)', 'rgba(255, 228, 235, 0)']}
+                    style={{
+                        position: 'absolute',
+                        top: headerHeight,
+                        left: 0,
+                        right: 0,
+                        height: 40,
+                        zIndex: 1,
+                    }}
+                    pointerEvents="none" />
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, paddingBottom: 10, }}>
                     <LikertScale section={section} subsections={subsections} answers={answers} setAnswers={setAnswers} />
                     {isLoaded && progress === 1 && (
                         <TouchableOpacity style={{
@@ -162,18 +159,17 @@ export default function QuestionnaireScreen() {
                     )}
                 </ScrollView>
                 {footerHeight > 0 && (
-                    <LinearGradient
-                            colors={['rgba(255, 228, 235, 0)', '#FFC6D5']}
-                            style={{
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                bottom: footerHeight+25,
-                                height: footerHeight,
-                                zIndex: 1,
-                            }}
-                            pointerEvents="none"
-                        />
+                    <LinearGradient colors={['rgba(255, 228, 235, 0)', '#FFC6D5']}
+                        style={{
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            bottom: footerHeight + 25,
+                            height: footerHeight,
+                            zIndex: 1,
+                        }}
+                        pointerEvents="none"
+                    />
                 )}
                 <View onLayout={e => setFooterHeight(e.nativeEvent.layout.height)} style={{
                     alignSelf: 'center',
@@ -191,8 +187,7 @@ export default function QuestionnaireScreen() {
                     shadowRadius: 2,
                     width: '83%',
                 }}>
-                    <Progress.Bar
-                        style={{flex: 1,}}
+                    <Progress.Bar style={{ flex: 1, }}
                         width={null}
                         progress={progress}
                         height={8}
