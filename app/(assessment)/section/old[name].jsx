@@ -75,6 +75,7 @@ export default function QuestionnaireScreen() {
         loadAnswers();
     }, [loadAnswers]);
 
+    // Why save answers on background? The only time we should save is if the answer changes
     useEffect(() => {
         const appStateListener = AppState.addEventListener('change', (nextAppState) => {
             if (nextAppState === 'background' || nextAppState === 'inactive') saveAnswers();
@@ -83,6 +84,7 @@ export default function QuestionnaireScreen() {
         return () => appStateListener.remove();
     }, [saveAnswers]);
 
+    // Why save answers on focus? The only time we should save is if the answer changes
     useFocusEffect(
         React.useCallback(() => {
             saveAnswers();

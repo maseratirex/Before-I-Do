@@ -2,20 +2,14 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import LikertItem from './LikertItem';
 import { questionnaire } from "../questionnaire";
-import createLogger from "../../utilities/logger";
 
 export default function AssessmentSubsection({ sectionName, subsectionName, subsectionAnswers, onSubsectionAnswersUpdate }) {
-  const logger = createLogger("AssessmentSubsection");
-  logger.info(`Subsection answers: ${subsectionAnswers}`);
-
   const subsectionQuestions = questionnaire[sectionName][subsectionName];
-  logger.info(`Subsection ${subsectionName} has ${subsectionQuestions.length} questions`);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{subsectionName}</Text>
       {subsectionQuestions.map((subsectionQuestion, index) => (
-        console.log(`Subsection question: ${subsectionQuestion} at index ${index} with answer ${subsectionAnswers[index]}`),
         <LikertItem key={index} question={subsectionQuestion} answer={subsectionAnswers[index]} onAnswerUpdate={(value) => onSubsectionAnswersUpdate(index, value)} />
       ))}
     </View>
