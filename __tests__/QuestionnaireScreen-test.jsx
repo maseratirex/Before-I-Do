@@ -24,9 +24,18 @@ jest.mock('@react-navigation/elements', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
-    getItem: jest.fn().mockReturnValue(JSON.stringify({
-        'test-user-id-cultural': [1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 5, 4, 3 ]
-    })),
+    getItem: jest.fn((key) => {
+        if (key === 'answers-test-user-id-cultural') {
+            return Promise.resolve(JSON.stringify({
+                "Spiritual Beliefs": [1, 2, 2, 2, 2, 2, 2, 2],
+                "Lifestyle": [2, 2, 2, 2, 2, 2, 2, 2, 2],
+                "Traditions": [2, 2, 2, 2, 2],
+                "Marriage Preparations": [2, 2, 2, 2, 2, 5]
+            }));
+        }
+        return Promise.resolve(null);
+    }),
+    setItem: jest.fn(() => Promise.resolve())
 }));
 
 // Separately, AsyncStorage is mocked in the setupTests.js file, which package.json is configured to run before the tests.
@@ -50,7 +59,6 @@ describe('QuestionnaireScreen', () => {
 
         expect(screen.getByText(personalityQuestions[0])).toBeTruthy();
         expect(screen.getByText(personalityQuestions[personalityQuestions.length - 1])).toBeTruthy();
-        // TODO check correct circles filled in
     });
     it('loads first and last culture answers for finished culture section', async () => {
         useLocalSearchParams.mockReturnValue({ name: 'cultural' });
@@ -65,11 +73,9 @@ describe('QuestionnaireScreen', () => {
         await waitFor(() => {
             expect(screen.queryByText('Loading...')).toBeNull();
         });
-        // TODO check correct circles filled in
-        const culturalQuestions = Object.values(questionnaire.cultural).flat();
 
-        expect(screen.getByText(culturalQuestions[0])).toBeTruthy();
-        expect(screen.getByText(culturalQuestions[culturalQuestions.length - 1])).toBeTruthy();
+        expect(screen.queryAllByTestId("Strongly Disagree pressed")).toHaveLength(1);
+        expect(screen.queryAllByTestId("Strongly Agree pressed")).toHaveLength(1);
     });
 
 });

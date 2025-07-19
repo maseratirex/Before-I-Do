@@ -2,9 +2,9 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function LikertButton({ label, isPressed, onPress }) {
   return (
-    <View testId={label} style={styles.container}>
-      <TouchableOpacity style={[styles.radioButton, isPressed && styles.selectedRadioButton]} onPress={onPress}>
-        {isPressed && <View style={styles.radioInner} />}
+    <View style={styles.container}>
+      <TouchableOpacity testID={label} style={[styles.radioButton, isPressed && styles.selectedRadioButton]} onPress={onPress}>
+        {isPressed && <View testID={label + " pressed"} style={styles.radioInner} />}
       </TouchableOpacity>
       <Text style={styles.radioLabel}>{label}</Text>
     </View>
@@ -13,8 +13,6 @@ export default function LikertButton({ label, isPressed, onPress }) {
 
 const styles = StyleSheet.create({
   container: {
-    // TODO How do I size each button the same
-    // TODO How do I cause the text to wrap when it's too long?
     alignItems: "center",
     flex: 1, // Ensures equal spacing for all options
   },

@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import LikertItem from '../components/assessment/LikertItem';
+import { useState } from 'react';
 
 const likertLabels = [
   "Strongly Disagree",
@@ -9,11 +10,11 @@ const likertLabels = [
   "Strongly Agree",
 ];
 
-jest.mock('@react-native-async-storage/async-storage', () => ({
-    getItem: jest.fn().mockReturnValue(JSON.stringify({
-        'test-user-id-cultural': [1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 5, 4, 3 ]
-    })),
-}));
+// Wrapper for testing rerenders; pass state changes up to LikertItemWrapper, which updates LikertItem props
+function LikertItemWrapper( { initialAnswer }) {
+    const [answer, setAnswer] = useState(initialAnswer);
+    return <LikertItem question="This is a test statement" answer={answer} onAnswerUpdate={setAnswer} />;
+}
 
 describe('LikertItem', () => {
     it('renders the question', () => {
@@ -22,24 +23,39 @@ describe('LikertItem', () => {
     });
     it('defaults to no option as selected', () => {
         render(<LikertItem question="This is a test statement" answer={0} onAnswerUpdate={() => {}} />);
-        expect(screen.getByTestId('pressedButton')).toBeFalsy();
+        expect(screen.queryByTestId('Strongly Disagree pressed')).toBeFalsy();
+        expect(screen.queryByTestId('Disagree pressed')).toBeFalsy();
+        expect(screen.queryByTestId('Neutral pressed')).toBeFalsy();
+        expect(screen.queryByTestId('Agree pressed')).toBeFalsy();
+        expect(screen.queryByTestId('Strongly Agree pressed')).toBeFalsy();
     });
     it('fills in the correct answer when an answer is given', () => {
         render(<LikertItem question="This is a test statement" answer={1} onAnswerUpdate={() => {}} />);
-        expect(screen.getByTestId('pressedButton')).toBeFalsy();
+        expect(screen.queryByTestId('Strongly Disagree pressed')).toBeTruthy();
+        expect(screen.queryByTestId('Disagree pressed')).toBeFalsy();
+        expect(screen.queryByTestId('Neutral pressed')).toBeFalsy();
+        expect(screen.queryByTestId('Agree pressed')).toBeFalsy();
+        expect(screen.queryByTestId('Strongly Agree pressed')).toBeFalsy();
     });
-    it('fills in the correct answer when a button is pressed', () => {
+    it('fills in the correct answer when a button is pressed', async () => {
         const onAnswerUpdate = jest.fn();
-        render(<LikertItem question="This is a test statement" answer={0} onAnswerUpdate={onAnswerUpdate} />);
-        const button1 = screen.getByTestId('button1');
-        expect(button1.props.isPressed).toBe(false);
-        fireEvent.press(button1);
-        // Wait for the button to be pressed
-        expect(onAnswerUpdate).toHaveBeenCalledOnce();
-        expect(button1.props.isPressed).toBe(true);
+        render(<LikertItemWrapper initialAnswer={0} />);
+        expect(screen.queryByTestId('Strongly Disagree pressed')).toBeFalsy();
+        const stronglyDisagreeButton = screen.getByTestId('Strongly Disagree');
+        act(() => {
+            fireEvent.press(stronglyDisagreeButton);
+        });
+        expect(screen.queryByTestId('Strongly Disagree pressed')).toBeTruthy();
     });
     it('deselects the old answer when a new answer is selected', () => {
-        render(<LikertItem question="This is a test statement" answer={0} onAnswerUpdate={() => {}} />);
-        expect(screen.getByTestId('pressedButton')).toBeFalsy();
+        render(<LikertItemWrapper initialAnswer={1} />);
+        expect(screen.queryByTestId('Strongly Disagree pressed')).toBeTruthy();
+        expect(screen.queryByTestId('Neutral pressed')).toBeFalsy();
+        const neutralButton = screen.getByTestId('Neutral');
+        act(() => {
+            fireEvent.press(neutralButton);
+        });
+        expect(screen.queryByTestId('Strongly Disagree pressed')).toBeFalsy();
+        expect(screen.queryByTestId('Neutral pressed')).toBeTruthy();
     });
 });

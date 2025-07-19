@@ -34,11 +34,10 @@ export default function QuestionnaireScreen() {
         }
     }, [sectionAnswers]);
 
-
     const loadAnswers = React.useCallback(async () => {
         try {
             // TODO Create environment variable to toggle testing mode
-            const testing = true;
+            const testing = false;
             if (testing) {
                 logger.info("Simulating answers");
                 const simulatedSectionAnswers = {};
@@ -61,7 +60,7 @@ export default function QuestionnaireScreen() {
                     Object.keys(questionnaire[sectionName]).forEach((subsectionName) => {
                         defaultSectionAnswers[subsectionName] = Array(questionnaire[sectionName][subsectionName].length).fill(0);
                     });
-                    logger.info(`Defaulted to no answers`);
+                    logger.info("Defaulted to no answers");
                     setSectionAnswers(defaultSectionAnswers);
                     saveAnswers();
                 }

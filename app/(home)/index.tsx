@@ -45,7 +45,13 @@ export default function HomeScreen() {
             const savedAnswers = await AsyncStorage.getItem(sectionStorageKey);
             if (savedAnswers) {
               const answers = JSON.parse(savedAnswers);
-              if (answers.some((answer: number) => answer !== 0)) {
+              Object.keys(answers).forEach((subsectionName) => {
+                if (answers[subsectionName].some((answer) => answer !== 0)) {
+                  started = true;
+                  return;
+                }
+              });
+              if (started) {
                 started = true;
                 break;
               }
