@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, Alert, SafeAreaView } from "react-native";
+import React, { useState } from "react";
+import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { LinearGradient } from "expo-linear-gradient";
 import * as Progress from 'react-native-progress';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAuth, User } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebaseConfig'
 import createLogger from '@/utilities/logger';
@@ -15,16 +15,14 @@ export default function AssessmentDirectoryScreen() {
   const logger = createLogger('AssessmentDirectoryScreen');
 
   const sectionNames = ["Personality", "Family", "Couple", "Cultural"];
-  const [progressData, setProgressData] = useState({});
+  const [sectionProgresses, setSectionProgresses] = useState({ Personality: 0, Family: 0, Couple: 0, Cultural: 0 });
 
   const auth = getAuth();
   const userId = auth.currentUser.uid;
   const router = useRouter();
   const allSectionsComplete = () => {
-    return sectionNames.every((sectionName) => progressData[sectionName] === 1);
+    return sectionNames.every((sectionName) => sectionProgresses[sectionName] === 1);
   };
-
-  const headerHeight = useHeaderHeight();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -33,27 +31,24 @@ export default function AssessmentDirectoryScreen() {
   );
 
   const loadProgress = async () => {
-    const progress = {};
+    logger.info("Loading progress");
+    const sectionProgressesCopy = { ...sectionProgresses };
     for (let sectionName of sectionNames) {
       const storageKey = `answers-${userId}-${sectionName.toLowerCase()}`;
       try {
         const savedAnswers = await AsyncStorage.getItem(storageKey);
         if (savedAnswers) {
           const savedAnswersObject = JSON.parse(savedAnswers);
-          progress[sectionName] = calculateSectionProgress(savedAnswersObject);
+          sectionProgressesCopy[sectionName] = calculateSectionProgress(savedAnswersObject);
         } else {
-          progress[sectionName] = 0;
+          sectionProgressesCopy[sectionName] = 0;
         }
       } catch (error) {
         logger.error(`Error loading progress for ${sectionName}:`, error);
       }
     }
-    setProgressData(progress);
+    setSectionProgresses(sectionProgressesCopy);
   };
-
-  useEffect(() => {
-    loadProgress();
-  }, [userId]);
 
   const storeAssessmentSubmissionStatusLocally = async (status) => {
     logger.info("Storing assessment submission status in local storage as", status);
@@ -66,17 +61,16 @@ export default function AssessmentDirectoryScreen() {
     }
   };
 
-
   const submitResults = async () => {
     logger.info("Submitting results...");
-    let answers = [];
+    const answers = {};
     for (let sectionName of sectionNames) {
       const sectionStorageKey = `answers-${userId}-${sectionName.toLowerCase()}`;
       try {
         const savedAnswers = await AsyncStorage.getItem(sectionStorageKey);
         if (savedAnswers) {
           const sectionAnswers = JSON.parse(savedAnswers);
-          answers.push(sectionAnswers);
+          answers[sectionName] = sectionAnswers;
         } else {
           logger.error("Failed to locate saved answers in local storage");
         }
@@ -85,17 +79,25 @@ export default function AssessmentDirectoryScreen() {
       }
     }
     const userRef = doc(db, "users", userId);
-    await setDoc(userRef, {
-      personalityDynamics: answers[0],
-      familyDynamics: answers[1],
-      coupleDynamics: answers[2],
-      cultureDynamics: answers[3],
-    }, { merge: true });
-    logger.info("Results submitted successfully");
-    Alert.alert("Results Submitted", "Your results have been submitted successfully.");
-    await storeAssessmentSubmissionStatusLocally(true);
-    router.back();
+    setDoc(userRef, {
+      personalityDynamics: answers["Personality"],
+      familyDynamics: answers["Family"],
+      coupleDynamics: answers["Couple"],
+      cultureDynamics: answers["Cultural"],
+      answers: answers,
+    }, { merge: true })
+      .then(async () => {
+        Alert.alert("Results Submitted", "Your results have been submitted successfully.");
+        logger.info("Results submitted successfully");
+        await storeAssessmentSubmissionStatusLocally(true);
+      })
+      .catch((error) => {
+        Alert.alert("Error", "Issue submitting results. Please try again later.");
+        logger.error("Failed to submit results to Firestore", error);
+      });
   }
+
+  const headerHeight = useHeaderHeight();
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={[styles.container, { paddingTop: headerHeight }]}>
@@ -103,12 +105,12 @@ export default function AssessmentDirectoryScreen() {
         <TouchableOpacity key={sectionName} style={styles.sectionContainer} onPress={() => router.push(`./section/${sectionName}`)}
           activeOpacity={0.7}>
           <Text style={styles.title}>{sectionName} Dynamics</Text>
-          {progressData[sectionName] !== undefined && (
+          {sectionProgresses[sectionName] !== undefined && (
             <View style={styles.progressContainer}>
               <Progress.Bar
                 style={{ flex: 1, }}
                 width={null}
-                progress={progressData[sectionName]}
+                progress={sectionProgresses[sectionName]}
                 height={8}
                 color="#5856ce"
                 unfilledColor="lightgray"
@@ -116,7 +118,7 @@ export default function AssessmentDirectoryScreen() {
                 borderRadius={5}
               />
               <View style={styles.progressTextContainer}>
-                <Text style={styles.progressText}>{Math.round(progressData[sectionName] * 100)}%</Text>
+                <Text style={styles.progressText}>{Math.round(sectionProgresses[sectionName] * 100)}%</Text>
               </View>
             </View>
           )}
@@ -124,7 +126,7 @@ export default function AssessmentDirectoryScreen() {
       ))}
 
       {allSectionsComplete() ? (
-        <TouchableOpacity style={styles.submitButton} onPress={submitResults}>
+        <TouchableOpacity style={styles.submitButton} onPress={() => { submitResults(); router.back(); }}>
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
       ) :

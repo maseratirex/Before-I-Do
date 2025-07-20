@@ -19,24 +19,22 @@ export default function QuestionnaireScreen() {
     const sectionName = name.toLowerCase();
     const [sectionAnswers, setSectionAnswers] = useState({});
 
-    const auth = getAuth();
-    const userId = auth.currentUser.uid;
+    const userId = getAuth().currentUser.uid;
     const storageKey = `answers-${userId}-${sectionName}`;
 
     const [isLoaded, setIsLoaded] = useState(false);
 
-    const saveAnswers = React.useCallback(async () => {
+    const saveAnswers = async (answers) => {
         try {
-            await AsyncStorage.setItem(storageKey, JSON.stringify(sectionAnswers));
+            await AsyncStorage.setItem(storageKey, JSON.stringify(answers));
             logger.info("Saved answers");
         } catch (error) {
             logger.error("Failed to save answers:", error);
         }
-    }, [sectionAnswers]);
+    };
 
     const loadAnswers = React.useCallback(async () => {
         try {
-            // TODO Create environment variable to toggle testing mode
             const testing = false;
             if (testing) {
                 logger.info("Simulating answers");
@@ -47,7 +45,7 @@ export default function QuestionnaireScreen() {
                         .map(() => Math.floor(Math.random() * 5) + 1);
                 });
                 setSectionAnswers(simulatedSectionAnswers);
-                saveAnswers();
+                saveAnswers(simulatedSectionAnswers);
             } else {
                 const savedSectionAnswers = await AsyncStorage.getItem(storageKey);
                 if (savedSectionAnswers) {
@@ -62,7 +60,7 @@ export default function QuestionnaireScreen() {
                     });
                     logger.info("Defaulted to no answers");
                     setSectionAnswers(defaultSectionAnswers);
-                    saveAnswers();
+                    saveAnswers(defaultSectionAnswers);
                 }
             }
         } catch (error) {
@@ -81,7 +79,7 @@ export default function QuestionnaireScreen() {
         updatedSectionAnswers[subsectionName][index] = value;
         setSectionAnswers(updatedSectionAnswers);
         logger.info(`Updated answers for ${subsectionName} at index ${index} to ${value}`);
-        saveAnswers();
+        saveAnswers(updatedSectionAnswers);
     }
 
     const headerHeight = useHeaderHeight();

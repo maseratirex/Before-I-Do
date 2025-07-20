@@ -1,7 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { View, StyleSheet, Text, ScrollView, Dimensions } from "react-native";
 import { BarChart, barDataItem } from "react-native-gifted-charts";
-import { auth, db, functions } from '@/firebaseConfig';
+import { db, functions } from '@/firebaseConfig';
+import { getAuth } from 'firebase/auth';
 import React, { useState, useEffect, useRef } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { questionnaire } from "../../components/questionnaire";
@@ -11,6 +12,7 @@ import createLogger from '@/utilities/logger';
 
 export default function PersonalityScreen() {
   const logger = createLogger('PersonalityScreen');
+  const userId = getAuth().currentUser.uid;
 
   const [combinedData, setCombinedData] = useState<barDataItem[]>([]);
   const [sectionTitles, setSectionTitles] = useState<string[]>([]);
@@ -26,7 +28,7 @@ export default function PersonalityScreen() {
     "Self-Confidence": "A sense of self-assurance and inner security allows individuals to express themselves clearly and confidently. It reduces the need for constant reassurance and promotes mutual respect.",
     "Secure Attachment": "The tendency to feel safe and supported in close relationships builds trust and emotional intimacy. It helps partners remain connected and resilient through challenges."
   };
-   
+
   const thresholds: Record<string, [number, number, number]> = {
     "Emotional Stability": [3.28, 4.0, 5.0],
     "Empathy": [3.85, 4.43, 5.0],
@@ -35,6 +37,7 @@ export default function PersonalityScreen() {
     "Secure Attachment": [3.5, 4.49, 5.0],
   };
 
+  // Screen width... but 90% of the screen width
   const screenWidth = Dimensions.get('window').width * 0.9;
   const barCount = combinedData.length;
   const barWidth = 20;
@@ -47,109 +50,107 @@ export default function PersonalityScreen() {
   };
 
   const loadData = async () => {
-    const user = auth.currentUser;
-    if (user) {
-      logger.info("Loading data");
-      let userAnswers: string[] = [];
-      let partnerAnswers: string[] = [];
+    logger.info("Loading data");
+    let userAnswers: string[] = [];
+    let partnerAnswers: string[] = [];
 
-      // Fetch current user's data
-      try {
-        const userRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-          const userData = docSnap.data();
-          userAnswers = userData.personalityDynamics as string[];
-          logger.debug("User answers from Firestore", userAnswers);
-        } else {
-          logger.error("User document does not exist.");
-          return;
-        }
-      } catch (error) {
-        logger.error("Error fetching user's data:", error);
+    // Fetch current user's data
+    // TODO Refactor to use AsyncStorage instead of Firestore
+    try {
+      const userRef = doc(db, "users", userId);
+      const docSnap = await getDoc(userRef);
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        userAnswers = userData.personalityDynamics as string[];
+        logger.debug("User answers from Firestore", userAnswers);
+      } else {
+        logger.error("User document does not exist.");
         return;
       }
-
-      // Fetch partner's data
-      try {
-        const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
-        const myParams = { user: auth.currentUser?.uid };
-        const result = await checkPartnerResponsesFunction(myParams);
-        const results = result.data as { success: boolean, responses: { personalityResponses: string[] }, message: string };
-        if (results.success) {
-          partnerAnswers = results.responses.personalityResponses;
-        } else {
-          logger.error("Error fetching partner's data:", results.message);
-          return;
-        }
-      } catch (error: any) {
-        logger.error("Error calling seePartnerResponses:", error.message || error);
-        return;
-      }
-
-      // Combine user and partner data for the bar chart
-      const section = questionnaire.personality;
-      const titles = Object.keys(section);
-      setSectionTitles(titles);
-
-      const subsections = Object.values(section);
-      const subsectionLengths = subsections.map((subsection) => Object.keys(subsection).length);
-
-      let startIndex = 0;
-      const newCombinedData: barDataItem[] = [];
-      const newUserScores: Record<string, string> = {};
-      const newPartnerScores: Record<string, string> = {};
-
-      subsectionLengths.forEach((length, index) => {
-        const userSubsectionAnswers = userAnswers
-          .slice(startIndex, startIndex + length)
-          .map((value) => parseFloat(value));
-        const partnerSubsectionAnswers = partnerAnswers
-          .slice(startIndex, startIndex + length)
-          .map((value) => parseFloat(value));
-
-        const userAverage = userSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
-        logger.debug("user average", userAverage);
-        const partnerAverage = partnerSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
-        logger.debug("user average", partnerAverage);
-
-        const sectionTitle = titles[index];
-        newUserScores[sectionTitle] = determineCategory(userAverage, thresholds[sectionTitle]);
-        newPartnerScores[sectionTitle] = determineCategory(partnerAverage, thresholds[sectionTitle]);
-
-        newCombinedData.push({ value: userAverage, spacing: 0.5, barBorderRadius: 3 });
-        newCombinedData.push({ value: partnerAverage, barBorderRadius: 3 });
-
-        startIndex += length;
-      });
-
-      setUserScores(newUserScores);
-      setPartnerScores(newPartnerScores);
-      setCombinedData(newCombinedData);
+    } catch (error) {
+      logger.error("Error fetching user's data:", error);
+      return;
     }
+
+    // Fetch partner's data
+    try {
+      const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
+      const myParams = { user: userId };
+      const result = await checkPartnerResponsesFunction(myParams);
+      const results = result.data as { success: boolean, responses: { personalityResponses: string[] }, message: string };
+      if (results.success) {
+        partnerAnswers = results.responses.personalityResponses;
+      } else {
+        logger.error("Error fetching partner's data:", results.message);
+        return;
+      }
+    } catch (error: any) {
+      logger.error("Error calling seePartnerResponses:", error.message || error);
+      return;
+    }
+
+    // Combine user and partner data for the bar chart
+    const section = questionnaire.personality;
+    const titles = Object.keys(section);
+    setSectionTitles(titles);
+
+    const subsections = Object.values(section);
+    const subsectionLengths = subsections.map((subsection) => Object.keys(subsection).length);
+
+    let startIndex = 0;
+    const newCombinedData: barDataItem[] = [];
+    const newUserScores: Record<string, string> = {};
+    const newPartnerScores: Record<string, string> = {};
+
+    subsectionLengths.forEach((length, index) => {
+      const userSubsectionAnswers = userAnswers
+        .slice(startIndex, startIndex + length)
+        .map((value) => parseFloat(value));
+      const partnerSubsectionAnswers = partnerAnswers
+        .slice(startIndex, startIndex + length)
+        .map((value) => parseFloat(value));
+
+      const userAverage = userSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
+      logger.debug("user average", userAverage);
+      const partnerAverage = partnerSubsectionAnswers.reduce((sum, value) => sum + value, 0) / length;
+      logger.debug("user average", partnerAverage);
+
+      const sectionTitle = titles[index];
+      newUserScores[sectionTitle] = determineCategory(userAverage, thresholds[sectionTitle]);
+      newPartnerScores[sectionTitle] = determineCategory(partnerAverage, thresholds[sectionTitle]);
+
+      newCombinedData.push({ value: userAverage, spacing: 0.5, barBorderRadius: 3 });
+      newCombinedData.push({ value: partnerAverage, barBorderRadius: 3 });
+
+      startIndex += length;
+    });
+
+    setUserScores(newUserScores);
+    setPartnerScores(newPartnerScores);
+    setCombinedData(newCombinedData);
   };
 
   useEffect(() => {
     loadData();
   }, []);
-  
+
   useEffect(() => {
     if (hasAnimatedRef.current) return;
     hasAnimatedRef.current = true;
-  
+
     const forward = () => {
       scrollViewRef.current?.scrollTo({ x: 20, animated: true });
     };
-  
+
     const back = () => {
       scrollViewRef.current?.scrollTo({ x: 0, animated: true });
     };
-  
+
     const t1 = setTimeout(forward, 1300);
     const t2 = setTimeout(back, 1500);
     const t3 = setTimeout(forward, 1700);
     const t4 = setTimeout(back, 1900);
-  
+
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -160,7 +161,7 @@ export default function PersonalityScreen() {
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={{ flex: 1 }}>
-      <ScrollView style={{flex: 1}}>
+      <ScrollView style={{ flex: 1 }}>
         <SafeAreaView>
           <View style={styles.container}>
             <View style={styles.chartContainer}>
@@ -168,11 +169,11 @@ export default function PersonalityScreen() {
               <View style={styles.legendContainer}>
                 <View style={styles.legendItem}>
                   <View style={[styles.legendColor, { backgroundColor: '#FF597C' }]} />
-                  <Text style={{fontSize: 14, fontWeight: 'bold'}}>You</Text>
+                  <Text style={{ fontSize: 14, fontWeight: 'bold' }}>You</Text>
                 </View>
                 <View style={styles.legendItem}>
                   <View style={[styles.legendColor, { backgroundColor: '#328ADA' }]} />
-                  <Text style={{fontSize: 14, fontWeight: 'bold'}}>Your Partner</Text>
+                  <Text style={{ fontSize: 14, fontWeight: 'bold' }}>Your Partner</Text>
                 </View>
               </View>
 
@@ -208,36 +209,36 @@ export default function PersonalityScreen() {
                 yAxisThickness={0}
                 xAxisThickness={0}
                 maxValue={5}
-                height={200}/>
+                height={200} />
             </View>
 
             <View style={styles.sectionInfo}>
-            <ScrollView
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              ref={scrollViewRef}
-              onMomentumScrollEnd={(e) => {
-                const newIndex = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - 40));
-                setSelectedSectionIndex(newIndex);
-              }}
-            >
-              {sectionTitles.map((title, index) => (
-                <View key={index} style={styles.sectionPage}>
-                  <Text style={styles.sectionTitle}>{title}</Text>
-                  <Text style={styles.sectionDescription}>{sectionDescriptions[title]}</Text>
-                  <View style={styles.divider} />
-                  <Text style={styles.sectionTitle}>Strength in this Area</Text>
-                  <View style={styles.strengthRow}>
-                      <View style={[styles.strengthRowWithScore, {paddingRight: 30}]}>
+              <ScrollView
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                ref={scrollViewRef}
+                onMomentumScrollEnd={(e) => {
+                  const newIndex = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - 40));
+                  setSelectedSectionIndex(newIndex);
+                }}
+              >
+                {sectionTitles.map((title, index) => (
+                  <View key={index} style={styles.sectionPage}>
+                    <Text style={styles.sectionTitle}>{title}</Text>
+                    <Text style={styles.sectionDescription}>{sectionDescriptions[title]}</Text>
+                    <View style={styles.divider} />
+                    <Text style={styles.sectionTitle}>Strength in this Area</Text>
+                    <View style={styles.strengthRow}>
+                      <View style={[styles.strengthRowWithScore, { paddingRight: 30 }]}>
                         <Text
                           style={[
                             styles.strengthValue,
                             userScores[title] === "Low"
                               ? styles.lowScore
                               : userScores[title] === "Med"
-                              ? styles.mediumScore
-                              : styles.highScore,
+                                ? styles.mediumScore
+                                : styles.highScore,
                           ]}
                         >
                           {userScores[title]}
@@ -251,8 +252,8 @@ export default function PersonalityScreen() {
                             partnerScores[title] === "Low"
                               ? styles.lowScore
                               : partnerScores[title] === "Med"
-                              ? styles.mediumScore
-                              : styles.highScore,
+                                ? styles.mediumScore
+                                : styles.highScore,
                           ]}
                         >
                           {partnerScores[title]}
@@ -262,9 +263,9 @@ export default function PersonalityScreen() {
                     </View>
                   </View>
                 ))}
-            </ScrollView>
+              </ScrollView>
             </View>
-            
+
             {/* Page Control */}
             <View style={styles.pageControlWrapper}>
               <View style={styles.pageControlContainer}>
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: "3%",
-    fontSize: 17, 
+    fontSize: 17,
   },
   sectionDescription: {
     fontSize: 15,
