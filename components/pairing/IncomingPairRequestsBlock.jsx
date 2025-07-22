@@ -4,8 +4,11 @@ import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 import { Pressable } from 'react-native';
+import createLogger from '@/utilities/logger';
 
 export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, setRequests, setPartnerInitials, setPartnerEmail }) {
+    const logger = createLogger('IncomingPairRequestsBlock');
+
     const numPairRequests = pairRequests.length;
     const [acceptPartner, setAcceptPartner] = useState("");
 
@@ -25,7 +28,7 @@ export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, s
             if (data.success) {
                 setIsPaired(true);
                 Alert.alert("Success", "Successfully confirmed pair request with " + numPairRequests == 1 ? pairRequests[0].email : acceptPartner + ".");
-                console.log("Successfully paired with " + numPairRequests == 1 ? pairRequests[0].email : acceptPartner + ".");
+                logger.info("Successfully paired with " + numPairRequests == 1 ? pairRequests[0].email : acceptPartner + ".");
                 const seePairStatusFunction = httpsCallable(functions, "seePairStatus");
                 const auth = getAuth();
                 const myParams = {
@@ -37,10 +40,10 @@ export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, s
             }
             else {
                 Alert.alert("Error", "Failed to confirm pair request: " + data.message);
-                console.log("Failed to confirm pair request:", data.message);
+                logger.error("Failed to confirm pair request:", data.message);
             }
         } catch (error) {
-            console.log("Error confirming pair requests:", error);
+            logger.error("Error confirming pair requests:", error);
         }
     }
 
@@ -51,7 +54,7 @@ export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, s
             [
             { 
                 text: 'Cancel',
-                onPress: () => console.log('Cancelled pairing'), 
+                onPress: () => logger.info('Cancelled pairing'), 
                 style: 'cancel'
             },
             {

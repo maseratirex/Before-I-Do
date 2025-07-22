@@ -9,8 +9,10 @@ import { onAuthStateChanged } from "firebase/auth";
 import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { useRouter } from "expo-router";
+import createLogger from '@/utilities/logger';
 
 export default function PairPartnerCard() {
+  const logger = createLogger('PairPartnerCard');
   const router = useRouter();
   const [isPaired, setIsPaired] = useState("");
   const [hasSentRequest, setHasSentRequest] = useState("");
@@ -23,7 +25,7 @@ export default function PairPartnerCard() {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
-        console.log("No authenticated user in seePairRequests");
+        logger.warn("No authenticated user in seePairRequests");
         return;
       }
       const checkPairRequestFunction = httpsCallable(functions, "checkPairRequest");
@@ -43,13 +45,13 @@ export default function PairPartnerCard() {
           })
         }
         setRequests(temp);
-        console.log("Pair requests:", temp);
+        logger.debug("Pair requests:", temp);
       } else {
         setRequests([]);
       }
       return requests;
     } catch (error) {
-      console.error("seePairRequests: Error occurred:", error);
+      logger.error("seePairRequests: Error occurred:", error);
     }
   }
 
@@ -57,32 +59,32 @@ export default function PairPartnerCard() {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
-        console.log("No authenticated user in seePairStatus");
+        logger.warn("No authenticated user in seePairStatus");
         return;
       }
       const seePairStatusFunction = httpsCallable(functions, "seePairStatus");
       const myParams = {
         user: currentUser.uid,
       };
-      console.log("Checking pairing status for user:", myParams);
+      logger.debug("Checking pairing status for user:", myParams);
       const result = await seePairStatusFunction(myParams);
       const data = result.data;
-      console.log("Pairing status data:", data);
+      logger.debug("Pairing status data:", data);
       if (data.success) {
-        console.log("Pairing status:", data);
+        logger.debug("Pairing status:", data);
         setIsPaired(data.type == "paired");
         setHasSentRequest(data.type == "requested");
         setSentRequest(data.type == "requested" ? data.partnerRequest : "");
         setPartnerInitials(data.type == "paired" ? data.partnerInitials : "");
         setPartnerEmail(data.type == "paired" ? data.partner : "");
-        console.log("Pairing status:", data.type);
-        console.log("Pair request email:", data.partnerRequest);
-        console.log("isPaired:", isPaired);
+        logger.debug("Pairing status:", data.type);
+        logger.debug("Pair request email:", data.partnerRequest);
+        logger.debug("isPaired:", isPaired);
       } else {
-        console.log("Failed to check pairing status:", data.message);
+        logger.warn("Failed to check pairing status:", data.message);
       }
     } catch (error) {
-      console.error("seePairRequests: Error occurred:", error);
+      logger.error("seePairRequests: Error occurred:", error);
     }
   }
 
@@ -92,9 +94,9 @@ export default function PairPartnerCard() {
         seePairStatus();
         seePairRequests();
       } else {
-        console.log("User is not authenticated or email not verified.");
+        logger.warn("User is not authenticated or email not verified.");
         if (auth.currentUser) {
-          console.log("User", auth.currentUser.email, "has verified email:", auth.currentUser.emailVerified);
+          logger.debug("User", auth.currentUser.email, "has verified email:", auth.currentUser.emailVerified);
         }
         router.replace('/auth/login');
       }

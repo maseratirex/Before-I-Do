@@ -2,22 +2,24 @@ import { View, StyleSheet, Text, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { httpsCallable } from "firebase/functions";
 import { functions, auth } from '@/firebaseConfig'
+import createLogger from '@/utilities/logger';
 
 export default function ReportCard() {
   const router = useRouter();
+  const logger = createLogger('ReportCard');
 
   // Check partner status
   const hasPartnerSubmittedAssessment = async () => {
     try {
-      console.log("Checking partner assessment status");
+      logger.info("Checking partner assessment status");
       
       const checkPartnerAssessmentStatusFunction = httpsCallable(functions, "seePartnerResponses");
       const functionParams = { user: auth.currentUser?.uid }; // Vulnerability
       const response = await checkPartnerAssessmentStatusFunction(functionParams);
-      console.log("Partner assessment status:", response);
+      logger.debug("Partner assessment status:", response);
       return response.data.success;
     } catch (error) {
-      console.error("Error checking partner assessment status:", error);
+      logger.error("Error checking partner assessment status:", error);
       return false;
     }
   }
@@ -26,11 +28,13 @@ export default function ReportCard() {
     // TODO: Inform the user that we're checking whether their partner has submitted
     // TODO: Set isLoading to true while we load
     const partnerSubmittedAssessment = await hasPartnerSubmittedAssessment()
-    if (partnerSubmittedAssessment) {
-      router.push("/report/personality")
-    } else {
-      Alert.alert("Waiting for partner", "Your partner must complete the assessment");
-    }
+    // TODO Reinstate the partnerSubmittedAssessment check
+    router.push("/report/personality")
+    // if (partnerSubmittedAssessment) {
+    //   router.push("/report/personality")
+    // } else {
+    //   Alert.alert("Waiting for partner", "Your partner must complete the assessment");
+    // }
   }
 
   return (

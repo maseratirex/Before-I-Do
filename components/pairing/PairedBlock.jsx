@@ -4,8 +4,11 @@ import { functions, db } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import createLogger from '@/utilities/logger'; 
 
 export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests, partnerInitials, setPartnerInitials, partnerEmail, setPartnerEmail }) {
+    const logger = createLogger('PairedBlock');
+
     const [userInitial, setUserInitial] = useState('');
 
     const unpairUsers = async () => {
@@ -22,14 +25,14 @@ export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, num
                 setPartnerInitials("");
                 setPartnerEmail("");
                 Alert.alert("Success", "Successfully unpaired.");
-                console.log("Successfully unpaired.");
+                logger.info("Successfully unpaired.");
             }
             else {
                 Alert.alert("Error", "Failed to unpair: " + data.message);
-                console.log("Failed to unpair:", data.message);
+                logger.error("Failed to unpair:", data.message);
             }
         } catch (error) {
-            console.log("Error unpairing:", error);
+            logger.error("Error unpairing:", error);
         }
     }
 
@@ -38,15 +41,15 @@ export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, num
             'Confirm unpairing',
             'Unpairing will remove your access to your partner\'s data and your partner\'s access to your data',
             [
-            { 
-                text: 'Cancel',
-                onPress: () => console.log('Cancelled pairing'), 
-                style: 'cancel'
-            },
-            {
-                text: 'OK',
-                onPress: () => unpairUsers(),
-            }
+                {
+                    text: 'Cancel',
+                    onPress: () => logger.info('Cancelled pairing'),
+                    style: 'cancel'
+                },
+                {
+                    text: 'OK',
+                    onPress: () => unpairUsers(),
+                }
             ],
             { cancelable: false }
         );
@@ -81,7 +84,7 @@ export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, num
             <TouchableOpacity style={styles.button} onPress={confirmUnpairUsers}>
                 <Text style={styles.buttonText}>
                     Unpair{'\n'}
-                    <Text style={{ fontWeight: 'normal'}}>{partnerEmail}</Text>
+                    <Text style={{ fontWeight: 'normal' }}>{partnerEmail}</Text>
                 </Text>
             </TouchableOpacity>
         </View>

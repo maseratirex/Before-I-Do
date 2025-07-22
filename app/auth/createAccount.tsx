@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'expo-router';
-import { auth, db } from '@/firebaseConfig';
-import { doc, setDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { doc, setDoc, getFirestore } from 'firebase/firestore';
 import { LinearGradient } from "expo-linear-gradient";
+import createLogger from '@/utilities/logger';
 
 export default function CreateAccountScreen() {
+  const logger = createLogger('CreateAccountScreen');
+  const auth = getAuth();
+  const db = getFirestore();
   const [email, setEmail] = useState('');
   const [initials, setInitials] = useState('');
   const [password, setPassword] = useState('');
@@ -14,14 +18,13 @@ export default function CreateAccountScreen() {
 
   const handleSignUp = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please enter both an email and password.');
+      Alert.alert('Please enter both an email and password.');
       return;
     }
     
-    // Email verification sent!
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log('Created user with email and password');
+        logger.info('Created user with email and password');
 
         //add user to firestore
         onAuthStateChanged(auth, async (user) => {
@@ -37,8 +40,7 @@ export default function CreateAccountScreen() {
               coupleDynamics: null,
               cultureDynamics: null,
           });
-        }
-        else {
+        } else {
             throw new Error("User not authenticated");
         }
         });
@@ -52,11 +54,11 @@ export default function CreateAccountScreen() {
       .catch((error) => {
         if (error.code === 'auth/email-already-in-use') {
           Alert.alert('This email is already in use!');
-        }
-        if (error.code === 'auth/invalid-email') {
+        } else if (error.code === 'auth/invalid-email') {
           Alert.alert('This email is invalid!');
+        } else {
+          Alert.alert(error.message);
         }
-        console.log(error);
       });
   };
 

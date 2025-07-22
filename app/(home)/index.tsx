@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { StyleSheet, ScrollView, ActivityIndicator, KeyboardAvoidingView } from "react-native";
 import { useFocusEffect } from "expo-router";
+import * as SplashScreen from 'expo-splash-screen';
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -12,26 +13,26 @@ import PairPartnerCard from '@/components/pairing/PairPartnerCard';
 import ReportCard from '@/components/ReportCard'
 import AssessmentCard from '@/components/AssessmentCard'
 import ResourcesCard from '@/components/ResourcesCard'
-import { useHeaderHeight } from '@react-navigation/elements'
+
+import createLogger from '@/utilities/logger';
 
 const TAB_BAR_HEIGHT = 75
 const TAB_MARGIN_BOTTOM = 40
 
 export default function HomeScreen() {
+  const logger = createLogger('HomeScreen');
+  
   // Loading state
-  const [isUserReady, setIsUserReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   // Assessment statuses
   const [hasStartedAssessment, setHasStartedAssessment] = useState(false);
   const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false);
 
-  const headerHeight = useHeaderHeight?.() ?? 0;   // optional
-
   const setupAssessmentStatuses = async (user: User) => {
-    console.log("Setting up isAssessmentSubmitted and hasStartedAssessment")
+    logger.info("Setting up isAssessmentSubmitted and hasStartedAssessment")
     // Determine assessment progress
     try {
-      const submittedStorageKey = user.uid + 'assessment-submitted'
+      const submittedStorageKey = user.uid + 'assessment-submitted';
       const assessmentSubmittedResponse = await AsyncStorage.getItem(submittedStorageKey);
       const submitted = assessmentSubmittedResponse === 'true'; // Convert string | null to boolean
       let started = false;
@@ -44,13 +45,19 @@ export default function HomeScreen() {
             const savedAnswers = await AsyncStorage.getItem(sectionStorageKey);
             if (savedAnswers) {
               const answers = JSON.parse(savedAnswers);
-              if (answers.some((answer: number) => answer !== 0)) {
+              Object.keys(answers).forEach((subsectionName) => {
+                if (answers[subsectionName].some((answer) => answer !== 0)) {
+                  started = true;
+                  return;
+                }
+              });
+              if (started) {
                 started = true;
                 break;
               }
             }
           } catch (error) {
-            console.error(`Could not load assessment progress for ${name} section:`, error);
+            logger.error(`Could not load assessment progress for ${name} section:`, error);
           }
         }
       } else {
@@ -58,10 +65,10 @@ export default function HomeScreen() {
       }
       setIsAssessmentSubmitted(submitted);
       setHasStartedAssessment(started);
-      console.log("Assessment submitted:", submitted);
-      console.log("Started assessment:", started);
+      logger.info("Assessment submitted:", submitted);
+      logger.info("Started assessment:", started);
     } catch (e) {
-      console.error("Error during assessment status setup:", e);
+      logger.error("Error during assessment status setup:", e);
     } finally {
       setIsLoading(false);
     }
@@ -73,19 +80,26 @@ export default function HomeScreen() {
         if (user) {
           setupAssessmentStatuses(user);
         } else {
-          console.log("No user found — should be logged in");
-          setIsLoading(false); // still stop loading
+          logger.warn("No user found — should be logged in");
         }
-        setIsUserReady(true);
       });
 
       return () => unsubscribe();
     }, [])
   );
 
-  if (isLoading || !isUserReady) {
+  const onLayoutRootView = useCallback(() => {
+    logger.info("Layout triggered");
+    if (!isLoading) {
+      logger.info("Hiding splash screen");
+      SplashScreen.hide();
+    }
+  }, [isLoading]);
+
+  if (isLoading) {
     return (
-      <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+      // RED FOR TESTING
+      <LinearGradient colors={['#FF0000', '#FF0000']} style={styles.root}>
         <ScrollView style={styles.root}>
           <SafeAreaView style={styles.containerForCards}>
             <ActivityIndicator size="large" color="#FF6780" />
@@ -96,7 +110,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+    <LinearGradient onLayout={onLayoutRootView} colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={'padding'}>
         <ScrollView keyboardShouldPersistTaps='handled'>
           <SafeAreaView style={styles.containerForCards}>

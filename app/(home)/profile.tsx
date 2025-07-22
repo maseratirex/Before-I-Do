@@ -8,8 +8,11 @@ import { httpsCallable } from "firebase/functions";
 import { functions, db } from "@/firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc } from "firebase/firestore";
+import createLogger from "@/utilities/logger";
 
 export default function ProfileScreen() {
+  const logger = createLogger('ProfileScreen');
+
   const [showPasswordDialog, setPasswordDialogVisible] = useState(false);
   const [password, setPassword] = useState('');
   const [userInitial, setUserInitial] = useState('');
@@ -44,40 +47,41 @@ export default function ProfileScreen() {
       return;
     }
     const credential = EmailAuthProvider.credential(user.email || '', password);
-    reauthenticateWithCredential(user, credential).then(async () => {
-      // User re-authenticated, proceed with deletion
-      setPasswordDialogVisible(false);
+    reauthenticateWithCredential(user, credential)
+      .then(async () => {
+        // User re-authenticated, proceed with deletion
+        setPasswordDialogVisible(false);
 
-      // Call firestore to delete user data
-      const deleteUserFunction = httpsCallable(functions, "deleteUserData");
-      const functionParams = { user: auth.currentUser?.uid };
-      const response = await deleteUserFunction(functionParams) as any;
-      if (!response.data.success) {
-        console.log("User data was not deleted successfully");
-        Alert.alert('Error', 'User data was not deleted successfully');
-        return;
-      }
-      // Remove user data from local storage
-      const keys = await AsyncStorage.getAllKeys();
-      await AsyncStorage.multiRemove(keys);
-      console.log("User data removed from local storage");
+        // Call firestore to delete user data
+        const deleteUserFunction = httpsCallable(functions, "deleteUserData");
+        const functionParams = { user: auth.currentUser?.uid };
+        const response = await deleteUserFunction(functionParams) as any;
+        if (!response.data.success) {
+          logger.warn("User data was not deleted successfully");
+          Alert.alert('Error', 'User data was not deleted successfully');
+          return;
+        }
+        // Remove user data from local storage
+        const keys = await AsyncStorage.getAllKeys();
+        await AsyncStorage.multiRemove(keys);
+        logger.info("User data removed from local storage");
 
-      // Call auth to delete user
-      if (user) {
-        deleteUser(user).then(() => {
-          console.log("User account deleted successfully");
-          Alert.alert('Success', 'User account deleted successfully');
-        }).catch((error) => {
-          console.error("Error deleting user account:", error);
-          Alert.alert('Error', 'Error deleting user account: ' + error.message);
-        });
-      }
-    }).catch((error) => {
-      setPassword('');
-      console.error("Error re-authenticating user:", error);
-      Alert.alert('Error', 'Re-authentication failed: ' + error.message);
-    });
-
+        // Call auth to delete user
+        if (user) {
+          deleteUser(user).then(() => {
+            logger.info("User account deleted successfully");
+            Alert.alert('Success', 'User account deleted successfully');
+          }).catch((error) => {
+            logger.error("Error deleting user account:", error);
+            Alert.alert('Error', 'Error deleting user account: ' + error.message);
+          });
+        }
+      })
+      .catch((error) => {
+        setPassword('');
+        logger.error("Error re-authenticating user:", error);
+        Alert.alert('Error', 'Re-authentication failed: ' + error.message);
+      });
   }
   
   return (
