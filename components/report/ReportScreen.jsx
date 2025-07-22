@@ -18,7 +18,7 @@ export default function ReportScreen({ sectionName }) {
     const userId = getAuth().currentUser.uid;
 
     const [combinedData, setCombinedData] = useState([]); // Bar chart data
-    const [selectedSectionIndex, setSelectedSectionIndex] = useState(0);
+    const [selectedSubsectionIndex, setSelectedSubsectionIndex] = useState(0);
     const [userSubsectionCategories, setUserSubsectionCategories] = useState({});
     const [partnerSubsectionCategories, setPartnerSubsectionCategories] = useState({});
 
@@ -100,7 +100,6 @@ export default function ReportScreen({ sectionName }) {
                 const userSubsectionAnswers = userSectionAnswers[subsectionName];
                 const partnerSubsectionAnswers = partnerSectionAnswers[subsectionName];
 
-                // Reverse scoring object: Look up section, then subsection, then see if the resulting array contains the index
                 let userSubsectionSum = 0;
                 for (let i = 0; i < userSubsectionAnswers.length; i++) {
                     const answer = userSubsectionAnswers[i];
@@ -200,7 +199,7 @@ export default function ReportScreen({ sectionName }) {
                                 data={combinedData.map((bar, index) => {
                                     const isUser = index % 2 === 0;
                                     const pair = Math.floor(index / 2);
-                                    const selected = pair === selectedSectionIndex;
+                                    const selected = pair === selectedSubsectionIndex;
                                     const base = isUser ? '#FDC2CE' : '#A7D5FF';
                                     const border = isUser ? '#FF597C' : '#328ADA';
 
@@ -210,7 +209,7 @@ export default function ReportScreen({ sectionName }) {
                                         barBorderColor: border,
                                         barBorderWidth: 1.5,
                                         onPress: () => {
-                                            setSelectedSectionIndex(pair);
+                                            setSelectedSubsectionIndex(pair);
                                             scrollViewRef.current?.scrollTo({
                                                 x: pair * (Dimensions.get("window").width * 0.83),
                                                 animated: true,
@@ -239,7 +238,7 @@ export default function ReportScreen({ sectionName }) {
                                 ref={scrollViewRef}
                                 onMomentumScrollEnd={(e) => {
                                     const newIndex = Math.round(e.nativeEvent.contentOffset.x / (Dimensions.get("window").width - 40));
-                                    setSelectedSectionIndex(newIndex);
+                                    setSelectedSubsectionIndex(newIndex);
                                 }}
                             >
                                 {subsectionNames.map((subsectionName, index) => (
@@ -293,7 +292,7 @@ export default function ReportScreen({ sectionName }) {
                                         key={index}
                                         style={[
                                             styles.pageControlDot,
-                                            selectedSectionIndex === index && styles.pageControlDotSelected,
+                                            selectedSubsectionIndex === index && styles.pageControlDotSelected,
                                         ]}
                                     />
                                 ))}
