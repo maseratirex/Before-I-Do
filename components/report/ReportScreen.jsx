@@ -89,8 +89,8 @@ export default function ReportScreen({ sectionName }) {
         };
 
         const newCombinedData = []; // Bar chart data
-        const newUserSubsectionCategories = {}; // Subsection averages
-        const newPartnerSubsectionCategories = {}; // Subsection averages
+        const newUserSubsectionCategories = {};
+        const newPartnerSubsectionCategories = {};
     
         // Calculate the corresponding category for each subsection for user and partner
         // Add the subsection average to the bar chart
