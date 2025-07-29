@@ -7,7 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import {onCall} from "firebase-functions/v2/https";
+import { onCall } from "firebase-functions/v2/https";
 
 // The Firebase Admin SDK to access Firestore.
 const admin = require('firebase-admin');
@@ -17,22 +17,31 @@ if (!admin.apps.length) {
 }
 
 export const pairRequest = onCall(async (request) => {
+  const emailVerified = request.auth?.token.email_verified;
+  if (!emailVerified) {
+    return { success: false, message: "Email not verified" };
+  }
+
   // Get parameters from request
   const partnerEmail = request.data.email;
-  const senderId = request.data.user;
+
+  // const senderId = request.data.user;
+  const senderId = request.auth?.uid;
 
   // Find the user document in Firestore associated with the partner email
   const partnerQuery = await admin.firestore().collection("users").where("email", "==", partnerEmail);
-  const querySnapshot =  await partnerQuery.get();
+  const querySnapshot = await partnerQuery.get();
   if (!querySnapshot.empty) {
     // Get just the one user document
     const snapshot = querySnapshot.docs[0]
     // Reference of user doc
     const partnerRef = snapshot.ref;
 
-
     // Check if a request already exists
-    const requestQuery = admin.firestore().collection("requests").where("recipientId", "==", partnerRef.id).where("senderId", "==", senderId);
+    const requestQuery = admin.firestore().collection("requests")
+      .where("recipientId", "==", partnerRef.id)
+      .where("senderId", "==", senderId);
+
     const requestSnapshot = await requestQuery.get();
     if (requestSnapshot.docs.length > 0) {
       return { success: false, message: "Request already exists" };
@@ -63,23 +72,27 @@ export const pairRequest = onCall(async (request) => {
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
     return { success: true, message: "Request has been sent with ID: " + val.id };
-  }
-  else {
+  } else {
     return { success: false, message: "User does not exist" };
   }
 });
 
 export const checkPairRequest = onCall(async (request) => {
-  // Get parameters from request
-  const userId = request.data.user;
-  
+  const emailVerified = request.auth?.token.email_verified;
+  if (!emailVerified) {
+    return { success: false, message: "Email not verified" };
+  }
+
+  const userId = request.auth?.uid;
+
   // create array to emails of senders of pair requests
   const senderEmails: string[] = [];
 
   // Find all pending requests associated with the current user as specified by userId
   const querySnapshot = await admin.firestore().collection('requests')
-      .where('recipientId', '==', userId).where('pairStatus', '==', 'pending')
-      .get();
+    .where('recipientId', '==', userId)
+    .where('pairStatus', '==', 'pending')
+    .get();
 
   if (!querySnapshot.empty) {
     for (const doc of querySnapshot.docs) {
@@ -94,13 +107,13 @@ export const checkPairRequest = onCall(async (request) => {
         if (senderDocData && senderDocData.email) {
           // Add the email to the array
           senderEmails.push(senderDocData.email);
-        } 
+        }
       } else {
-        return {success: false, message: "Sender does not exist: " + senderId};
+        return { success: false, message: "Sender does not exist: " + senderId };
       }
     }
   }
-  
+
   if (senderEmails.length > 0) {
     return { success: true, emails: senderEmails, message: "Pending pair requests found." };
   } else {
@@ -109,26 +122,32 @@ export const checkPairRequest = onCall(async (request) => {
 });
 
 export const confirmPairing = onCall(async (request) => {
-  // Get parameters from request
-  const userId = request.data.user;
+  const emailVerified = request.auth?.token.email_verified;
+  if (!emailVerified) {
+    return { success: false, message: "Email not verified" };
+  }
+
+  const userId = request.auth?.uid;
   const partnerEmail = request.data.email;
 
   // Don't allow pairing if a request is already confirmed
   const confirmedRequestsSnapshot = await admin.firestore().collection('requests')
-  .where('recipientId', '==', userId).where('pairStatus', '==', 'confirmed')
-  .get();
+    .where('recipientId', '==', userId)
+    .where('pairStatus', '==', 'confirmed')
+    .get();
+
   if (!confirmedRequestsSnapshot.empty) {
-    return { success: false, message: "A Pair request has already been confirmed" };
+    return { success: false, message: "A pair request has already been confirmed" };
   }
 
   // Convert partnerEmail to partnerId through query
   const partnerQuery = await admin.firestore().collection("users").where("email", "==", partnerEmail);
-  const partnerSnapshot =  await partnerQuery.get();
+  const partnerSnapshot = await partnerQuery.get();
   if (!partnerSnapshot.empty) {
     // Get just the one user document
     const partnerRef = partnerSnapshot.docs[0];
     const partnerId = partnerRef.id;
-    
+
     // Confirm the pair request exists
     const requestSnapshot = await admin.firestore().collection("requests").where("recipientId", "==", userId).where("senderId", "==", partnerId).where("pairStatus", "==", "pending").get();
     if (!requestSnapshot.empty) {
@@ -143,8 +162,7 @@ export const confirmPairing = onCall(async (request) => {
         await senderRef.update({ isPaired: true, partner: userId });
         await recipientRef.update({ isPaired: true, partner: partnerId });
         return { success: true, message: "Pair request confirmed" };
-      }
-      catch (error) {
+      } catch (error) {
         // Reset all values on error
         const requestDoc = requestSnapshot.docs[0];
         await requestDoc.ref.update({ pairStatus: "pending" });
@@ -156,23 +174,29 @@ export const confirmPairing = onCall(async (request) => {
         await recipientRef.update({ isPaired: false, partner: null });
         return { success: false, message: "Pair request confirmation failed" };
       }
-    }
-    else {
+    } else {
       return { success: false, message: "Pair request does not exist" };
     }
-  }
-  else {
+  } else {
     return { success: false, message: "User does not exist" };
   }
 });
 
 export const cancelPairingRequest = onCall(async (request) => {
-  // Get parameters from request
-  const userId = request.data.user;
+  // Cancels all pending pair requests sent by the user
+  const emailVerified = request.auth?.token.email_verified;
+  if (!emailVerified) {
+    return { success: false, message: "Email not verified" };
+  }
+
+  const userId = request.auth?.uid;
 
   // Get all sent pair requests
   const pendingSentRequestsSnapshot = await admin.firestore().collection('requests')
-  .where('senderId', '==', userId).where('pairStatus', '==', 'pending').get();
+    .where('senderId', '==', userId)
+    .where('pairStatus', '==', 'pending')
+    .get();
+
   if (!pendingSentRequestsSnapshot.empty) {
     for (const doc of pendingSentRequestsSnapshot.docs) {
       await doc.ref.delete();
@@ -183,8 +207,12 @@ export const cancelPairingRequest = onCall(async (request) => {
 });
 
 export const seePairStatus = onCall(async (request) => {
-  // Get parameters from request
-  const userId = request.data.user;
+  const emailVerified = request.auth?.token.email_verified;
+  if (!emailVerified) {
+    return { success: false, message: "Email not verified" };
+  }
+
+  const userId = request.auth?.uid;
 
   // Check if the user is paired
   const userDoc = await admin.firestore().collection("users").doc(userId).get();
@@ -205,8 +233,8 @@ export const seePairStatus = onCall(async (request) => {
   }
   // Find requests associated with the current user as specified by userId
   const querySnapshot = await admin.firestore().collection('requests')
-      .where('senderId', '==', userId).where('pairStatus', '==', 'pending')
-      .get();
+    .where('senderId', '==', userId).where('pairStatus', '==', 'pending')
+    .get();
 
   if (!querySnapshot.empty) {
     const recipientId = querySnapshot.docs[0].data().recipientId;
@@ -220,18 +248,21 @@ export const seePairStatus = onCall(async (request) => {
     } else {
       return { success: false, message: "Invalid recipientId in pair request" };
     }
-  }
-  else {
+  } else {
     return { success: true, type: "not requested", message: "No pair requests exist" };
   }
 });
 
 export const unpair = onCall(async (request) => {
-  // Get parameters from request
-  const userId = request.data.user;
-  
-  var partnerId = "";
-  
+  const emailVerified = request.auth?.token.email_verified;
+  if (!emailVerified) {
+    return { success: false, message: "Email not verified" };
+  }
+
+  const userId = request.auth?.uid;
+
+  let partnerId = "";
+
   // Confirm that the user is paired
   const userDoc = await admin.firestore().collection("users").doc(userId).get();
   if (userDoc.exists) {
@@ -239,15 +270,13 @@ export const unpair = onCall(async (request) => {
     if (userData && userData.isPaired) {
       // User is paired, return the partnerId
       partnerId = userData.partner;
-    }
-    else {
+    } else {
       return { success: false, message: "You are not paired with anyone" };
     }
-  }
-  else {
+  } else {
     return { success: false, message: "User does not exist" };
   }
-  
+
   // change pair request to pending
   const requestSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).where('senderId', '==', partnerId).get();
   if (!requestSnapshot.empty) {
@@ -259,12 +288,11 @@ export const unpair = onCall(async (request) => {
     if (!requestSnapshot.empty) {
       const requestDoc = requestSnapshot.docs[0];
       await requestDoc.ref.update({ pairStatus: "pending" });
-    }
-    else {
+    } else {
       return { success: false, message: "Pair request does not exist" };
     }
   }
-  
+
   // update both users to unpaired state
   const partnerRef = await admin.firestore().collection("users").doc(partnerId);
   const userRef = await admin.firestore().collection("users").doc(userId);
@@ -274,10 +302,14 @@ export const unpair = onCall(async (request) => {
 });
 
 export const seePartnerResponses = onCall(async (request) => {
-  // Get parameters from request
-  const userId = request.data.user;
-  
-  var partnerId = "";
+  const emailVerified = request.auth?.token.email_verified;
+  if (!emailVerified) {
+    return { success: false, message: "Email not verified" };
+  }
+
+  const userId = request.auth?.uid;
+
+  let partnerId = "";
 
   // Confirm that the user is paired
   const userDoc = await admin.firestore().collection("users").doc(userId).get();
@@ -286,12 +318,10 @@ export const seePartnerResponses = onCall(async (request) => {
     if (userData && userData.isPaired) {
       // User is paired, return the partnerId
       partnerId = userData.partner;
-    }
-    else {
+    } else {
       return { success: false, message: "You are not paired with anyone" };
     }
-  }
-  else {
+  } else {
     return { success: false, message: "User does not exist" };
   }
 
@@ -300,21 +330,23 @@ export const seePartnerResponses = onCall(async (request) => {
   if (partnerDoc.exists) {
     const partnerData = partnerDoc.data();
     if (partnerData && partnerData.coupleDynamics && partnerData.cultureDynamics && partnerData.familyDynamics && partnerData.personalityDynamics) {
-      return { success: true, responses: {coupleResponses: partnerData.coupleDynamics, cultureResponses: partnerData.cultureDynamics, familyResponses: partnerData.familyDynamics, personalityResponses: partnerData.personalityDynamics}, message: "Partner's questionnaire responses retrieved" };
-    }
-    else {
+      return { success: true, responses: { coupleResponses: partnerData.coupleDynamics, cultureResponses: partnerData.cultureDynamics, familyResponses: partnerData.familyDynamics, personalityResponses: partnerData.personalityDynamics }, message: "Partner's questionnaire responses retrieved" };
+    } else {
       return { success: false, message: "Partner's questionnaire responses not found" };
     }
-  }
-  else {
+  } else {
     return { success: false, message: "Partner does not exist" };
   }
 });
 
 export const deleteUserData = onCall(async (request) => {
-  // Get parameters from request
-  const userId = request.data.user;
-  
+  const emailVerified = request.auth?.token.email_verified;
+  if (!emailVerified) {
+    return { success: false, message: "Email not verified" };
+  }
+
+  const userId = request.auth?.uid;
+
   // Get user document
   const userDoc = await admin.firestore().collection("users").doc(userId).get();
   if (userDoc.exists) {
@@ -344,9 +376,8 @@ export const deleteUserData = onCall(async (request) => {
       // delete the user document
       await userDoc.ref.delete();
       return { success: true, message: "User and associated data deleted successfully from firestore" };
-    }
-    // handle an unpaired user
-    else if (userData && !userData.isPaired) {
+    } else if (userData && !userData.isPaired) {
+      // handle an unpaired user
       // remove all pair requests associated with the user
       const requestRecipientSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).get();
       if (!requestRecipientSnapshot.empty) {
@@ -364,12 +395,10 @@ export const deleteUserData = onCall(async (request) => {
       // delete the user document
       await userDoc.ref.delete();
       return { success: true, message: "User and associated data deleted successfully from firestore" };
-    }
-    else {
+    } else {
       return { success: false, message: "User does not exist" };
     }
-  }
-  else {
+  } else {
     return { success: false, message: "User does not exist" };
   }
 });

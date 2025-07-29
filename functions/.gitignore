@@ -8,3 +8,5 @@ typings/
 # Node.js dependency directory
 node_modules/
 *.local
+
+before-i-do-f23a976ddb1f.json

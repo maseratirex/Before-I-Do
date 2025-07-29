@@ -1,6 +1,7 @@
 {
   "projects": {
-    "b-i-d": "before-i-do"
+    "dev": "before-i-do",
+    "prod": "before-i-do-production"
   },
   "targets": {},
   "etags": {}
