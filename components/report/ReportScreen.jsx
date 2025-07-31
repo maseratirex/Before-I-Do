@@ -12,6 +12,7 @@ import createLogger from '@/utilities/logger';
 import { reverseScoringIndices } from '@/constants/reverseScoringIndices';
 import { thresholds } from '@/constants/thresholds';
 import { descriptions } from '@/constants/descriptions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ReportScreen({ sectionName }) {
     const logger = createLogger('ReportScreen');
@@ -32,25 +33,18 @@ export default function ReportScreen({ sectionName }) {
         logger.info("Loading data");
 
         // Fetch current user's data
-        // TODO Refactor to use AsyncStorage instead of Firestore
-        // TODO Store Firestore data in AsyncStorage when user logs in on a different device
-        // let userSectionAnswers = {};
-        // try {
-        //     const userRef = doc(db, "users", userId);
-        //     const docSnap = await getDoc(userRef);
-        //     if (docSnap.exists()) {
-        //         const userData = docSnap.data();
-        //         // userAnswers = userData.personalityDynamics;
-        //         userSectionAnswers = userData.answers[section];
-        //         logger.debug("User section answers from Firestore", userSectionAnswers);
-        //     } else {
-        //         logger.error("User document does not exist.");
-        //         return;
-        //     }
-        // } catch (error) {
-        //     logger.error("Error fetching user's data:", error);
-        //     return;
-        // }
+        const sectionStorageKey = `answers-${userId}-${sectionName.toLowerCase()}`;
+        let userSectionAnswers = {};
+        try {
+            const savedAnswers = await AsyncStorage.getItem(sectionStorageKey);
+            if (savedAnswers) {
+                userSectionAnswers = JSON.parse(savedAnswers);
+            } else {
+                logger.error("Failed to locate saved answers in local storage");
+            }
+        } catch (error) {
+            logger.error(`Error loading progress for ${sectionName}:`, error);
+        }
 
         // Fetch partner's data
         // let partnerSectionAnswers = {};
@@ -72,14 +66,6 @@ export default function ReportScreen({ sectionName }) {
         //     return;
         // }
 
-        // TODO update to real data
-        const userSectionAnswers = {
-            "Emotional Stability": [5, 5, 5, 5, 5, 5, 5, 5],
-            "Empathy": [5, 5, 5, 5, 5, 5, 5, 5],
-            "Openness to Experience": [5, 5, 5, 5, 5, 5, 5, 5],
-            "Secure Attachment": [5, 5, 5, 5, 5, 5, 5, 5],
-            "Self-Confidence": [1, 2, 2, 2, 2, 2, 2, 2],
-        };
         const partnerSectionAnswers = {
             "Emotional Stability": [1, 2, 2, 2, 2, 2, 2, 2],
             "Empathy": [1, 2, 2, 2, 2, 2, 2, 2],
