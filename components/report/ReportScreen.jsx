@@ -1,11 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { View, StyleSheet, Text, ScrollView, Dimensions } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
-import { db, functions } from '@/firebaseConfig';
-import { getAuth } from 'firebase/auth';
 import React, { useState, useEffect, useRef } from "react";
-import { doc, getDoc } from "firebase/firestore";
 import { questionnaire } from "../../components/questionnaire";
+import { auth, functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import createLogger from '@/utilities/logger';
@@ -16,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ReportScreen({ sectionName }) {
     const logger = createLogger('ReportScreen');
-    const userId = getAuth().currentUser.uid;
+    const userId = auth.currentUser.uid;
 
     const [combinedData, setCombinedData] = useState([]); // Bar chart data
     const [selectedSubsectionIndex, setSelectedSubsectionIndex] = useState(0);

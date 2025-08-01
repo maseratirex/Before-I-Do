@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { functions, db } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
-import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import createLogger from '@/utilities/logger'; 
+import { auth, db, functions } from "@/firebaseConfig";
 
 export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests, partnerInitials, setPartnerInitials, partnerEmail, setPartnerEmail }) {
     const logger = createLogger('PairedBlock');
@@ -14,7 +13,6 @@ export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, num
     const unpairUsers = async () => {
         try {
             const unpairFunction = httpsCallable(functions, "unpair");
-            const auth = getAuth();
             const myParams = {
                 user: auth.currentUser?.uid,
             }
@@ -56,7 +54,6 @@ export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, num
     }
 
     const getUserInitials = async () => {
-        const auth = getAuth();
         const user = auth.currentUser;
         const userRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(userRef);

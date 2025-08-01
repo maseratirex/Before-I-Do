@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Text, ScrollView, StyleSheet, View, TouchableOpacity } from "react-native";
 import AssessmentSubsection from "@/components/assessment/AssessmentSubsection";
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { getAuth } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { auth } from "@/firebaseConfig";
 import { questionnaire } from "@/components/questionnaire";
 import createLogger from "@/utilities/logger";
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -19,7 +19,7 @@ export default function QuestionnaireScreen() {
     const sectionName = name.toLowerCase();
     const [sectionAnswers, setSectionAnswers] = useState({});
 
-    const userId = getAuth().currentUser.uid;
+    const userId = auth.currentUser.uid;
     const storageKey = `answers-${userId}-${sectionName}`;
 
     const [isLoaded, setIsLoaded] = useState(false);

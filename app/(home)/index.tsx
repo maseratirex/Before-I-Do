@@ -4,9 +4,8 @@ import { useFocusEffect } from "expo-router";
 import * as SplashScreen from 'expo-splash-screen';
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { auth } from '@/firebaseConfig'
+import { auth } from "@/firebaseConfig";
 import { onAuthStateChanged, User } from 'firebase/auth';
 
 import PairPartnerCard from '@/components/pairing/PairPartnerCard';

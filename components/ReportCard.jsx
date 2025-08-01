@@ -1,8 +1,8 @@
 import { View, StyleSheet, Text, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { httpsCallable } from "firebase/functions";
-import { functions, auth } from '@/firebaseConfig'
 import createLogger from '@/utilities/logger';
+import { auth, functions } from "@/firebaseConfig";
 
 export default function ReportCard() {
   const router = useRouter();

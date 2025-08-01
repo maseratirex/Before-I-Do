@@ -1,10 +1,9 @@
 import React, { useState, useCallback } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
-import { getAuth } from "firebase/auth";
 import { Pressable } from 'react-native';
 import createLogger from '@/utilities/logger';
+import { auth, functions } from "@/firebaseConfig";
 
 export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, setRequests, setPartnerInitials, setPartnerEmail }) {
     const logger = createLogger('IncomingPairRequestsBlock');
@@ -18,7 +17,6 @@ export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, s
                 return Alert.alert("Error", "Please select a partner to accept.");
             }
             const confirmPairRequestFunction = httpsCallable(functions, "confirmPairing");
-            const auth = getAuth();
             const myParams = {
                 email: numPairRequests == 1 ? pairRequests[0].email : acceptPartner,
                 user: auth.currentUser?.uid,
@@ -30,7 +28,6 @@ export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, s
                 Alert.alert("Success", "Successfully confirmed pair request with " + numPairRequests == 1 ? pairRequests[0].email : acceptPartner + ".");
                 logger.info("Successfully paired with " + numPairRequests == 1 ? pairRequests[0].email : acceptPartner + ".");
                 const seePairStatusFunction = httpsCallable(functions, "seePairStatus");
-                const auth = getAuth();
                 const myParams = {
                     user: auth.currentUser?.uid,
                 };

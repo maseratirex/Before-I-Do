@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from "react-native";
-import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
-import { getAuth } from "firebase/auth";
 import createLogger from '@/utilities/logger';
+import { auth, functions } from "@/firebaseConfig";
 
 export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRequest, sentRequestEmail, setSentRequest }) {
     const [email, setEmail] = useState("");
@@ -17,7 +16,6 @@ export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRe
 
         try {
             const sendPairRequestFunction = httpsCallable(functions, "pairRequest");
-            const auth = getAuth();
             const myParams = {
                 email: email,
                 user: auth.currentUser?.uid,
@@ -42,7 +40,6 @@ export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRe
     const cancelPairRequest = async () => {
         try {
             const cancelPairRequestFunction = httpsCallable(functions, "cancelPairingRequest");
-            const auth = getAuth();
             const myParams = {
                 user: auth.currentUser?.uid,
             }

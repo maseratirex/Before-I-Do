@@ -5,9 +5,8 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import { LinearGradient } from "expo-linear-gradient";
 import * as Progress from 'react-native-progress';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAuth } from "firebase/auth";
+import { db, auth } from "@/firebaseConfig";
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from '@/firebaseConfig'
 import createLogger from '@/utilities/logger';
 import { calculateSectionProgress } from "@/utilities/calculateSectionProgress";
 
@@ -17,7 +16,6 @@ export default function AssessmentDirectoryScreen() {
   const sectionNames = ["Personality", "Family", "Couple", "Cultural"];
   const [sectionProgresses, setSectionProgresses] = useState({ Personality: 0, Family: 0, Couple: 0, Cultural: 0 });
 
-  const auth = getAuth();
   const userId = auth.currentUser.uid;
   const router = useRouter();
   const allSectionsComplete = () => {

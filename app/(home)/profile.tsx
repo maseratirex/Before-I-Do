@@ -3,12 +3,12 @@ import Dialog from "react-native-dialog";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from "react";
-import { getAuth, signOut, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import { signOut, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
-import { functions, db } from "@/firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc } from "firebase/firestore";
 import createLogger from "@/utilities/logger";
+import { auth, db, functions } from "@/firebaseConfig";
 
 export default function ProfileScreen() {
   const logger = createLogger('ProfileScreen');
@@ -23,7 +23,6 @@ export default function ProfileScreen() {
   };
 
   const getUserInitials = async () => {
-    const auth = getAuth();
     const user = auth.currentUser;
     const userRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(userRef);
@@ -38,8 +37,6 @@ export default function ProfileScreen() {
   }, []);
 
   const deleteUserFunc = async () => {
-    const auth = getAuth();
-
     // re-authenticate user
     const user = auth.currentUser;
     if (!user) {
@@ -93,11 +90,10 @@ export default function ProfileScreen() {
               <Text style={styles.initialsText}>{userInitial}</Text>
             </View>
           </View>
-          <Text style={styles.emailText}>{getAuth().currentUser?.email}</Text>
+          <Text style={styles.emailText}>{auth.currentUser?.email}</Text>
         </View>
         <View style={styles.buttonContainers}>
           <TouchableOpacity style={styles.button} onPress={() => {
-            const auth = getAuth();
             signOut(auth).catch((error) => {
               Alert.alert('Sign Out Failed', error.message);
             });

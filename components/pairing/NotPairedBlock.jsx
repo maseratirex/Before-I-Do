@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { functions, db } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
-import { getAuth } from "firebase/auth";
 import { MaterialIcons } from "@expo/vector-icons";
 import createLogger from '@/utilities/logger';
+import { auth, functions } from "@/firebaseConfig";
 
 export default function NotPairedBlock({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests, partnerInitials, setPartnerInitials, partnerEmail, setPartnerEmail }) {
     const logger = createLogger('NotPairedBlock');
@@ -12,7 +11,6 @@ export default function NotPairedBlock({ isPaired, setIsPaired, hasSentRequest, 
     const updatePairStatus = async () => {
         try {
             const checkPairStatusFunction = httpsCallable(functions, "seePairStatus");
-            const auth = getAuth();
             const myParams = {
                 user: auth.currentUser?.uid,
             };

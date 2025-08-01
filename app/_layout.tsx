@@ -2,8 +2,8 @@ import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
 import createLogger from "@/utilities/logger";
 
 // Keep the splash screen visible while we fetch resources

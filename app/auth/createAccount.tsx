@@ -2,15 +2,13 @@ import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'expo-router';
-import { getAuth } from 'firebase/auth';
-import { doc, setDoc, getFirestore } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { LinearGradient } from "expo-linear-gradient";
 import createLogger from '@/utilities/logger';
+import { auth, db } from "@/firebaseConfig";
 
 export default function CreateAccountScreen() {
   const logger = createLogger('CreateAccountScreen');
-  const auth = getAuth();
-  const db = getFirestore();
   const [email, setEmail] = useState('');
   const [initials, setInitials] = useState('');
   const [password, setPassword] = useState('');

@@ -4,14 +4,13 @@ import QuestionnaireScreen from '../app/(assessment)/section/[name]';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { questionnaire } from '../components/questionnaire';
 
-// getAuth() and getFirestore() are called inside the screens, so we need to mock them.
-// We don't need to mock signInWithEmailAndPassword() because it's not called when navigating from the EntryScreen to LoginScreen.
-jest.mock('firebase/auth', () => ({
-    getAuth: jest.fn().mockReturnValue({
+// Mock imports for QuestionnaireScreen
+jest.mock('../firebaseConfig', () => ({
+    auth: {
         currentUser: {
             uid: 'test-user-id'
         }
-    }),
+    },
 }));
 
 jest.mock('firebase/firestore', () => ({

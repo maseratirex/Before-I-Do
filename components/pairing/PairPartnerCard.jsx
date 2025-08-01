@@ -4,12 +4,11 @@ import PairedBlock from '@/components/pairing/PairedBlock';
 import NotPairedBlock from '@/components/pairing/NotPairedBlock';
 import IncomingPairRequestsBlock from '@/components/pairing/IncomingPairRequestsBlock';
 import OutgoingPairRequestsBlock from '@/components/pairing/OutgoingPairRequestsBlock';
-import { auth } from '@/firebaseConfig'
 import { onAuthStateChanged } from "firebase/auth";
-import { functions } from "@/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
 import { useRouter } from "expo-router";
 import createLogger from '@/utilities/logger';
+import { auth, functions } from "@/firebaseConfig";
 
 export default function PairPartnerCard() {
   const logger = createLogger('PairPartnerCard');

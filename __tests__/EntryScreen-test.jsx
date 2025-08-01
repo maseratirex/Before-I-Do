@@ -4,15 +4,16 @@ import EntryScreen from '../app/auth/entry';
 import LoginScreen from '../app/auth/login';
 import CreateAccountScreen from '../app/auth/createAccount';
 
-// getAuth() and getFirestore() are called inside the screens, so we need to mock them.
-// We don't need to mock signInWithEmailAndPassword() because it's not called when navigating from the EntryScreen to LoginScreen.
-jest.mock('firebase/auth', () => ({
-    getAuth: jest.fn(),
+// Mock imports for CreateAccountScreen and LoginScreen
+jest.mock('../firebaseConfig', () => ({
+    auth: {},
+    db: {},
+    functions: {},
 }));
 
-jest.mock('firebase/firestore', () => ({
-    getFirestore: jest.fn(),
-}));
+jest.mock('firebase/auth', () => ({}));
+
+jest.mock('firebase/firestore', () => ({}));
 
 // Separately, AsyncStorage is mocked in the setupTests.js file, which package.json is configured to run before the tests.
 
