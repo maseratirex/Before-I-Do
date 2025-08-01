@@ -77,13 +77,7 @@ export default function AssessmentDirectoryScreen() {
       }
     }
     const userRef = doc(db, "users", userId);
-    setDoc(userRef, {
-      personalityDynamics: answers["Personality"],
-      familyDynamics: answers["Family"],
-      coupleDynamics: answers["Couple"],
-      cultureDynamics: answers["Cultural"],
-      answers: answers,
-    }, { merge: true })
+    setDoc(userRef, { answers: answers, }, { merge: true })
       .then(async () => {
         Alert.alert("Results Submitted", "Your results have been submitted successfully.");
         logger.info("Results submitted successfully");

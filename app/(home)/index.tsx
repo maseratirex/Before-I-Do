@@ -20,7 +20,7 @@ const TAB_MARGIN_BOTTOM = 40
 
 export default function HomeScreen() {
   const logger = createLogger('HomeScreen');
-  
+
   // Loading state
   const [isLoading, setIsLoading] = useState(true);
   // Assessment statuses
