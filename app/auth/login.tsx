@@ -46,31 +46,39 @@ export default function LoginScreen() {
     const submittedStorageKey = userId + 'assessment-submitted';
     const assessmentSubmittedResponse = await AsyncStorage.getItem(submittedStorageKey);
     if (assessmentSubmittedResponse !== null) {
+      logger.info("Assessment already submitted");
       return; // Successful login handled a previous time, no need to load answers
     }
 
-    await loadUserAssessmentData(userId);
+    await loadUserData(userId);
   }
 
-  const loadUserAssessmentData = async (userId) => {
-    logger.info("Loading user answers from Firestore");
+  const loadUserData = async (userId) => {
+    logger.info("Loading user data from Firestore");
     const userDocSnap = await getDoc(doc(db, "users", userId));
     if (!userDocSnap.exists()) {
-      logger.info("Assessment data not found in Firestore");
+      logger.info("User data not found in Firestore");
       await markAssessmentAsNotSubmitted(userId);
       return;
     }
 
     const answers = userDocSnap.data().answers;
     if (answers === null) {
-      logger.info("Assessment data not found in Firestore");
+      logger.info("Firestore answers not found");
       await markAssessmentAsNotSubmitted(userId);
-      return;
+    } else {
+      logger.info("Firestore answers found");
+      await markAssessmentAsSubmitted(userId);
+      await saveAnswersToLocalStorage(userId, answers);
     }
 
-    logger.info("Firestore answers found");
-    await markAssessmentAsSubmitted(userId);
-    await saveAnswersToLocalStorage(userId, answers);
+    const userInitials = userDocSnap.data().initials;
+    if (userInitials === null) {
+      logger.warn("No initials found in Firestore");
+      return;
+    }
+    await saveUserInitials(userId, userInitials);
+    logger.info("Saved initials to AsyncStorage");
   }
 
   const markAssessmentAsNotSubmitted = async (userId) => {
@@ -95,8 +103,8 @@ export default function LoginScreen() {
 
   const saveAnswersToLocalStorage = async (userId, answers) => {
     logger.info("Storing answers in local storage");
-    const lowercaseSectionNames = ["personality", "family", "couple", "cultural"];
-    for (let sectionName of lowercaseSectionNames) {
+    const sectionNames = ["Personality", "Family", "Couple", "Cultural"];
+    for (let sectionName of sectionNames) {
       const sectionStorageKey = `answers-${userId}-${sectionName}`;
       try {
         await AsyncStorage.setItem(sectionStorageKey, JSON.stringify(answers[sectionName]));
@@ -104,6 +112,15 @@ export default function LoginScreen() {
       } catch (error) {
         logger.error(`Error saving answers for ${sectionName} in local storage:`, error);
       }
+    }
+  }
+
+  const saveUserInitials = async (userId, initials) => {
+    logger.info("Storing initials in local storage");
+    try {
+      await AsyncStorage.setItem(`initials-${userId}`, initials);
+    } catch (e) {
+      logger.error('Failed to save initials', e);
     }
   }
 

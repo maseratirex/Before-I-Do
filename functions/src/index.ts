@@ -122,6 +122,7 @@ export const checkPairRequest = onCall(async (request) => {
 });
 
 export const confirmPairing = onCall(async (request) => {
+  // Confirm pairing given a partner sent a request to the user
   const emailVerified = request.auth?.token.email_verified;
   if (!emailVerified) {
     return { success: false, message: "Email not verified" };
@@ -149,33 +150,37 @@ export const confirmPairing = onCall(async (request) => {
     const partnerId = partnerRef.id;
 
     // Confirm the pair request exists
-    const requestSnapshot = await admin.firestore().collection("requests").where("recipientId", "==", userId).where("senderId", "==", partnerId).where("pairStatus", "==", "pending").get();
-    if (!requestSnapshot.empty) {
-      // The pair request exists, so update the pairStatus to "confirmed"
-      try {
-        const requestDoc = requestSnapshot.docs[0];
-        await requestDoc.ref.update({ pairStatus: "confirmed" });
+    const requestSnapshot = await admin.firestore().collection("requests")
+      .where("recipientId", "==", userId)
+      .where("senderId", "==", partnerId)
+      .where("pairStatus", "==", "pending")
+      .get();
+    
+    if(requestSnapshot.empty) {
+      return { success: false, message: "Pair request from specified partner does not exist" };
+    }
+    // The pair request exists, so update the pairStatus to "confirmed"
+    try {
+      const requestDoc = requestSnapshot.docs[0];
+      await requestDoc.ref.update({ pairStatus: "confirmed" });
 
-        // Update the sender and recipient documents to set isPaired to true and add a reference to each other
-        const senderRef = await admin.firestore().collection("users").doc(partnerId);
-        const recipientRef = await admin.firestore().collection("users").doc(userId);
-        await senderRef.update({ isPaired: true, partner: userId });
-        await recipientRef.update({ isPaired: true, partner: partnerId });
-        return { success: true, message: "Pair request confirmed" };
-      } catch (error) {
-        // Reset all values on error
-        const requestDoc = requestSnapshot.docs[0];
-        await requestDoc.ref.update({ pairStatus: "pending" });
+      // Update the sender and recipient documents to set isPaired to true and add a reference to each other
+      const senderRef = await admin.firestore().collection("users").doc(partnerId);
+      const recipientRef = await admin.firestore().collection("users").doc(userId);
+      await senderRef.update({ isPaired: true, partner: userId });
+      await recipientRef.update({ isPaired: true, partner: partnerId });
+      return { success: true, message: "Pair request confirmed" };
+    } catch (error) {
+      // Reset all values on error
+      const requestDoc = requestSnapshot.docs[0];
+      await requestDoc.ref.update({ pairStatus: "pending" });
 
-        // Update the sender and recipient documents to set isPaired to true and add a reference to each other
-        const senderRef = await admin.firestore().collection("users").doc(partnerId);
-        const recipientRef = await admin.firestore().collection("users").doc(userId);
-        await senderRef.update({ isPaired: false, partner: null });
-        await recipientRef.update({ isPaired: false, partner: null });
-        return { success: false, message: "Pair request confirmation failed" };
-      }
-    } else {
-      return { success: false, message: "Pair request does not exist" };
+      // Update the sender and recipient documents to set isPaired to true and add a reference to each other
+      const senderRef = await admin.firestore().collection("users").doc(partnerId);
+      const recipientRef = await admin.firestore().collection("users").doc(userId);
+      await senderRef.update({ isPaired: false, partner: null });
+      await recipientRef.update({ isPaired: false, partner: null });
+      return { success: false, message: "Pair request confirmation failed" };
     }
   } else {
     return { success: false, message: "User does not exist" };
@@ -277,14 +282,19 @@ export const unpair = onCall(async (request) => {
     return { success: false, message: "User does not exist" };
   }
 
-  // change pair request to pending
-  const requestSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).where('senderId', '==', partnerId).get();
+  // change pair request to pending: either the user or the partner sent a request to the other
+  const requestSnapshot = await admin.firestore().collection('requests')
+    .where('recipientId', '==', userId)
+    .where('senderId', '==', partnerId)
+    .get();
   if (!requestSnapshot.empty) {
     const requestDoc = requestSnapshot.docs[0];
     await requestDoc.ref.update({ pairStatus: "pending" });
-  }
-  else {
-    const requestSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', partnerId).where('senderId', '==', userId).get();
+  } else {
+    const requestSnapshot = await admin.firestore().collection('requests')
+      .where('recipientId', '==', partnerId)
+      .where('senderId', '==', userId)
+      .get();
     if (!requestSnapshot.empty) {
       const requestDoc = requestSnapshot.docs[0];
       await requestDoc.ref.update({ pairStatus: "pending" });
@@ -372,10 +382,6 @@ export const deleteUserData = onCall(async (request) => {
           await doc.ref.delete();
         }
       }
-
-      // delete the user document
-      await userDoc.ref.delete();
-      return { success: true, message: "User and associated data deleted successfully from firestore" };
     } else if (userData && !userData.isPaired) {
       // handle an unpaired user
       // remove all pair requests associated with the user
@@ -391,14 +397,19 @@ export const deleteUserData = onCall(async (request) => {
           await doc.ref.delete();
         }
       }
-
-      // delete the user document
-      await userDoc.ref.delete();
-      return { success: true, message: "User and associated data deleted successfully from firestore" };
-    } else {
-      return { success: false, message: "User does not exist" };
     }
-  } else {
-    return { success: false, message: "User does not exist" };
+    // delete the users/user document
+    await userDoc.ref.delete();
+    // delete the user from firebase auth
+    await admin.auth()
+      .deleteUser(userId)
+      .then(() => {
+        console.log('Successfully deleted user');
+      })
+      .catch((error: any) => {
+        console.log('Error deleting user:', error);
+      });
+    return { success: true, message: "User and associated data deleted successfully from firestore" };
   }
+  return { success: false, message: "User does not exist" };
 });

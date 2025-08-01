@@ -6,6 +6,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { LinearGradient } from "expo-linear-gradient";
 import createLogger from '@/utilities/logger';
 import { auth, db } from "@/firebaseConfig";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CreateAccountScreen() {
   const logger = createLogger('CreateAccountScreen');
@@ -19,45 +20,46 @@ export default function CreateAccountScreen() {
       Alert.alert('Please enter both an email and password.');
       return;
     }
-    
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        logger.info('Created user with email and password');
 
-        //add user to firestore
-        onAuthStateChanged(auth, async (user) => {
-          if (user) {
-            const userRef = doc(db, "users", user.uid);
-            await setDoc(userRef, {
-              initials: initials,
-              email: email,
-              isPaired: false,
-              partner: null,
-              personalityDynamics: null,
-              familyDynamics: null,
-              coupleDynamics: null,
-              cultureDynamics: null,
-          });
-        } else {
-            throw new Error("User not authenticated");
-        }
-        });
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      logger.info('Created user with email and password');
 
-        sendEmailVerification(userCredential.user)
-          .then(() => {
-            Alert.alert('Sent verification email');
-            router.dismissTo('/auth/login');
+      //add user to firestore
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const userRef = doc(db, "users", user.uid);
+          await setDoc(userRef, {
+            initials: initials,
+            email: email,
+            isPaired: false,
+            partner: null,
+            answers: null,
           });
-      })
-      .catch((error) => {
-        if (error.code === 'auth/email-already-in-use') {
-          Alert.alert('This email is already in use!');
-        } else if (error.code === 'auth/invalid-email') {
-          Alert.alert('This email is invalid!');
+
+          await AsyncStorage.setItem(`initials-${user.uid}`, initials);
+          logger.info("Saved initials to AsyncStorage");
         } else {
-          Alert.alert(error.message);
+          throw new Error("User not authenticated");
         }
       });
+
+      try {
+        await sendEmailVerification(userCredential.user);
+        Alert.alert('Sent verification email');
+        router.dismissTo('/auth/login');
+      } catch (error) {
+        Alert.alert('Failed to send verification email');
+      }
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('This email is already in use!');
+      } else if (error.code === 'auth/invalid-email') {
+        Alert.alert('This email is invalid!');
+      } else {
+        Alert.alert(error.message);
+      }
+    };
   };
 
   return (

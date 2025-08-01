@@ -6,9 +6,8 @@ import { useState, useEffect } from "react";
 import { signOut, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { doc, getDoc } from "firebase/firestore";
 import createLogger from "@/utilities/logger";
-import { auth, db, functions } from "@/firebaseConfig";
+import { auth, functions } from "@/firebaseConfig";
 
 export default function ProfileScreen() {
   const logger = createLogger('ProfileScreen');
@@ -23,13 +22,14 @@ export default function ProfileScreen() {
   };
 
   const getUserInitials = async () => {
-    const user = auth.currentUser;
-    const userRef = doc(db, "users", user.uid);
-    const docSnap = await getDoc(userRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      setUserInitial(data.initials);
+    const userId = auth.currentUser?.uid;
+    const initials = await AsyncStorage.getItem(`initials-${userId}`);
+    if (initials == null) {
+      logger.warn("No initials found in AsyncStorage");
+      return;
     }
+    logger.info("Retrieved initials from AsyncStorage: " + initials);
+    setUserInitial(initials);
   }
 
   useEffect(() => {
@@ -51,28 +51,18 @@ export default function ProfileScreen() {
 
         // Call firestore to delete user data
         const deleteUserFunction = httpsCallable(functions, "deleteUserData");
-        const functionParams = { user: auth.currentUser?.uid };
-        const response = await deleteUserFunction(functionParams) as any;
+        const response = await deleteUserFunction() as any;
         if (!response.data.success) {
           logger.warn("User data was not deleted successfully");
           Alert.alert('Error', 'User data was not deleted successfully');
           return;
+        } else {
+          logger.info("Firebase and Firestore user data deleted successfully");
         }
         // Remove user data from local storage
         const keys = await AsyncStorage.getAllKeys();
         await AsyncStorage.multiRemove(keys);
         logger.info("User data removed from local storage");
-
-        // Call auth to delete user
-        if (user) {
-          deleteUser(user).then(() => {
-            logger.info("User account deleted successfully");
-            Alert.alert('Success', 'User account deleted successfully');
-          }).catch((error) => {
-            logger.error("Error deleting user account:", error);
-            Alert.alert('Error', 'Error deleting user account: ' + error.message);
-          });
-        }
       })
       .catch((error) => {
         setPassword('');

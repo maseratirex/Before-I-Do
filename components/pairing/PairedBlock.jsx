@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { httpsCallable } from "firebase/functions";
-import { doc, getDoc } from "firebase/firestore";
 import createLogger from '@/utilities/logger'; 
-import { auth, db, functions } from "@/firebaseConfig";
+import { auth, functions } from "@/firebaseConfig";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, numRecievedRequest, setRequests, partnerInitials, setPartnerInitials, partnerEmail, setPartnerEmail }) {
     const logger = createLogger('PairedBlock');
@@ -54,13 +54,14 @@ export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, num
     }
 
     const getUserInitials = async () => {
-        const user = auth.currentUser;
-        const userRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            setUserInitial(data.initials);
+        const userId = auth.currentUser.uid;
+        const initials = await AsyncStorage.getItem(`initials-${userId}`);
+        if (initials == null) {
+            logger.warn("No initials found in AsyncStorage");
+            return;
         }
+        setUserInitial(initials);
+        logger.info("Retrieved initials from AsyncStorage: " + initials);
     }
 
     useEffect(() => {

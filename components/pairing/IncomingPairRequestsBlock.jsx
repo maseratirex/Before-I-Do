@@ -19,7 +19,6 @@ export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, s
             const confirmPairRequestFunction = httpsCallable(functions, "confirmPairing");
             const myParams = {
                 email: numPairRequests == 1 ? pairRequests[0].email : acceptPartner,
-                user: auth.currentUser?.uid,
             }
             const result = await confirmPairRequestFunction(myParams);
             const data = result.data;
