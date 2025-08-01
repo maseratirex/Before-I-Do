@@ -28,13 +28,11 @@ export default function ReportCard() {
     // TODO: Inform the user that we're checking whether their partner has submitted
     // TODO: Set isLoading to true while we load
     const partnerSubmittedAssessment = await hasPartnerSubmittedAssessment()
-    // TODO Reinstate the partnerSubmittedAssessment check
-    router.push("/report/personality")
-    // if (partnerSubmittedAssessment) {
-    //   router.push("/report/personality")
-    // } else {
-    //   Alert.alert("Waiting for partner", "Your partner must complete the assessment");
-    // }
+    if (partnerSubmittedAssessment) {
+      router.push("/report/personality")
+    } else {
+      Alert.alert("Waiting for partner", "Your partner must complete the assessment");
+    }
   }
 
   return (

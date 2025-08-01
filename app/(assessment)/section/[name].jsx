@@ -35,7 +35,7 @@ export default function QuestionnaireScreen() {
 
     const loadAnswers = React.useCallback(async () => {
         try {
-            const testing = true;
+            const testing = false;
             if (testing) {
                 logger.info("Simulating answers");
                 const simulatedSectionAnswers = {};

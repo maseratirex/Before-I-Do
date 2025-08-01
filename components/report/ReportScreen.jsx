@@ -47,32 +47,20 @@ export default function ReportScreen({ sectionName }) {
         }
 
         // Fetch partner's data
-        // let partnerSectionAnswers = {};
-        // try {
-        //     const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
-        //     const myParams = { user: userId };
-        //     const result = await checkPartnerResponsesFunction(myParams);
-        //     const results = result.data;
-        //     if (results.success) {
-        //         // partnerSectionAnswers = results.responses.personalityResponses;
-        //         partnerSectionAnswers = results.responses[section];
-        //         logger.debug("Partner section answers from Firestore", partnerSectionAnswers);
-        //     } else {
-        //         logger.error("Error fetching partner's data:", results.message);
-        //         return;
-        //     }
-        // } catch (error) {
-        //     logger.error("Error calling seePartnerResponses:", error.message || error);
-        //     return;
-        // }
-
-        const partnerSectionAnswers = {
-            "Emotional Stability": [1, 2, 2, 2, 2, 2, 2, 2],
-            "Empathy": [1, 2, 2, 2, 2, 2, 2, 2],
-            "Openness to Experience": [1, 2, 2, 2, 2, 2, 2, 2],
-            "Secure Attachment": [1, 2, 2, 2, 2, 2, 2, 2],
-            "Self-Confidence": [1, 2, 2, 2, 2, 2, 2, 2],
-        };
+        let partnerSectionAnswers = {};
+        try {
+            const checkPartnerResponsesFunction = httpsCallable(functions, "seePartnerResponses");
+            const result = await checkPartnerResponsesFunction();
+            if (result.data.success) {
+                partnerSectionAnswers = result.data.partnerResponses[sectionName];
+            } else {
+                logger.error("Error fetching partner's data:", result.data.message);
+                return;
+            }
+        } catch (error) {
+            logger.error("Error calling seePartnerResponses:", error.message || error);
+            return;
+        }
 
         const newCombinedData = []; // Bar chart data
         const newUserSubsectionCategories = {};

@@ -329,8 +329,8 @@ export const seePartnerResponses = onCall(async (request) => {
   const partnerDoc = await admin.firestore().collection("users").doc(partnerId).get();
   if (partnerDoc.exists) {
     const partnerData = partnerDoc.data();
-    if (partnerData && partnerData.coupleDynamics && partnerData.cultureDynamics && partnerData.familyDynamics && partnerData.personalityDynamics) {
-      return { success: true, responses: { coupleResponses: partnerData.coupleDynamics, cultureResponses: partnerData.cultureDynamics, familyResponses: partnerData.familyDynamics, personalityResponses: partnerData.personalityDynamics }, message: "Partner's questionnaire responses retrieved" };
+    if (partnerData && partnerData.answers) {
+      return { success: true, partnerResponses: partnerData.answers, message: "Partner's questionnaire responses retrieved" };
     } else {
       return { success: false, message: "Partner's questionnaire responses not found" };
     }
