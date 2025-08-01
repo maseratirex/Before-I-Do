@@ -144,11 +144,10 @@ export default function ReportScreen({ sectionName }) {
         };
     }, []);
 
-    // Screen width... but 90% of the screen width
-    const screenWidth = Dimensions.get('window').width * 0.9;
+    const cardWidth = Dimensions.get('window').width * 0.83;
     const barCount = combinedData.length;
     const barWidth = 20;
-    const spacing = barCount > 1 ? (screenWidth - barCount * barWidth) / (barCount - 1) : 0;
+    const spacing = barCount > 1 ? (cardWidth - barCount * barWidth) / (barCount - 1) : 0;
     const subsectionNames = Object.keys(questionnaire[sectionName.toLowerCase()]);
 
     return (

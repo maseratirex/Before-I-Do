@@ -6,6 +6,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as SplashScreen from 'expo-splash-screen';
 import { InteractionManager } from 'react-native';
 import createLogger from '@/utilities/logger';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebaseConfig';
 
 export default function LoginScreen() {
   const logger = createLogger('LoginScreen');
@@ -26,19 +29,84 @@ export default function LoginScreen() {
       return;
     }
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        if (userCredential.user.emailVerified) {
-          // Signed in 
-          router.replace('/');
-        } else {
-          Alert.alert('Please verify your email or resend email verification');
-        }
-      })
-      .catch((error) => {
-        Alert.alert('Incorrect email or password');
-      });
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCredential.user.emailVerified) {
+        Alert.alert('Please verify your email or resend email verification');
+        return;
+      }
+      await handleSuccessfulLogin(userCredential.user.uid);
+      router.replace('/');
+    } catch (error) {
+      Alert.alert('Incorrect email or password');
+    }
   };
+
+  const handleSuccessfulLogin = async (userId) => {
+    logger.info("Email verified. Handling successful login");
+    const submittedStorageKey = userId + 'assessment-submitted';
+    const assessmentSubmittedResponse = await AsyncStorage.getItem(submittedStorageKey);
+    if (assessmentSubmittedResponse !== null) {
+      return; // Successful login handled a previous time, no need to load answers
+    }
+
+    await loadUserAssessmentData(userId);
+  }
+
+  const loadUserAssessmentData = async (userId) => {
+    logger.info("Loading user answers from Firestore");
+    const userDocSnap = await getDoc(doc(db, "users", userId));
+    if (!userDocSnap.exists()) {
+      logger.info("Assessment data not found in Firestore");
+      await markAssessmentAsNotSubmitted(userId);
+      return;
+    }
+
+    const answers = userDocSnap.data().answers;
+    if (answers === null) {
+      logger.info("Assessment data not found in Firestore");
+      await markAssessmentAsNotSubmitted(userId);
+      return;
+    }
+
+    logger.info("Firestore answers found");
+    await markAssessmentAsSubmitted(userId);
+    await saveAnswersToLocalStorage(userId, answers);
+  }
+
+  const markAssessmentAsNotSubmitted = async (userId) => {
+    logger.info("Storing assessment submitted in local storage as false");
+    try {
+      const submittedStorageKey = userId + 'assessment-submitted'
+      await AsyncStorage.setItem(submittedStorageKey, JSON.stringify(false));
+    } catch (e) {
+      logger.error('Failed to save assessment status', e);
+    }
+  }
+
+  const markAssessmentAsSubmitted = async (userId) => {
+    logger.info("Storing assessment submitted in local storage as true");
+    try {
+      const submittedStorageKey = userId + 'assessment-submitted'
+      await AsyncStorage.setItem(submittedStorageKey, JSON.stringify(true));
+    } catch (e) {
+      logger.error('Failed to save assessment status', e);
+    }
+  }
+
+  const saveAnswersToLocalStorage = async (userId, answers) => {
+    logger.info("Storing answers in local storage");
+    const lowercaseSectionNames = ["personality", "family", "couple", "cultural"];
+    for (let sectionName of lowercaseSectionNames) {
+      const sectionStorageKey = `answers-${userId}-${sectionName}`;
+      try {
+        await AsyncStorage.setItem(sectionStorageKey, JSON.stringify(answers[sectionName]));
+        logger.info(`Saved answers for ${sectionName} in local storage`);
+      } catch (error) {
+        logger.error(`Error saving answers for ${sectionName} in local storage:`, error);
+      }
+    }
+  }
 
   useEffect(() => {
     if (!hasLaidOut) return;

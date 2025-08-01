@@ -38,9 +38,9 @@ export default function HomeScreen() {
       let started = false;
       if (!submitted) {
         // Determine whether assessment has been started
-        const names = ["personality", "family", "couple", "cultural"];
-        for (let name of names) {
-          const sectionStorageKey = `answers-${user.uid}-${name}`;
+        const lowercaseSectionNames = ["personality", "family", "couple", "cultural"];
+        for (let sectionName of lowercaseSectionNames) {
+          const sectionStorageKey = `answers-${user.uid}-${sectionName}`;
           try {
             const savedAnswers = await AsyncStorage.getItem(sectionStorageKey);
             if (savedAnswers) {
@@ -57,7 +57,7 @@ export default function HomeScreen() {
               }
             }
           } catch (error) {
-            logger.error(`Could not load assessment progress for ${name} section:`, error);
+            logger.error(`Could not load assessment progress for ${sectionName} section:`, error);
           }
         }
       } else {
