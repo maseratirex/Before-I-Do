@@ -27,7 +27,7 @@ export default function HomeScreen() {
   const [hasStartedAssessment, setHasStartedAssessment] = useState(false);
   const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false);
 
-  const setupAssessmentStatuses = async (user: User) => {
+  const setupAssessmentStatuses = async (user) => {
     logger.info("Setting up isAssessmentSubmitted and hasStartedAssessment")
     // Determine assessment progress
     try {
