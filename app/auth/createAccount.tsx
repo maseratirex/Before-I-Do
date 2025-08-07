@@ -76,6 +76,7 @@ export default function CreateAccountScreen() {
             value={initials}
             maxLength={3}
             placeholderTextColor="#888"
+            spellCheck={false}
           />
           <TextInput
             style={styles.input}
@@ -85,6 +86,7 @@ export default function CreateAccountScreen() {
             onChangeText={setEmail}
             value={email}
             placeholderTextColor="#888"
+            spellCheck={false}
           />
           <TextInput
             style={styles.input}
@@ -93,6 +95,7 @@ export default function CreateAccountScreen() {
             onChangeText={setPassword}
             value={password}
             placeholderTextColor="#888"
+            spellCheck={false}
           />
           <Text style={styles.infoText}>You will be sent a verification email. Please click the link to confirm your email address before logging in.</Text>
           <TouchableOpacity style={styles.button} onPress={handleSignUp}>

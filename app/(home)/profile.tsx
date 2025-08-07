@@ -3,7 +3,7 @@ import Dialog from "react-native-dialog";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from "react";
-import { signOut, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import { signOut, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import createLogger from "@/utilities/logger";
