@@ -21,12 +21,12 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     alignItems: 'center',
+    gap: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: 'center',
-    marginBottom: 10,
   },
   questionContainer: { // Aka card
     width: '83%',

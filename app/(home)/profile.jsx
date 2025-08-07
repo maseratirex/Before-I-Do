@@ -51,7 +51,7 @@ export default function ProfileScreen() {
 
         // Call firestore to delete user data
         const deleteUserFunction = httpsCallable(functions, "deleteUserData");
-        const response = await deleteUserFunction() as any;
+        const response = await deleteUserFunction();
         if (!response.data.success) {
           logger.warn("User data was not deleted successfully");
           Alert.alert('Error', 'User data was not deleted successfully');

@@ -28,11 +28,7 @@ export default function PairPartnerCard() {
         return;
       }
       const checkPairRequestFunction = httpsCallable(functions, "checkPairRequest");
-      const myParams = {
-        user: currentUser.uid,
-      };
-
-      const result = await checkPairRequestFunction(myParams);
+      const result = await checkPairRequestFunction();
       const data = result.data;
       if (data.success) {
         const temp = [];
@@ -62,11 +58,8 @@ export default function PairPartnerCard() {
         return;
       }
       const seePairStatusFunction = httpsCallable(functions, "seePairStatus");
-      const myParams = {
-        user: currentUser.uid,
-      };
-      logger.debug("Checking pairing status for user:", myParams);
-      const result = await seePairStatusFunction(myParams);
+      logger.debug("Checking pairing status for user:", currentUser.uid);
+      const result = await seePairStatusFunction();
       const data = result.data;
       logger.debug("Pairing status data:", data);
       if (data.success) {

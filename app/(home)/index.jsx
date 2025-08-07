@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { StyleSheet, ScrollView, ActivityIndicator, KeyboardAvoidingView } from "react-native";
 import { useFocusEffect } from "expo-router";
 import * as SplashScreen from 'expo-splash-screen';
@@ -96,15 +96,13 @@ export default function HomeScreen() {
   }, [isLoading]);
 
   if (isLoading) {
+    logger.info("Loading");
     return (
-      // RED FOR TESTING
-      <LinearGradient colors={['#FF0000', '#FF0000']} style={styles.root}>
-        <ScrollView style={styles.root}>
-          <SafeAreaView style={styles.containerForCards}>
-            <ActivityIndicator size="large" color="#FF6780" />
-          </SafeAreaView>
-        </ScrollView>
-      </LinearGradient >
+      <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
+        <SafeAreaView style={[styles.root, styles.containerForCards]}>
+          <ActivityIndicator size="large" color="#FF6780" />
+        </SafeAreaView>
+      </LinearGradient>
     );
   }
 
