@@ -13,10 +13,7 @@ export default function PairedBlock({ isPaired, setIsPaired, hasSentRequest, num
     const unpairUsers = async () => {
         try {
             const unpairFunction = httpsCallable(functions, "unpair");
-            const myParams = {
-                user: auth.currentUser?.uid,
-            }
-            const result = await unpairFunction(myParams);
+            const result = await unpairFunction();
             const data = result.data;
             if (data.success) {
                 setIsPaired(false);

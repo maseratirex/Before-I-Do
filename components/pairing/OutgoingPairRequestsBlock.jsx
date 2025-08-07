@@ -18,7 +18,6 @@ export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRe
             const sendPairRequestFunction = httpsCallable(functions, "pairRequest");
             const myParams = {
                 email: email,
-                user: auth.currentUser?.uid,
             }
             const result = await sendPairRequestFunction(myParams);
             const data = result.data;
@@ -40,10 +39,7 @@ export default function OutgoingPairRequestsBlock({ hasSentRequest, setHasSentRe
     const cancelPairRequest = async () => {
         try {
             const cancelPairRequestFunction = httpsCallable(functions, "cancelPairingRequest");
-            const myParams = {
-                user: auth.currentUser?.uid,
-            }
-            const result = await cancelPairRequestFunction(myParams);
+            const result = await cancelPairRequestFunction();
             const data = result.data;
             if (data.success) {
                 setHasSentRequest(false) // Update the state to indicate that a request has been sent

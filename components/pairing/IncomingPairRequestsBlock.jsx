@@ -27,10 +27,7 @@ export default function IncomingPairRequestsBlock({ setIsPaired, pairRequests, s
                 Alert.alert("Success", "Successfully confirmed pair request with " + numPairRequests == 1 ? pairRequests[0].email : acceptPartner + ".");
                 logger.info("Successfully paired with " + numPairRequests == 1 ? pairRequests[0].email : acceptPartner + ".");
                 const seePairStatusFunction = httpsCallable(functions, "seePairStatus");
-                const myParams = {
-                    user: auth.currentUser?.uid,
-                };
-                const result = await seePairStatusFunction(myParams);
+                const result = await seePairStatusFunction();
                 setPartnerInitials(result.data.partnerInitials);
                 setPartnerEmail(result.data.partner);
             }

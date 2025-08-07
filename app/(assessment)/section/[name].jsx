@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     },
     container: {
         paddingTop: 20,
+        gap: 20,
     },
     autoSaveText: {
         fontSize: 16,
@@ -155,10 +156,8 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 2,
-        marginBottom: 20, // After the auto save text, there will be a 20 gap
     },
     subsectionContainer: {
-        // marginBottom: 20, // After the last card, there will be a 20 margin
         flex: 1,
         width: '100%',
         alignItems: 'center',
@@ -225,7 +224,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         paddingVertical: 12,
         paddingHorizontal: 30,
-        marginBottom: 10,
         borderRadius: 30,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

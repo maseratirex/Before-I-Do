@@ -227,7 +227,9 @@ export default function ReportScreen({ sectionName }) {
                                                             ? styles.lowScore
                                                             : userSubsectionCategories[subsectionName] === "Med"
                                                                 ? styles.mediumScore
-                                                                : styles.highScore,
+                                                                : userSubsectionCategories[subsectionName] === "High"
+                                                                    ? styles.highScore
+                                                                    : styles.undeterminedScore,
                                                     ]}
                                                 >
                                                     {userSubsectionCategories[subsectionName]}
@@ -242,7 +244,9 @@ export default function ReportScreen({ sectionName }) {
                                                             ? styles.lowScore
                                                             : partnerSubsectionCategories[subsectionName] === "Med"
                                                                 ? styles.mediumScore
-                                                                : styles.highScore,
+                                                                : partnerSubsectionCategories[subsectionName] === "High"
+                                                                    ? styles.highScore
+                                                                    : styles.undeterminedScore,
                                                     ]}
                                                 >
                                                     {partnerSubsectionCategories[subsectionName]}
@@ -405,5 +409,15 @@ const styles = StyleSheet.create({
     highScore: {
         backgroundColor: '#C8E6C9', // Light green background
         color: '#388E3C', // Green text
+    },
+    undeterminedScore: {
+        backgroundColor: '#FFFFFF', // White background
+        color: '#000000', // Black text
+        paddingVertical: 5, // Same padding as strengthValue
+        paddingHorizontal: 15, // Same padding as strengthValue
+        shadowColor: "transparent", // No drop shadow
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0,
     },
 });

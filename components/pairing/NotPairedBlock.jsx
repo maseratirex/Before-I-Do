@@ -11,11 +11,7 @@ export default function NotPairedBlock({ isPaired, setIsPaired, hasSentRequest, 
     const updatePairStatus = async () => {
         try {
             const checkPairStatusFunction = httpsCallable(functions, "seePairStatus");
-            const myParams = {
-                user: auth.currentUser?.uid,
-            };
-
-            const statusResult = await checkPairStatusFunction(myParams);
+            const statusResult = await checkPairStatusFunction();
             const statusData = statusResult.data;
             if (statusData.success) {
                 if (statusData.type == "paired") {
@@ -28,7 +24,7 @@ export default function NotPairedBlock({ isPaired, setIsPaired, hasSentRequest, 
                     setPartnerInitials("");
                     setPartnerEmail("");
                     const checkPairRequestFunction = httpsCallable(functions, "checkPairRequest");
-                    const requestsResult = await checkPairRequestFunction(myParams);
+                    const requestsResult = await checkPairRequestFunction();
                     const requestsData = requestsResult.data;
                     if (requestsData.success) {
                         const temp = [];
