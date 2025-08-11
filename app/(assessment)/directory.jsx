@@ -50,10 +50,16 @@ export default function AssessmentDirectoryScreen() {
 
   const storeAssessmentSubmissionStatusLocally = async (status) => {
     logger.info("Storing assessment submission status in local storage as", status);
-    // Store user assessment submitted false in local storage
+    // Store user assessment submitted status in local storage
     try {
       const submittedStorageKey = userId + 'assessment-submitted'
-      await AsyncStorage.setItem(submittedStorageKey, JSON.stringify(status));
+      const statusString = JSON.stringify(status);
+      await AsyncStorage.setItem(submittedStorageKey, statusString);
+      logger.info(`Successfully stored assessment submission status. Key: ${submittedStorageKey}, Value: ${statusString}`);
+      
+      // Verify it was stored correctly
+      const verifyStatus = await AsyncStorage.getItem(submittedStorageKey);
+      logger.info(`Verification read from AsyncStorage: ${verifyStatus}`);
     } catch (e) {
       logger.error('Failed to save assessment submission in local storage', e);
     }
@@ -76,17 +82,25 @@ export default function AssessmentDirectoryScreen() {
         logger.error(`Error loading progress for ${sectionName}:`, error);
       }
     }
-    const userRef = doc(db, "users", userId);
-    setDoc(userRef, { answers: answers, }, { merge: true })
-      .then(async () => {
-        Alert.alert("Results Submitted", "Your results have been submitted successfully.");
-        logger.info("Results submitted successfully");
-        await storeAssessmentSubmissionStatusLocally(true);
-      })
-      .catch((error) => {
-        Alert.alert("Error", "Issue submitting results. Please try again later.");
-        logger.error("Failed to submit results to Firestore", error);
-      });
+    
+    try {
+      logger.info("Submitting answers to Firestore...");
+      const userRef = doc(db, "users", userId);
+      await setDoc(userRef, { answers: answers, }, { merge: true });
+      
+      logger.info("Results submitted to Firestore successfully");
+      Alert.alert("Results Submitted", "Your results have been submitted successfully.");
+      
+      logger.info("Storing submission status locally...");
+      await storeAssessmentSubmissionStatusLocally(true);
+      
+      logger.info("All submission steps completed successfully");
+      return true; // Indicate success
+    } catch (error) {
+      logger.error("Failed to submit results:", error);
+      Alert.alert("Error", "Issue submitting results. Please try again later.");
+      return false; // Indicate failure
+    }
   }
 
   const headerHeight = useHeaderHeight();
@@ -118,7 +132,15 @@ export default function AssessmentDirectoryScreen() {
       ))}
 
       {allSectionsComplete() ? (
-        <TouchableOpacity style={styles.submitButton} onPress={() => { submitResults(); router.back(); }}>
+        <TouchableOpacity style={styles.submitButton} onPress={async () => { 
+          const success = await submitResults(); 
+          if (success) {
+            logger.info("Navigation back to home after successful submission");
+            router.back(); 
+          } else {
+            logger.warn("Not navigating due to submission failure");
+          }
+        }}>
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
       ) :

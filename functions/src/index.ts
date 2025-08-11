@@ -8,6 +8,11 @@
  */
 
 import { onCall } from "firebase-functions/v2/https";
+const {
+  info,
+  error,
+  warn,
+} = require("firebase-functions/logger");
 
 // The Firebase Admin SDK to access Firestore.
 const admin = require('firebase-admin');
@@ -350,66 +355,160 @@ export const seePartnerResponses = onCall(async (request) => {
 });
 
 export const deleteUserData = onCall(async (request) => {
-  const emailVerified = request.auth?.token.email_verified;
-  if (!emailVerified) {
-    return { success: false, message: "Email not verified" };
-  }
+  try {
+    info("Starting deleteUserData function");
+    
+    // Get parameters from request
+    const emailVerified = request.auth?.token.email_verified;
+    info(`Email verification status: ${emailVerified}`);
+    
+    if (!emailVerified) {
+      warn("Delete user data failed: Email not verified");
+      return { success: false, message: "Email not verified" };
+    }
 
-  const userId = request.auth?.uid;
+    const userId = request.auth?.uid;
+    info(`Deleting user data for verified user ID: ${userId}`);
+    
+    if (!userId) {
+      error("Delete user data failed: No user ID found in auth token");
+      return { success: false, message: "No user ID found" };
+    }
 
-  // Get user document
-  const userDoc = await admin.firestore().collection("users").doc(userId).get();
-  if (userDoc.exists) {
-    const userData = userDoc.data();
+    // Get user document
+    info(`Fetching user document for ID: ${userId}`);
+    const userDoc = await admin.firestore().collection("users").doc(userId).get();
+    
+    if (userDoc.exists) {
+      const userData = userDoc.data();
+      info(`User document found. Data keys: ${userData ? Object.keys(userData).join(', ') : 'none'}`);
+      info(`User isPaired status: ${userData?.isPaired}`);
 
-    // handle a paired user
-    if (userData && userData.isPaired) {
-      const partnerId = userData.partner;
-      // get partner document and unpair
-      const partnerRef = await admin.firestore().collection("users").doc(partnerId);
-      await partnerRef.update({ isPaired: false, partner: null });
+      // handle a paired user
+      if (userData && userData.isPaired) {
+        info("Processing paired user deletion");
+        const partnerId = userData.partner;
+        info(`Partner ID: ${partnerId}`);
+        
+        try {
+          // get partner document and unpair
+          info(`Updating partner document to unpair: ${partnerId}`);
+          const partnerRef = await admin.firestore().collection("users").doc(partnerId);
+          await partnerRef.update({ isPaired: false, partner: null });
+          info("Successfully unpaired partner");
+        } catch (partnerError) {
+          error(`Failed to unpair partner ${partnerId}:`, partnerError);
+          // Continue with deletion even if partner update fails
+        }
 
-      // remove all pair requests associated with the user
-      const requestRecipientSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).get();
-      if (!requestRecipientSnapshot.empty) {
-        for (const doc of requestRecipientSnapshot.docs) {
-          await doc.ref.delete();
+        // remove all pair requests associated with the user
+        info("Removing pair requests where user is recipient");
+        try {
+          const requestRecipientSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).get();
+          info(`Found ${requestRecipientSnapshot.size} requests where user is recipient`);
+          
+          if (!requestRecipientSnapshot.empty) {
+            for (const doc of requestRecipientSnapshot.docs) {
+              info(`Deleting recipient request: ${doc.id}`);
+              await doc.ref.delete();
+            }
+            info("Successfully deleted all recipient requests");
+          }
+        } catch (recipientError) {
+          error("Failed to delete recipient requests:", recipientError);
+          throw recipientError;
+        }
+
+        info("Removing pair requests where user is sender");
+        try {
+          const requestSenderSnapshot = await admin.firestore().collection('requests').where('senderId', '==', userId).get();
+          info(`Found ${requestSenderSnapshot.size} requests where user is sender`);
+          
+          if (!requestSenderSnapshot.empty) {
+            for (const doc of requestSenderSnapshot.docs) {
+              info(`Deleting sender request: ${doc.id}`);
+              await doc.ref.delete();
+            }
+            info("Successfully deleted all sender requests");
+          }
+        } catch (senderError) {
+          error("Failed to delete sender requests:", senderError);
+          throw senderError;
+        }
+
+        // delete the user document
+        info(`Deleting user document: ${userId}`);
+        try {
+          await userDoc.ref.delete();
+          info("Successfully deleted user document");
+          return { success: true, message: "User and associated data deleted successfully from firestore" };
+        } catch (deleteError) {
+          error("Failed to delete user document:", deleteError);
+          throw deleteError;
         }
       }
-      const requestSenderSnapshot = await admin.firestore().collection('requests').where('senderId', '==', userId).get();
-      if (!requestSenderSnapshot.empty) {
-        for (const doc of requestSenderSnapshot.docs) {
-          await doc.ref.delete();
-        }
-      }
-    } else if (userData && !userData.isPaired) {
       // handle an unpaired user
-      // remove all pair requests associated with the user
-      const requestRecipientSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).get();
-      if (!requestRecipientSnapshot.empty) {
-        for (const doc of requestRecipientSnapshot.docs) {
-          await doc.ref.delete();
+      else if (userData && !userData.isPaired) {
+        info("Processing unpaired user deletion");
+        
+        // remove all pair requests associated with the user
+        info("Removing pair requests where user is recipient");
+        try {
+          const requestRecipientSnapshot = await admin.firestore().collection('requests').where('recipientId', '==', userId).get();
+          info(`Found ${requestRecipientSnapshot.size} requests where user is recipient`);
+          
+          if (!requestRecipientSnapshot.empty) {
+            for (const doc of requestRecipientSnapshot.docs) {
+              info(`Deleting recipient request: ${doc.id}`);
+              await doc.ref.delete();
+            }
+            info("Successfully deleted all recipient requests");
+          }
+        } catch (recipientError) {
+          error("Failed to delete recipient requests:", recipientError);
+          throw recipientError;
+        }
+
+        info("Removing pair requests where user is sender");
+        try {
+          const requestSenderSnapshot = await admin.firestore().collection('requests').where('senderId', '==', userId).get();
+          info(`Found ${requestSenderSnapshot.size} requests where user is sender`);
+          
+          if (!requestSenderSnapshot.empty) {
+            for (const doc of requestSenderSnapshot.docs) {
+              info(`Deleting sender request: ${doc.id}`);
+              await doc.ref.delete();
+            }
+            info("Successfully deleted all sender requests");
+          }
+        } catch (senderError) {
+          error("Failed to delete sender requests:", senderError);
+          throw senderError;
+        }
+
+        // delete the user document
+        info(`Deleting user document: ${userId}`);
+        try {
+          await userDoc.ref.delete();
+          info("Successfully deleted user document");
+          return { success: true, message: "User and associated data deleted successfully from firestore" };
+        } catch (deleteError) {
+          error("Failed to delete user document:", deleteError);
+          throw deleteError;
         }
       }
-      const requestSenderSnapshot = await admin.firestore().collection('requests').where('senderId', '==', userId).get();
-      if (!requestSenderSnapshot.empty) {
-        for (const doc of requestSenderSnapshot.docs) {
-          await doc.ref.delete();
-        }
+      else {
+        warn(`User data exists but isPaired is undefined or null. UserData: ${JSON.stringify(userData)}`);
+        return { success: false, message: "User data is in an invalid state" };
       }
     }
-    // delete the users/user document
-    await userDoc.ref.delete();
-    // delete the user from firebase auth
-    await admin.auth()
-      .deleteUser(userId)
-      .then(() => {
-        console.log('Successfully deleted user');
-      })
-      .catch((error: any) => {
-        console.log('Error deleting user:', error);
-      });
-    return { success: true, message: "User and associated data deleted successfully from firestore" };
+    else {
+      warn(`User document does not exist for ID: ${userId}`);
+      return { success: false, message: "User does not exist" };
+    }
+  } catch (functionError) {
+    error("Unexpected error in deleteUserData function:", functionError);
+    const errorMessage = functionError instanceof Error ? functionError.message : String(functionError);
+    return { success: false, message: `Delete operation failed: ${errorMessage}` };
   }
-  return { success: false, message: "User does not exist" };
 });

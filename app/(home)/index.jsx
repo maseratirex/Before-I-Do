@@ -32,10 +32,17 @@ export default function HomeScreen() {
     // Determine assessment progress
     try {
       const submittedStorageKey = user.uid + 'assessment-submitted';
+      logger.info(`Looking for assessment submission status with key: ${submittedStorageKey}`);
+      
       const assessmentSubmittedResponse = await AsyncStorage.getItem(submittedStorageKey);
+      logger.info(`Raw response from AsyncStorage: "${assessmentSubmittedResponse}" (type: ${typeof assessmentSubmittedResponse})`);
+      
       const submitted = assessmentSubmittedResponse === 'true'; // Convert string | null to boolean
+      logger.info(`Converted submitted status: ${submitted} (assessmentSubmittedResponse === 'true': ${assessmentSubmittedResponse === 'true'})`);
+      
       let started = false;
       if (!submitted) {
+        logger.info("Assessment not submitted, checking if started...");
         // Determine whether assessment has been started
         const lowercaseSectionNames = ["personality", "family", "couple", "cultural"];
         for (let sectionName of lowercaseSectionNames) {
@@ -60,8 +67,11 @@ export default function HomeScreen() {
           }
         }
       } else {
+        logger.info("Assessment was submitted, marking as started");
         started = true;
       }
+      
+      logger.info(`Final status - Assessment submitted: ${submitted}, Started: ${started}`);
       setIsAssessmentSubmitted(submitted);
       setHasStartedAssessment(started);
       logger.info("Assessment submitted:", submitted);

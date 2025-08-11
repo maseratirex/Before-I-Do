@@ -3,7 +3,7 @@ import Dialog from "react-native-dialog";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from "react";
-import { signOut, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import { signOut, reauthenticateWithCredential, EmailAuthProvider, deleteUser } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import createLogger from "@/utilities/logger";
@@ -61,8 +61,22 @@ export default function ProfileScreen() {
         }
         // Remove user data from local storage
         const keys = await AsyncStorage.getAllKeys();
-        await AsyncStorage.multiRemove(keys);
+        keys.forEach(async (key) => {
+          if (key.includes(user.uid)) {
+            await AsyncStorage.removeItem(key);
+          }
+        });
         logger.info("User data removed from local storage");
+              // Call auth to delete user
+        if (user) {
+          deleteUser(user).then(() => {
+            console.log("User account deleted successfully");
+            Alert.alert('Success', 'User account deleted successfully');
+          }).catch((error) => {
+            console.error("Error deleting user account:", error);
+            Alert.alert('Error', 'Error deleting user account: ' + error.message);
+          });
+        }
       })
       .catch((error) => {
         setPassword('');
@@ -107,7 +121,7 @@ export default function ProfileScreen() {
             placeholderTextColor="#888"
           />
           <Dialog.Button label="Cancel" onPress={handleCancel} />
-          <Dialog.Button label="Delete" onPress={deleteUserFunc} />
+          <Dialog.Button label="Delete" onPress={async () => {await deleteUserFunc(); }} />
         </Dialog.Container>
       </SafeAreaView>
     </LinearGradient>

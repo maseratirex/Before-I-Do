@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
-import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { doc, setDoc } from 'firebase/firestore';
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,45 +21,65 @@ export default function CreateAccountScreen() {
       return;
     }
 
+    if (!initials || initials.trim().length === 0) {
+      Alert.alert('Please enter your initials.');
+      return;
+    }
+
     try {
+      logger.info('Starting account creation process');
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       logger.info('Created user with email and password');
 
-      //add user to firestore
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          const userRef = doc(db, "users", user.uid);
-          await setDoc(userRef, {
-            initials: initials,
-            email: email,
-            isPaired: false,
-            partner: null,
-            answers: null,
-          });
+      const user = userCredential.user;
+      logger.info(`User created with UID: ${user.uid}`);
 
-          await AsyncStorage.setItem(`initials-${user.uid}`, initials);
-          logger.info("Saved initials to AsyncStorage");
-        } else {
-          throw new Error("User not authenticated");
-        }
-      });
-
+      // Add user to firestore
       try {
+        logger.info('Creating user document in Firestore');
+        const userRef = doc(db, "users", user.uid);
+        await setDoc(userRef, {
+          initials: initials.trim(),
+          email: email,
+          isPaired: false,
+          partner: null,
+          answers: null,
+        });
+        logger.info('Successfully created user document in Firestore');
+
+        // Save initials to AsyncStorage
+        logger.info('Saving initials to AsyncStorage');
+        await AsyncStorage.setItem(`initials-${user.uid}`, initials.trim());
+        logger.info("Successfully saved initials to AsyncStorage");
+      } catch (firestoreError) {
+        logger.error('Failed to create user document or save initials:', firestoreError);
+        Alert.alert('Error', 'Failed to complete account setup. Please try again.');
+        return;
+      }
+
+      // Send verification email
+      try {
+        logger.info("Sending verification email");
         await sendEmailVerification(userCredential.user);
-        Alert.alert('Sent verification email');
+        Alert.alert('Verification Email Sent', 'Please check your email and click the verification link before logging in.');
         router.dismissTo('/auth/login');
-      } catch (error) {
-        Alert.alert('Failed to send verification email');
+      } catch (emailError) {
+        logger.error('Failed to send verification email:', emailError);
+        Alert.alert('Warning', 'Account created but failed to send verification email. You can request a new verification email when logging in.');
+        router.dismissTo('/auth/login');
       }
     } catch (error) {
+      logger.error('Account creation failed:', error);
       if (error.code === 'auth/email-already-in-use') {
-        Alert.alert('This email is already in use!');
+        Alert.alert('Email In Use', 'This email is already in use!');
       } else if (error.code === 'auth/invalid-email') {
-        Alert.alert('This email is invalid!');
+        Alert.alert('Invalid Email', 'This email is invalid!');
+      } else if (error.code === 'auth/weak-password') {
+        Alert.alert('Weak Password', 'Password should be at least 6 characters.');
       } else {
-        Alert.alert(error.message);
+        Alert.alert('Error', error.message || 'An error occurred during account creation.');
       }
-    };
+    }
   };
 
   return (
