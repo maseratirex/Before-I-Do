@@ -43,13 +43,32 @@ export default function LoginScreen() {
 
   const handleSuccessfulLogin = async (userId) => {
     logger.info("Email verified. Handling successful login");
-    const submittedStorageKey = userId + 'assessment-submitted';
-    const assessmentSubmittedResponse = await AsyncStorage.getItem(submittedStorageKey);
-    if (assessmentSubmittedResponse !== null) {
-      logger.info("Assessment already submitted");
-      return; // Successful login handled a previous time, no need to load answers
+    
+    // Check if assessment answers are already in local storage
+    const sectionNames = ["Personality", "Family", "Couple", "Cultural"];
+    let hasAllAnswers = true;
+    
+    for (let sectionName of sectionNames) {
+      const sectionStorageKey = `answers-${userId}-${sectionName.toLowerCase()}`;
+      try {
+        const savedAnswers = await AsyncStorage.getItem(sectionStorageKey);
+        if (!savedAnswers) {
+          hasAllAnswers = false;
+          break;
+        }
+      } catch (error) {
+        logger.error(`Error checking saved answers for ${sectionName}:`, error);
+        hasAllAnswers = false;
+        break;
+      }
+    }
+    
+    if (hasAllAnswers) {
+      logger.info("Assessment answers already available in local storage");
+      return; // All answers are present locally, no need to load from Firestore
     }
 
+    logger.info("Assessment answers not found in local storage, loading from Firestore");
     await loadUserData(userId);
   }
 
@@ -105,7 +124,7 @@ export default function LoginScreen() {
     logger.info("Storing answers in local storage");
     const sectionNames = ["Personality", "Family", "Couple", "Cultural"];
     for (let sectionName of sectionNames) {
-      const sectionStorageKey = `answers-${userId}-${sectionName}`;
+      const sectionStorageKey = `answers-${userId}-${sectionName.toLowerCase()}`;
       try {
         await AsyncStorage.setItem(sectionStorageKey, JSON.stringify(answers[sectionName]));
         logger.info(`Saved answers for ${sectionName} in local storage`);
