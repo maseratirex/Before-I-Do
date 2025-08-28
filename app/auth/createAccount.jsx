@@ -84,8 +84,7 @@ export default function CreateAccountScreen() {
 
   return (
     <LinearGradient colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-      <ScrollView contentContainerStyle={styles.root} keyboardShouldPersistTaps="handled">
-        <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
+      <ScrollView style={styles.root} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>Create Account</Text>
           <TextInput
             style={styles.input}
@@ -121,7 +120,6 @@ export default function CreateAccountScreen() {
           <TouchableOpacity style={styles.button} onPress={handleSignUp}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
-        </KeyboardAvoidingView>
       </ScrollView>
     </LinearGradient>
   );

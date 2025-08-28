@@ -153,7 +153,7 @@ export default function ReportScreen({ sectionName }) {
             <ScrollView style={{ flex: 1 }}>
                 <SafeAreaView>
                     <View style={styles.container}>
-                        <View style={styles.chartContainer}>
+                        <View style={styles.combinedContainer}>
                             {/* Legend */}
                             <View style={styles.legendContainer}>
                                 <View style={styles.legendItem}>
@@ -199,9 +199,8 @@ export default function ReportScreen({ sectionName }) {
                                 xAxisThickness={0}
                                 maxValue={5}
                                 height={200} />
-                        </View>
 
-                        <View style={styles.sectionInfo}>
+                            {/* Displays definition of the subsection and strength in it */}
                             <ScrollView
                                 horizontal
                                 pagingEnabled
@@ -215,6 +214,7 @@ export default function ReportScreen({ sectionName }) {
                                 {subsectionNames.map((subsectionName, index) => (
                                     <View key={index} style={styles.sectionPage}>
                                         <Text style={styles.sectionTitle}>{subsectionName}</Text>
+                                        <View style={styles.titleDivider} />
                                         <Text style={styles.sectionDescription}>{descriptions[sectionName][subsectionName]}</Text>
                                         <View style={styles.divider} />
                                         <Text style={styles.sectionTitle}>Strength in this Area</Text>
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
         marginRight: 6,
         borderRadius: 3,
     },
-    chartContainer: {
+    combinedContainer: {
         width: "83%",
         paddingTop: 20,
         backgroundColor: '#FFF',
@@ -314,36 +314,30 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 2,
     },
-    sectionInfo: {
-        width: "83%",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-        borderRadius: 12,
-        backgroundColor: '#FFF',
-    },
     sectionPage: {
         width: Dimensions.get("window").width * 0.83,
         paddingVertical: 20,
     },
     sectionTitle: {
         fontWeight: 'bold',
-        textAlign: 'center',
+        textAlign: 'left',
         marginBottom: "3%",
         fontSize: 17,
+        paddingHorizontal: "4%",
     },
     sectionDescription: {
         fontSize: 15,
-        textAlign: 'center',
+        color: '#aaa',
         lineHeight: 22,
         paddingHorizontal: "4%",
+        fontStyle: 'italic',
     },
     divider: {
-        width: "100%",
+        width: "92%",
         height: 1,
         backgroundColor: "#ccc",
         marginVertical: "4%",
+        alignSelf: 'center',
     },
     pageControlWrapper: {
         alignSelf: 'center',
@@ -419,5 +413,13 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0,
         shadowRadius: 0,
+    },
+    titleDivider: {
+        width: "92%",
+        height: 1,
+        backgroundColor: "#ccc",
+        marginBottom: "3%",
+        alignSelf: 'flex-start',
+        marginLeft: "4%",
     },
 });

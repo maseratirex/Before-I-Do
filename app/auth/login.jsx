@@ -165,8 +165,7 @@ export default function LoginScreen() {
 
   return (
     <LinearGradient onLayout={onLayoutRootView} colors={['#FFE4EB', '#FFC6D5']} style={styles.root}>
-      <ScrollView contentContainerStyle={styles.root} keyboardShouldPersistTaps="handled">
-        <KeyboardAvoidingView style={styles.container} behavior={'padding'}>
+      <ScrollView style={styles.root} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           <View style={styles.titleAndButtonsContainer}>
             <Text style={styles.title}>Sign in</Text>
             <TextInput
@@ -198,7 +197,6 @@ export default function LoginScreen() {
               Sign Up
             </Text>
           </View>
-        </KeyboardAvoidingView>
       </ScrollView>
     </LinearGradient>
   );
